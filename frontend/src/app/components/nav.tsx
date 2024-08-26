@@ -42,7 +42,7 @@ export default function Nav() {
                     <svg xmlns="http://www.w3.org/2000/svg" fill={pathName == link ? "white" : "black"} viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="icon">
                         {icons[i]}
                     </svg>
-                    <span className={(pathName == link ? "text-white" : "text-black") + " text-start nav-link"} href={link}>
+                    <span className={(pathName == link ? "text-white" : "text-black") + " text-start nav-link"}>
                         {link[0].toLocaleUpperCase() + link.slice(1)}
                     </span>
                     {link == "notifications" ? "0" : ""}
