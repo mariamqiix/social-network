@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Nav from "./components/nav";
+import SearchBar from "./components/search_bar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function RootLayout({
       <body className={inter.className + " d-flex flex-row h-100"}>
         <Nav />
         <div className="flex-fill h-100 overflow-y-scroll p-2">
+          <SearchBar />
           {children}
         </div>
       </body>
