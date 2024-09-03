@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Card from "../components/card";
-import { randomColor } from "../components/colors";
+import { colors } from "../components/colors";
 
-const color = randomColor();
+const color = colors[0];
 export default function loginPage() {
     let [isRegister, setIsRegister] = useState(true);
     return isRegister ? <Card title="Login" color={color}>
