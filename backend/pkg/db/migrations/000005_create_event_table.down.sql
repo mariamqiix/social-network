@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS Event;
+DROP TABLE IF EXISTS EventResponse;
