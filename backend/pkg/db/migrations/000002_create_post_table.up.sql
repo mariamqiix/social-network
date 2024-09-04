@@ -23,6 +23,6 @@ CREATE TABLE Reaction (
     user_id INTEGER REFERENCES User(id),
     user_post_id INTEGER REFERENCES Post(id),
     group_post_id INTEGER REFERENCES Post(id),
-    reaction_type VARCHAR(50),
+    reaction_type VARCHAR(50) CHECK (reaction_type IN ('like', 'dislike')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

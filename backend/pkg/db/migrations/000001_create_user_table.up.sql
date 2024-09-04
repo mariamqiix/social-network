@@ -1,17 +1,18 @@
 -- User Table
 CREATE TABLE User (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username VARCHAR(255) UNIQUE,
-    user_type VARCHAR(50) NOT NULL,
-    hashed_password VARCHAR(255) NOT NULL,
-    first_name VARCHAR(255) NOT NULL,
-    last_name VARCHAR(255) NOT NULL,
+    username VARCHAR(10) UNIQUE,
+    user_type VARCHAR(10) NOT NULL,
+    hashed_password CHAR(60) NOT NULL,
+    first_name VARCHAR(16) NOT NULL,
+    last_name VARCHAR(16) NOT NULL,
     date_of_birth DATE NOT NULL,
     image_id INTEGER REFERENCES Image(id),
     bio TEXT,
-    profile_type VARCHAR(50),
-    nickname VARCHAR(255)
+    profile_type VARCHAR(20) DEFAULT 'public' CHECK (profile_type IN ('public', 'private')),
+    nickname VARCHAR(16)
 );
+
 
 -- Follower Table
 CREATE TABLE Follower (
@@ -24,7 +25,7 @@ CREATE TABLE Follower (
 
 CREATE TABLE Session (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    token VARCHAR(255) NOT NULL,
+    token VARCHAR(64) NOT NULL,
     user_id INTEGER REFERENCES User(id),
     creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
