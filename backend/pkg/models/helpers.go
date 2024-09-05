@@ -92,28 +92,27 @@ func Read(tableName string, columns []string, conditionColumns []string, conditi
 
 	// Execute the query with the condition values
 	rows, err := db.Database.Query(query, conditionValues...)
-	return rows, err
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	return rows, nil
 }
 
-// Delete removes records from the specified table based on multiple conditions.
 func Delete(tableName string, conditionColumns []string, conditionValues []interface{}) error {
-	if len(conditionColumns) != len(conditionValues) {
-		return fmt.Errorf("number of condition columns does not match number of condition values")
-	}
-
-	// Build the WHERE clause for multiple conditions
 	whereClause := ""
-	for i, col := range conditionColumns {
-		if i > 0 {
-			whereClause += " AND "
+	if len(conditionColumns) > 0 {
+		whereClause = " WHERE "
+		for i, col := range conditionColumns {
+			if i > 0 {
+				whereClause += " AND "
+			}
+			whereClause += fmt.Sprintf("%s = $%d", col, i+1)
 		}
-		whereClause += fmt.Sprintf("%s = $%d", col, i+1)
 	}
-
-	// Prepare the SQL query
-	query := fmt.Sprintf("DELETE FROM %s WHERE %s", tableName, whereClause)
-
-	// Execute the query with the condition values
+	query := fmt.Sprintf("DELETE FROM %s%s", tableName, whereClause)
 	_, err := db.Database.Exec(query, conditionValues...)
-	return err
+	if err != nil {
+		return fmt.Errorf("error executing delete query: %v", err)
+	}
+	return nil
 }

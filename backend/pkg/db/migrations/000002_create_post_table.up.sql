@@ -17,11 +17,11 @@ CREATE TABLE Recipient (
     recipient_id INTEGER REFERENCES User(id)
 );
 
--- Reaction Table
 CREATE TABLE Reaction (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES User(id),
     post_id INTEGER REFERENCES Post(id),
     reaction_type VARCHAR(10) CHECK (reaction_type IN ('like', 'dislike')),
-    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, post_id) -- Ensures a user can only react once per post
 );

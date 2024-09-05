@@ -30,7 +30,6 @@ func DeletePost(id int) error {
 	// Execute a delete query to delete the post
 	return Delete("Post", []string{"id"}, []interface{}{id})
 }
-
 func GetPostByID(id int) (*structs.Post, error) {
 	// Execute a read query to fetch the post by ID
 	rows, err := Read("Post", []string{"*"}, []string{"id"}, []interface{}{id})
@@ -38,26 +37,30 @@ func GetPostByID(id int) (*structs.Post, error) {
 		return nil, fmt.Errorf("error executing query: %v", err)
 	}
 	defer rows.Close()
+
 	// Check if a result is found
 	if !rows.Next() {
 		return nil, nil // No post found, return nil without error
 	}
+
 	// Create a Post struct to hold the scanned data
 	var post structs.Post
-	// Scan the row into the Post struct fields
+
+	// Scan the row into the Post struct fields, handle NULL for nullable fields
 	err = rows.Scan(
 		&post.ID,
 		&post.UserID,
+		&post.GroupID, // Ensure *int can be scanned properly for nullable fields
+		&post.ParentID,
 		&post.Content,
 		&post.ImageID,
 		&post.Privacy,
 		&post.CreationDate,
-		&post.ParentID,
-		&post.GroupID,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error scanning row: %v", err)
 	}
+
 	// Return the post struct if everything was successful
 	return &post, nil
 }
@@ -80,23 +83,20 @@ func GetUserComments(userID int) ([]structs.Post, error) {
 func GetPostComments(postID int) ([]structs.Post, error) {
 	return GetPosts(postID, "parent_id", 1)
 }
-
-// GetPosts retrieves posts for a given ID and column, optionally filtering by parentID
 func GetPosts(id int, column string, parentID int) ([]structs.Post, error) {
 	// Define the WHERE clause and parameters
-	whereClause := fmt.Sprintf("%s = ?", column)
-	params := []interface{}{id}
+	whereClause := ""
 
 	if parentID == -1 {
 		// If parentID is -1, include posts with parent_id as NULL
-		whereClause += " AND parent_id IS NULL"
+		whereClause = "parent_id IS NULL AND " + column
 	} else {
 		// Otherwise, filter posts where parent_id IS NOT NULL
-		whereClause += " AND parent_id IS NOT NULL"
+		whereClause += "parent_id IS NOT NULL AND " + column
 	}
 
 	// Execute a read query to fetch the posts by ID and optional parentID
-	rows, err := Read("Post", []string{"*"}, []string{whereClause}, params)
+	rows, err := Read("Post", []string{"*"}, []string{whereClause}, []interface{}{id})
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)
 	}
@@ -111,17 +111,22 @@ func GetPosts(id int, column string, parentID int) ([]structs.Post, error) {
 		err := rows.Scan(
 			&post.ID,
 			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
 			&post.Content,
 			&post.ImageID,
 			&post.Privacy,
 			&post.CreationDate,
-			&post.ParentID,
-			&post.GroupID,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
 		}
 		posts = append(posts, post)
+	}
+
+	// Check if any error occurred during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
 	}
 
 	// Return the posts if everything was successful
@@ -193,6 +198,7 @@ func GetPostReactions(postID int) ([]structs.Reaction, error) {
 			&reaction.UserID,
 			&reaction.PostID,
 			&reaction.ReactionType,
+			&reaction.CreationDate,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
@@ -203,49 +209,24 @@ func GetPostReactions(postID int) ([]structs.Reaction, error) {
 	return reactions, nil
 }
 
-func AddReaction(reaction structs.Reaction) error {
-	// Define the table and columns
-	tableName := "Reaction"
-	// Define the condition to check for an existing reaction
-	conditionColumns := []string{"user_id", "post_id"}
-	conditionValues := []interface{}{reaction.UserID, reaction.PostID}
-
-	// Check if the user has already reacted to the post
-	existingReactions, err := Read(tableName, []string{"id"}, conditionColumns, conditionValues)
-	if err != nil {
-		return fmt.Errorf("error checking existing reactions: %v", err)
-	}
-	defer existingReactions.Close()
-
-	// If an existing reaction is found, delete it
-	if existingReactions.Next() {
-		var reactionID int
-		if err := existingReactions.Scan(&reactionID); err != nil {
-			return fmt.Errorf("error scanning existing reaction: %v", err)
-		}
-
-		// Define the condition to delete the existing reaction
-		deleteConditionColumns := []string{"id"}
-		deleteConditionValues := []interface{}{reactionID}
-		if err := Delete(tableName, deleteConditionColumns, deleteConditionValues); err != nil {
-			return fmt.Errorf("error deleting existing reaction: %v", err)
-		}
-	}
-
-	// Define the columns and values for the new reaction
-	columns := []string{"user_id", "post_id", "reaction_type"}
-	values := []interface{}{reaction.UserID, reaction.PostID, reaction.ReactionType}
-
-	// Create the new reaction
-	return Create(tableName, columns, values)
-}
-
 func DeleteReaction(userId, postId int) error {
 	// Define the table and columns
 	tableName := "Reaction"
 	// Define the condition to delete the existing reaction
 	deleteConditionColumns := []string{"post_id", "user_id"}
 	deleteConditionValues := []interface{}{postId, userId}
+	if err := Delete(tableName, deleteConditionColumns, deleteConditionValues); err != nil {
+		return fmt.Errorf("error deleting existing reaction: %v", err)
+	}
+	return nil
+}
+
+func DeleteReactionById(reactionId int) error {
+	// Define the table and columns
+	tableName := "Reaction"
+	// Define the condition to delete the existing reaction
+	deleteConditionColumns := []string{"id"}
+	deleteConditionValues := []interface{}{reactionId}
 	if err := Delete(tableName, deleteConditionColumns, deleteConditionValues); err != nil {
 		return fmt.Errorf("error deleting existing reaction: %v", err)
 	}
@@ -277,4 +258,12 @@ func GetUserReactions(userId int) ([]structs.Reaction, error) {
 	}
 	// Return the reactions if everything was successful
 	return reactions, nil
+}
+
+func AddReaction(reaction structs.Reaction) error {
+	// Define the table name
+	tableName := "Reaction"
+	columns := []string{"user_id", "post_id", "reaction_type"}
+	values := []interface{}{reaction.UserID, reaction.PostID, reaction.ReactionType}
+	return Create(tableName, columns, values)
 }

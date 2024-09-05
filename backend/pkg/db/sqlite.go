@@ -67,3 +67,17 @@ func Init() {
 
 	fmt.Println("Database connection established.")
 }
+
+func ConnectDB() ( error) {
+	var err error
+	Database, err = sql.Open("sqlite3", "social_network.db")
+	if err != nil {
+		return  err
+	}
+
+	if err = Database.Ping(); err != nil {
+		return  err
+	}
+
+	return nil
+}

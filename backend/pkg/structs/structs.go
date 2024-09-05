@@ -33,28 +33,28 @@ type Session struct {
 
 // Post represents a record in the Post table.
 type Post struct {
-    ID           int
-    UserID       int
-    GroupID      int
-    ParentID     int
-    Content      string
-    ImageID      int
-    Privacy      string
-    CreationDate time.Time
+	ID           int
+	UserID       *int
+	GroupID      *int
+	ParentID     *int
+	Content      string
+	ImageID      int
+	Privacy      string
+	CreationDate time.Time
 }
 
 // Recipient represents a record in the Recipient table.
 type Recipient struct {
-    ID          int
-    PostID      int
-    RecipientID int
+	ID          int
+	PostID      int
+	RecipientID int
 }
 
 // Reaction represents a record in the Reaction table.
 type Reaction struct {
-    ID           int
-    UserID       int
-    PostID   int
-    ReactionType string
-    CreationDate time.Time
+	ID           int
+	UserID       int
+	PostID       int
+	ReactionType string
+	CreationDate time.Time
 }
