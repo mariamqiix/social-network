@@ -58,3 +58,26 @@ type Reaction struct {
 	ReactionType string
 	CreationDate time.Time
 }
+
+type Group struct {
+	ID           int
+	CreatorID    int
+	Title        string
+	Description  string
+	CreationDate time.Time
+}
+
+type GroupMember struct {
+	ID      int
+	GroupID int
+	UserID  int
+}
+
+type GroupRequest struct {
+	ID           int
+	GroupID      int
+	UserID       int
+	Status       string // 'pending', 'accepted', 'rejected'
+	Type         string // 'invite', 'request'
+	CreationDate time.Time
+}

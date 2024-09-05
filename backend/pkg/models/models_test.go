@@ -34,7 +34,7 @@ func TestCreateUser(t *testing.T) {
 		FirstName:      "Test",
 		LastName:       "User",
 		DateOfBirth:    time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC),
-		ProfileType:    "public",
+		ProfileType:    "Public",
 		ImageID:        nil,
 	}
 
@@ -203,7 +203,7 @@ func TestCreateUserPost(t *testing.T) {
 		UserID:  &userId,
 		Content: "This is a test post",
 		ImageID: -1,
-		Privacy: "public",
+		Privacy: "Public",
 	}
 
 	err := CreateUserPost(post)
@@ -218,6 +218,7 @@ func TestCreateGroupPost(t *testing.T) {
 		GroupID: &groupId,
 		Content: "This is a test group post",
 		ImageID: -1,
+		Privacy: "Public",
 	}
 
 	err := CreateGroupPost(post)
@@ -235,6 +236,7 @@ func TestCreateComment(t *testing.T) {
 		ParentID: &ParentID,
 		Content:  "This is a test comment",
 		ImageID:  -1,
+		Privacy:  "Public",
 	}
 
 	err := CreateComment(post)
@@ -275,7 +277,7 @@ func TestGetGroupPosts(t *testing.T) {
 
 func TestUpdatePostPrivacy(t *testing.T) {
 	postID := 1
-	newPrivacy := "private"
+	newPrivacy := "Private"
 	err := UpdatePostPrivacy(postID, newPrivacy)
 	if err != nil {
 		t.Errorf("UpdatePostPrivacy failed: %v", err)
@@ -299,7 +301,7 @@ func TestGetUserPosts(t *testing.T) {
 	post := structs.Post{
 		UserID:   &userID,
 		Content:  "This is a test post",
-		Privacy:  "public",
+		Privacy:  "Public",
 		ParentID: nil, // Top-level post
 	}
 	err := CreateUserPost(post)
@@ -321,7 +323,7 @@ func TestAddReaction(t *testing.T) {
 	reaction := structs.Reaction{
 		UserID:       1,
 		PostID:       1,
-		ReactionType: "like",
+		ReactionType: "Like",
 	}
 
 	err := AddReaction(reaction)
@@ -338,5 +340,160 @@ func TestGetPostReactions(t *testing.T) {
 	}
 	if len(reactions) == 0 {
 		t.Errorf("Expected reactions, got none")
+	}
+}
+
+func TestCreateGroup(t *testing.T) {
+	group := structs.Group{
+		CreatorID:    1,
+		Title:        "Test Group",
+		Description:  "Test Description",
+		CreationDate: time.Now(),
+	}
+	err := CreateGroup(group)
+	if err != nil {
+		t.Fatalf("CreateGroup() error = %v", err)
+	}
+}
+
+func TestGetGroupByID(t *testing.T) {
+	groupID := 1
+	group, err := GetGroupByID(groupID)
+	if err != nil {
+		t.Fatalf("GetGroupByID() error = %v", err)
+	}
+	if group == nil {
+		t.Fatal("GetGroupByID() returned nil group")
+	}
+}
+
+func TestUpdateGroup(t *testing.T) {
+	group := structs.Group{
+		ID:           1,
+		Title:        "Updated Title",
+		Description:  "Updated Description",
+		CreationDate: time.Now(),
+	}
+	err := UpdateGroup(group)
+	if err != nil {
+		t.Fatalf("UpdateGroup() error = %v", err)
+	}
+}
+
+func TestAddInviteToGroup(t *testing.T) {
+	err := AddInviteToGroup(2, 1)
+	if err != nil {
+		t.Fatalf("AddInviteToGroup() error = %v", err)
+	}
+}
+
+func TestAddUserRequestJoinGroup(t *testing.T) {
+	err := AddUserRequestJoinGroup(2, 1)
+	if err != nil {
+		t.Fatalf("AddUserRequestJoinGroup() error = %v", err)
+	}
+}
+
+func TestGetUserInvites(t *testing.T) {
+	userID := 1
+	invites, err := GetUserInvites(userID)
+	if err != nil {
+		t.Fatalf("GetUserInvites() error = %v", err)
+	}
+	if len(invites) == 0 {
+		t.Fatal("GetUserInvites() returned no invites")
+	}
+}
+
+func TestUpdateInviteStatus(t *testing.T) {
+	err := UpdateInviteStatus(1, 2, "Accepted")
+	if err != nil {
+		t.Fatalf("UpdateInviteStatus() error = %v", err)
+	}
+}
+
+func TestUpdateRequestStatus(t *testing.T) {
+	err := UpdateRequestStatus(1, 2, "Accepted")
+	if err != nil {
+		t.Fatalf("UpdateRequestStatus() error = %v", err)
+	}
+}
+
+func TestGetGroupRequests(t *testing.T) {
+	groupID := 2
+	requests, err := GetGroupRequests(groupID)
+	if err != nil {
+		t.Fatalf("GetGroupRequests() error = %v", err)
+	}
+	if len(requests) == 0 {
+		t.Fatal("GetGroupRequests() returned no requests")
+	}
+}
+
+func TestAddMember(t *testing.T) {
+	err := AddMember(2, 1)
+	if err != nil {
+		t.Fatalf("AddMember() error = %v", err)
+	}
+}
+
+func TestGetGroupMembers(t *testing.T) {
+	groupID := 2
+	members, err := GetGroupMembers(groupID)
+	if err != nil {
+		t.Fatalf("GetGroupMembers() error = %v", err)
+	}
+	if len(members) == 0 {
+		t.Fatal("GetGroupMembers() returned no members")
+	}
+}
+
+func TestGetGroupsCreatedByTheUser(t *testing.T) {
+	userID := 1
+	groups, err := GetGroupsCreatedByTheUser(userID)
+	if err != nil {
+		t.Fatalf("GetGroupsCreatedByTheUser() error = %v", err)
+	}
+	if len(groups) == 0 {
+		t.Fatal("GetGroupsCreatedByTheUser() returned no groups")
+	}
+}
+
+func TestGetUserGroups(t *testing.T) {
+	userID := 1
+	groups, err := GetUserGroups(userID)
+	if err != nil {
+		t.Fatalf("GetUserGroups() error = %v", err)
+	}
+	if len(groups) == 0 {
+		t.Fatal("GetUserGroups() returned no groups")
+	}
+}
+
+func TestRemoveMember(t *testing.T) {
+	err := RemoveMember(1, 2)
+	if err != nil {
+		t.Fatalf("RemoveMember() error = %v", err)
+	}
+}
+
+func TestRemoveRequest(t *testing.T) {
+	err := RemoveRequest(1, 2)
+	if err != nil {
+		t.Fatalf("RemoveRequest() error = %v", err)
+	}
+}
+
+func TestRemoveInvite(t *testing.T) {
+	err := RemoveInvite(1, 2)
+	if err != nil {
+		t.Fatalf("RemoveInvite() error = %v", err)
+	}
+}
+func TestRemoveGroup(t *testing.T) {
+	groupID := 1
+	err := RemoveGroup(groupID)
+	if err != nil {
+		t.Fatalf("RemoveGroup() error = %v", err)
 	}
 }

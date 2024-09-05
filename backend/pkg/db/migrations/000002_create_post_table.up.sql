@@ -6,7 +6,7 @@ CREATE TABLE Post (
     parent_id INTEGER REFERENCES Post(id),
     content TEXT,
     image_id INTEGER REFERENCES Image(id),
-    privacy VARCHAR(10) CHECK (privacy IN ('public', 'private', 'almost')),
+    privacy VARCHAR(10) CHECK (privacy IN ('Public', 'Private', 'Almost')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -21,7 +21,7 @@ CREATE TABLE Reaction (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES User(id),
     post_id INTEGER REFERENCES Post(id),
-    reaction_type VARCHAR(10) CHECK (reaction_type IN ('like', 'dislike')),
+    reaction_type VARCHAR(10) CHECK (reaction_type IN ('Like', 'Dislike')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, post_id) -- Ensures a user can only react once per post
 );

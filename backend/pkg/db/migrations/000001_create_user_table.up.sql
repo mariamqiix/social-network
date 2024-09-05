@@ -9,7 +9,7 @@ CREATE TABLE User (
     date_of_birth DATE NOT NULL,
     image_id INTEGER REFERENCES Image(id),
     bio TEXT,
-    profile_type VARCHAR(20) DEFAULT 'public' CHECK (profile_type IN ('public', 'private')),
+    profile_type VARCHAR(20) DEFAULT 'public' CHECK (profile_type IN ('Public', 'Private')),
     nickname VARCHAR(16)
 );
 

@@ -15,14 +15,14 @@ func CreateUserPost(p structs.Post) error {
 func CreateGroupPost(p structs.Post) error {
 	// Create a new record in the Post table
 	columns := []string{"group_id", "content", "image_id", "privacy"}
-	values := []interface{}{p.GroupID, p.Content, p.ImageID, "public"}
+	values := []interface{}{p.GroupID, p.Content, p.ImageID, "Public"}
 	return Create("Post", columns, values)
 }
 
 func CreateComment(p structs.Post) error {
 	// Create a new record in the Post table
 	columns := []string{"user_id", "parent_id", "content", "image_id", "privacy"}
-	values := []interface{}{p.UserID, p.ParentID, p.Content, p.ImageID, "public"}
+	values := []interface{}{p.UserID, p.ParentID, p.Content, p.ImageID, "Public"}
 	return Create("Post", columns, values)
 }
 
@@ -266,4 +266,34 @@ func AddReaction(reaction structs.Reaction) error {
 	columns := []string{"user_id", "post_id", "reaction_type"}
 	values := []interface{}{reaction.UserID, reaction.PostID, reaction.ReactionType}
 	return Create(tableName, columns, values)
+}
+
+func GetAllPosts() ([]structs.Post, error) {
+	tableName := "Post"
+	columns := []string{"*"}
+	rows, err := Read(tableName, columns, []string{}, []interface{}{})
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	// Create a slice to hold the posts
+	var posts []structs.Post
+	// Iterate over the rows and scan each row into a Post struct
+	for rows.Next() {
+		var post structs.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+	// Return the posts if everything was successful
+	return posts, nil
 }
