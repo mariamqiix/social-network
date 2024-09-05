@@ -6,7 +6,7 @@ CREATE TABLE Post (
     parent_id INTEGER REFERENCES Post(id),
     content TEXT,
     image_id INTEGER REFERENCES Image(id),
-    privacy VARCHAR(50),
+    privacy VARCHAR(10) CHECK (privacy IN ('public', 'private', 'almost')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -21,8 +21,7 @@ CREATE TABLE Recipient (
 CREATE TABLE Reaction (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES User(id),
-    user_post_id INTEGER REFERENCES Post(id),
-    group_post_id INTEGER REFERENCES Post(id),
-    reaction_type VARCHAR(50) CHECK (reaction_type IN ('like', 'dislike')),
+    post_id INTEGER REFERENCES Post(id),
+    reaction_type VARCHAR(10) CHECK (reaction_type IN ('like', 'dislike')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

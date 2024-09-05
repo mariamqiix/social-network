@@ -24,8 +24,13 @@ func Create(tableName string, columns []string, values []interface{}) error {
 	return err
 }
 
-// Update updates existing records in the specified table.
-func Update(tableName string, columnsToSet []string, valuesToSet []interface{}, conditionColumn string, conditionValue interface{}) error {
+// Update updates existing records in the specified table with multiple conditions.
+func Update(tableName string, columnsToSet []string, valuesToSet []interface{}, conditionColumns []string, conditionValues []interface{}) error {
+	if len(conditionColumns) != len(conditionValues) {
+		return fmt.Errorf("number of condition columns does not match number of condition values")
+	}
+
+	// Construct the SET clause
 	setClause := ""
 	for i, col := range columnsToSet {
 		if i > 0 {
@@ -34,13 +39,31 @@ func Update(tableName string, columnsToSet []string, valuesToSet []interface{}, 
 		setClause += fmt.Sprintf("%s = $%d", col, i+1)
 	}
 
-	query := fmt.Sprintf("UPDATE %s SET %s WHERE %s = $%d", tableName, setClause, conditionColumn, len(valuesToSet)+1)
-	_, err := db.Database.Exec(query, append(valuesToSet, conditionValue)...)
+	// Construct the WHERE clause
+	whereClause := ""
+	for i, col := range conditionColumns {
+		if i > 0 {
+			whereClause += " AND "
+		}
+		whereClause += fmt.Sprintf("%s = $%d", col, len(valuesToSet)+i+1)
+	}
+
+	// Prepare the SQL query
+	query := fmt.Sprintf("UPDATE %s SET %s WHERE %s", tableName, setClause, whereClause)
+
+	// Execute the query with the combined values (columnsToSet + conditionValues)
+	_, err := db.Database.Exec(query, append(valuesToSet, conditionValues...)...)
 	return err
 }
 
-// Read retrieves records from the specified table based on a condition.
-func Read(tableName string, columns []string, conditionColumn string, conditionValue interface{}) (*sql.Rows, error) {
+// Read retrieves records from the specified table based on multiple conditions.
+func Read(tableName string, columns []string, conditionColumns []string, conditionValues []interface{}) (*sql.Rows, error) {
+	// Ensure the number of condition columns matches the number of condition values
+	if len(conditionColumns) != len(conditionValues) {
+		return nil, fmt.Errorf("number of condition columns does not match number of condition values")
+	}
+
+	// Build the column names to retrieve
 	colNames := "*"
 	if len(columns) > 0 {
 		colNames = ""
@@ -52,14 +75,45 @@ func Read(tableName string, columns []string, conditionColumn string, conditionV
 		}
 	}
 
-	query := fmt.Sprintf("SELECT %s FROM %s WHERE %s = $1", colNames, tableName, conditionColumn)
-	rows, err := db.Database.Query(query, conditionValue)
+	// Build the WHERE clause for multiple conditions
+	whereClause := ""
+	if len(conditionColumns) > 0 {
+		whereClause = " WHERE "
+		for i, col := range conditionColumns {
+			if i > 0 {
+				whereClause += " AND "
+			}
+			whereClause += fmt.Sprintf("%s = $%d", col, i+1)
+		}
+	}
+
+	// Prepare the SQL query
+	query := fmt.Sprintf("SELECT %s FROM %s%s", colNames, tableName, whereClause)
+
+	// Execute the query with the condition values
+	rows, err := db.Database.Query(query, conditionValues...)
 	return rows, err
 }
 
-// Delete removes records from the specified table based on a condition.
-func Delete(tableName string, conditionColumn string, conditionValue interface{}) error {
-	query := fmt.Sprintf("DELETE FROM %s WHERE %s = $1", tableName, conditionColumn)
-	_, err := db.Database.Exec(query, conditionValue)
+// Delete removes records from the specified table based on multiple conditions.
+func Delete(tableName string, conditionColumns []string, conditionValues []interface{}) error {
+	if len(conditionColumns) != len(conditionValues) {
+		return fmt.Errorf("number of condition columns does not match number of condition values")
+	}
+
+	// Build the WHERE clause for multiple conditions
+	whereClause := ""
+	for i, col := range conditionColumns {
+		if i > 0 {
+			whereClause += " AND "
+		}
+		whereClause += fmt.Sprintf("%s = $%d", col, i+1)
+	}
+
+	// Prepare the SQL query
+	query := fmt.Sprintf("DELETE FROM %s WHERE %s", tableName, whereClause)
+
+	// Execute the query with the condition values
+	_, err := db.Database.Exec(query, conditionValues...)
 	return err
 }
