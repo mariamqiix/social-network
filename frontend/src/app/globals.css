@@ -1,5 +1,7 @@
 nav {
     width: 300px;
+    min-width: 300px;
+    overflow-x: hidden;
 }
 
 .icon {
@@ -9,4 +11,72 @@ nav {
 
 .form-control {
     background: rgba(255, 255, 255, 0.513);
+}
+
+.group-blur:hover {
+    transform: scale(1.03);
+    /* Slight zoom on hover */
+    filter: blur(2px);
+    /* Apply blur */
+}
+
+.group-card {
+    position: relative;
+}
+
+.group-card:hover .full-description {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* Remove blur on full description */
+
+.full-description {
+    z-index: 10;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #000;
+    display: flex;
+    /* Use flex to center content */
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
+    padding: 20px;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.4;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    visibility: hidden;
+    margin: auto;
+    /* Center the div itself */
+}
+
+.group-card-container {
+    position: relative;
+    /* Ensure the container's position is relative */
+}
+
+.group-card-container::-webkit-scrollbar {
+    height: 5px;
+    border-radius: 100px;
+}
+
+.group-card-container::-webkit-scrollbar-thumb {
+    background-color: rgb(85, 85, 85, 0.2);
+    border-radius: 100px;
+}
+
+.group-card-container::-webkit-scrollbar-track {
+    background-color: transparent;
+    /* Make the scrollbar thumb transparent */
+    border-radius: 100px;
 }
