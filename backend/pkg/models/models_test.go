@@ -30,6 +30,7 @@ func TestCreateUser(t *testing.T) {
 	mockUser := structs.User{
 		Username:       "testuser",
 		UserType:       "regular",
+		Email:          "testuser@example.com",
 		HashedPassword: "hashedpassword",
 		FirstName:      "Test",
 		LastName:       "User",
@@ -45,6 +46,143 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
+func TestGetUserEmailByUsername(t *testing.T) {
+	username := "testuser"
+
+	// Assuming the user exists
+	email, err := GetUserEmailByUsername(username)
+	if err != nil {
+		t.Fatalf("GetUserEmailByUsername() error = %v", err)
+	}
+	if email == "" {
+		t.Fatalf("GetUserEmailByUsername() returned empty email, expected a valid email")
+	}
+
+	// Assuming the user does not exist
+	username = "nonexistentuser"
+	email, err = GetUserEmailByUsername(username)
+	if err == nil {
+		t.Fatalf("GetUserEmailByUsername() expected error, got nil")
+	}
+	if email != "" {
+		t.Fatalf("GetUserEmailByUsername() returned email, expected empty string")
+	}
+}
+
+func TestGetUserEmailByID(t *testing.T) {
+	id := 1
+
+	// Assuming the user exists
+	email, err := GetUserEmailByID(id)
+	if err != nil {
+		t.Fatalf("GetUserEmailByID() error = %v", err)
+	}
+	if email == "" {
+		t.Fatalf("GetUserEmailByID() returned empty email, expected a valid email")
+	}
+
+	// Assuming the user does not exist
+	id = 999
+	email, err = GetUserEmailByID(id)
+	if err == nil {
+		t.Fatalf("GetUserEmailByID() expected error, got nil")
+	}
+	if email != "" {
+		t.Fatalf("GetUserEmailByID() returned email, expected empty string")
+	}
+}
+
+func TestGetUsernameByUserId(t *testing.T) {
+	userId := 1
+
+	// Assuming the user exists
+	username, err := GetUsernameByUserId(userId)
+	if err != nil {
+		t.Fatalf("GetUsernameByUserId() error = %v", err)
+	}
+	if username == "" {
+		t.Fatalf("GetUsernameByUserId() returned empty username, expected a valid username")
+	}
+
+	// Assuming the user does not exist
+	userId = 999
+	username, err = GetUsernameByUserId(userId)
+	if err == nil {
+		t.Fatalf("GetUsernameByUserId() expected error, got nil")
+	}
+	if username != "" {
+		t.Fatalf("GetUsernameByUserId() returned username, expected empty string")
+	}
+}
+
+func TestGetUsernameByEmail(t *testing.T) {
+	email := "testuser@example.com"
+
+	// Assuming the user exists
+	username, err := GetUsernameByEmail(email)
+	if err != nil {
+		t.Fatalf("GetUsernameByEmail() error = %v", err)
+	}
+	if username == "" {
+		t.Fatalf("GetUsernameByEmail() returned empty username, expected a valid username")
+	}
+
+	// Assuming the user does not exist
+	email = "nonexistent@example.com"
+	username, err = GetUsernameByEmail(email)
+	if err == nil {
+		t.Fatalf("GetUsernameByEmail() expected error, got nil")
+	}
+	if username != "" {
+		t.Fatalf("GetUsernameByEmail() returned username, expected empty string")
+	}
+}
+
+func TestCheckUsernameExists(t *testing.T) {
+	username := "testuser"
+
+	// Assuming the username exists
+	exists, err := CheckUsernameExists(username)
+	if err != nil {
+		t.Fatalf("CheckUsernameExists() error = %v", err)
+	}
+	if !exists {
+		t.Fatalf("CheckUsernameExists() returned false, expected true")
+	}
+
+	// Assuming the username does not exist
+	username = "nonexistentuser"
+	exists, err = CheckUsernameExists(username)
+	if err != nil {
+		t.Fatalf("CheckUsernameExists() error = %v", err)
+	}
+	if exists {
+		t.Fatalf("CheckUsernameExists() returned true, expected false")
+	}
+}
+
+func TestCheckEmailExists(t *testing.T) {
+	email := "testuser@example.com"
+
+	// Assuming the email exists
+	exists, err := CheckEmailExists(email)
+	if err != nil {
+		t.Fatalf("CheckEmailExists() error = %v", err)
+	}
+	if !exists {
+		t.Fatalf("CheckEmailExists() returned false, expected true")
+	}
+
+	// Assuming the email does not exist
+	email = "nonexistent@example.com"
+	exists, err = CheckEmailExists(email)
+	if err != nil {
+		t.Fatalf("CheckEmailExists() error = %v", err)
+	}
+	if exists {
+		t.Fatalf("CheckEmailExists() returned true, expected false")
+	}
+}
 func TestGetUserByUsername(t *testing.T) {
 	// Define a username to query
 	username := "testuser"
@@ -144,16 +282,6 @@ func TestCreateUserSession(t *testing.T) {
 	}
 }
 
-func TestDeleteUserSession(t *testing.T) {
-	// Define a mock user ID to delete the session for
-	userID := "1" // Replace with a valid user ID
-
-	// Call the DeleteUserSession function
-	err := DeleteUserSession(userID)
-	if err != nil {
-		t.Fatalf("Failed to delete user session: %v", err)
-	}
-}
 func TestGetPasswordByUsername(t *testing.T) {
 	// Define a mock username to query
 	username := "testuser"
@@ -180,20 +308,6 @@ func TestCreateFollower(t *testing.T) {
 	err := CreateFollower(mockFollower)
 	if err != nil {
 		t.Fatalf("Failed to create follower: %v", err)
-	}
-}
-
-func TestDeleteFollower(t *testing.T) {
-	// Define a mock follower to delete
-	mockFollower := structs.Follower{
-		FollowingID: 1,
-		FollowerID:  2,
-	}
-
-	// Call the DeleteFollower function
-	err := DeleteFollower(mockFollower)
-	if err != nil {
-		t.Fatalf("Failed to delete follower: %v", err)
 	}
 }
 
@@ -242,14 +356,6 @@ func TestCreateComment(t *testing.T) {
 	err := CreateComment(post)
 	if err != nil {
 		t.Errorf("CreateComment failed: %v", err)
-	}
-}
-
-func TestDeletePost(t *testing.T) {
-	postID := 1
-	err := DeletePost(postID)
-	if err != nil {
-		t.Errorf("DeletePost failed: %v", err)
 	}
 }
 
@@ -356,6 +462,30 @@ func TestCreateGroup(t *testing.T) {
 	}
 }
 
+func TestCheckGroupCreator(t *testing.T) {
+	groupID := 1
+	userID := 1
+
+	// Assuming the user is the creator of the group
+	exists, err := CheckGroupCreator(groupID, userID)
+	if err != nil {
+		t.Fatalf("1CheckGroupCreator() error = %v", err)
+	}
+	if !exists {
+		t.Fatalf("1CheckGroupCreator() returned false, expected true")
+	}
+
+	// Assuming the user is not the creator of the group
+	groupID = 999
+	exists, err = CheckGroupCreator(groupID, userID)
+	if err != nil {
+		t.Fatalf("2CheckGroupCreator() error = %v", err)
+	}
+	if exists {
+		t.Fatalf("2CheckGroupCreator() returned true, expected false")
+	}
+}
+
 func TestGetGroupByID(t *testing.T) {
 	groupID := 1
 	group, err := GetGroupByID(groupID)
@@ -436,6 +566,29 @@ func TestAddMember(t *testing.T) {
 		t.Fatalf("AddMember() error = %v", err)
 	}
 }
+func TestCheckGroupMember(t *testing.T) {
+	groupID := 2
+	userID := 1
+
+	// Assuming the user is a member of the group
+	exists, err := CheckGroupMember(groupID, userID)
+	if err != nil {
+		t.Fatalf("CheckGroupMember() error = %v", err)
+	}
+	if !exists {
+		t.Fatalf("CheckGroupMember() returned false, expected true")
+	}
+
+	// Assuming the user is not a member of the group
+	groupID = 999
+	exists, err = CheckGroupMember(groupID, userID)
+	if err != nil {
+		t.Fatalf("CheckGroupMember() error = %v", err)
+	}
+	if exists {
+		t.Fatalf("CheckGroupMember() returned true, expected false")
+	}
+}
 
 func TestGetGroupMembers(t *testing.T) {
 	groupID := 2
@@ -470,6 +623,389 @@ func TestGetUserGroups(t *testing.T) {
 	}
 }
 
+func TestCreateEvent(t *testing.T) {
+	event := structs.Event{
+		GroupID:     1,
+		CreatorID:   1,
+		Title:       "Test Event",
+		Description: "This is a test event",
+		EventTime:   time.Now(),
+	}
+
+	err := CreateEvent(event)
+	if err != nil {
+		t.Fatalf("CreateEvent() error = %v", err)
+	}
+}
+
+func TestUpdateEvent(t *testing.T) {
+	event := structs.Event{
+		ID:          1,
+		GroupID:     1,
+		CreatorID:   1,
+		Title:       "Updated Event",
+		Description: "This is an updated test event",
+		EventTime:   time.Now(),
+	}
+
+	err := UpdateEvent(event)
+	if err != nil {
+		t.Fatalf("UpdateEvent() error = %v", err)
+	}
+}
+
+func TestGetEventByID(t *testing.T) {
+	eventID := 1
+	event, err := GetEventByID(eventID)
+	if err != nil {
+		t.Fatalf("GetEventByID() error = %v", err)
+	}
+	if event == nil {
+		t.Fatalf("GetEventByID() returned nil for event ID %d", eventID)
+	}
+}
+
+func TestGetGroupEvents(t *testing.T) {
+	groupID := 1
+	events, err := GetGroupEvents(groupID)
+	if err != nil {
+		t.Fatalf("GetGroupEvents() error = %v", err)
+	}
+	if len(events) == 0 {
+		t.Fatalf("GetGroupEvents() returned no events for group ID %d", groupID)
+	}
+}
+
+func TestGetEventsByCreator(t *testing.T) {
+	creatorID := 1
+	events, err := GetEventsByCreator(creatorID)
+	if err != nil {
+		t.Fatalf("GetEventsByCreator() error = %v", err)
+	}
+	if len(events) == 0 {
+		t.Fatalf("GetEventsByCreator() returned no events for creator ID %d", creatorID)
+	}
+}
+
+func TestCreateEventResponse(t *testing.T) {
+	response := structs.EventResponse{
+		EventID:  1,
+		UserID:   1,
+		Response: "Yes",
+	}
+
+	err := CreateEventResponse(response)
+	if err != nil {
+		t.Fatalf("CreateEventResponse() error = %v", err)
+	}
+}
+
+func TestGetEventResponsesByEventId(t *testing.T) {
+	eventID := 1
+	responses, err := GetEventResponsesByEventId(eventID)
+	if err != nil {
+		t.Fatalf("GetEventResponsesByEventId() error = %v", err)
+	}
+	if responses == nil {
+		t.Fatalf("GetEventResponsesByEventId() returned nil for event ID %d", eventID)
+	}
+}
+
+func TestGetEventByGroupAndCreator(t *testing.T) {
+	groupID := 1
+	creatorID := 1
+	events, err := GetEventByGroupAndCreator(groupID, creatorID)
+	if err != nil {
+		t.Fatalf("GetEventByGroupAndCreator() error = %v", err)
+	}
+	if len(events) == 0 {
+		t.Fatalf("GetEventByGroupAndCreator() returned no events for group ID %d and creator ID %d", groupID, creatorID)
+	}
+}
+
+func TestGetEventResponsesByEventIdAndUserId(t *testing.T) {
+	eventID := 1
+	userID := 1
+	responses, err := GetEventResponsesByEventIdAndUserId(eventID, userID)
+	if err != nil {
+		t.Fatalf("GetEventResponsesByEventIdAndUserId() error = %v", err)
+	}
+	if responses == nil {
+		t.Fatalf("GetEventResponsesByEventIdAndUserId() returned nil for event ID %d and user ID %d", eventID, userID)
+	}
+}
+
+func TestGetEventResponseByEventIdAndResponse(t *testing.T) {
+	eventID := 1
+	response := "Yes"
+	responses, err := GetEventResponseByEventIdAndResponse(eventID, response)
+	if err != nil {
+		t.Fatalf("GetEventResponseByEventIdAndResponse() error = %v", err)
+	}
+	if responses == nil {
+		t.Fatalf("GetEventResponseByEventIdAndResponse() returned nil for event ID %d and response %s", eventID, response)
+	}
+}
+
+func TestGetUserEventsResponseByUserId(t *testing.T) {
+	userID := 1
+	responses, err := GetUserEventsResponseByUserId(userID)
+	if err != nil {
+		t.Fatalf("GetUserEventsResponseByUserId() error = %v", err)
+	}
+	if responses == nil {
+		t.Fatalf("GetUserEventsResponseByUserId() returned nil for user ID %d", userID)
+	}
+}
+
+func TestUpdateEventResponse(t *testing.T) {
+	response := structs.EventResponse{
+		ID:       1,
+		EventID:  1,
+		UserID:   1,
+		Response: "No",
+	}
+
+	err := UpdateEventResponse(response)
+	if err != nil {
+		t.Fatalf("UpdateEventResponse() error = %v", err)
+	}
+}
+
+func TestCreateGroupsNotification(t *testing.T) {
+	entity := 1
+	notification := structs.Notification{
+		UserID:           1,
+		GroupID:          &entity,
+		NotificationType: "group",
+		IsRead:           false,
+	}
+	err := CreateGroupsNotification(notification)
+	if err != nil {
+		t.Fatalf("CreateGroupsNotification() error = %v", err)
+	}
+}
+
+func TestCreateEventsNotification(t *testing.T) {
+	entity := 1
+
+	notification := structs.Notification{
+		UserID:           1,
+		EventID:          &entity,
+		NotificationType: "event",
+		IsRead:           false,
+	}
+	err := CreateEventsNotification(notification)
+	if err != nil {
+		t.Fatalf("CreateEventsNotification() error = %v", err)
+	}
+}
+
+func TestCreateMessagesNotification(t *testing.T) {
+	entity := 1
+
+	notification := structs.Notification{
+		UserID:           1,
+		SenderID:         &entity,
+		NotificationType: "message",
+		IsRead:           false,
+	}
+	err := CreateMessagesNotification(notification)
+	if err != nil {
+		t.Fatalf("CreateMessagesNotification() error = %v", err)
+	}
+}
+
+func TestGetUserNotifications(t *testing.T) {
+	notifications, err := GetUserNotifications(1)
+	if err != nil {
+		t.Fatalf("GetUserNotifications() error = %v", err)
+	}
+	if len(notifications) == 0 {
+		t.Fatalf("GetUserNotifications() returned no notifications")
+	}
+}
+
+func TestUpdateUserNotifications(t *testing.T) {
+	err := UpdateUserNotifications(1)
+	if err != nil {
+		t.Fatalf("UpdateUserNotifications() error = %v", err)
+	}
+}
+
+func TestUpdateNotificationToRead(t *testing.T) {
+	err := UpdateNotificationToRead(1)
+	if err != nil {
+		t.Fatalf("UpdateNotificationToRead() error = %v", err)
+	}
+}
+
+func TestCreateUserMessage(t *testing.T) {
+	message := structs.UserChat{
+		SenderID:   1,
+		ReceiverID: 2,
+		Message:    "Hello",
+		ImageID:    0,
+		IsRead:     false,
+	}
+
+	err := CreateUserMessage(message)
+	if err != nil {
+		t.Fatalf("CreateUserMessage() error = %v", err)
+	}
+}
+
+func TestCreateGroupMessage(t *testing.T) {
+	message := structs.GroupChat{
+		GroupID:  1,
+		SenderID: 1,
+		Message:  "Hello Group",
+		ImageID:  0,
+	}
+
+	err := CreateGroupMessage(message)
+	if err != nil {
+		t.Fatalf("CreateGroupMessage() error = %v", err)
+	}
+}
+
+func TestUpdatePrivateMessageToRead(t *testing.T) {
+	err := UpdatePrivateMessageToRead(1, 2)
+	if err != nil {
+		t.Fatalf("UpdatePrivateMessageToRead() error = %v", err)
+	}
+}
+
+func TestUpdatePrivateMessage(t *testing.T) {
+	message := structs.UserChat{
+		ID:         1,
+		SenderID:   1,
+		ReceiverID: 2,
+		Message:    "Updated Message",
+		ImageID:    0,
+		IsRead:     true,
+	}
+
+	err := UpdatePrivateMessage(message)
+	if err != nil {
+		t.Fatalf("UpdatePrivateMessage() error = %v", err)
+	}
+}
+
+func TestUpdateGroupMessage(t *testing.T) {
+	message := structs.GroupChat{
+		ID:       1,
+		GroupID:  1,
+		SenderID: 1,
+		Message:  "Updated Group Message",
+		ImageID:  0,
+	}
+
+	err := UpdateGroupMessage(message)
+	if err != nil {
+		t.Fatalf("UpdateGroupMessage() error = %v", err)
+	}
+}
+
+func TestGetUserMessages(t *testing.T) {
+	messages, err := GetUserMessages(1, 2)
+	if err != nil {
+		t.Fatalf("GetUserMessages() error = %v", err)
+	}
+	if len(messages) == 0 {
+		t.Fatalf("GetUserMessages() returned no messages")
+	}
+}
+
+func TestGetGroupMessages(t *testing.T) {
+	messages, err := GetGroupMessages(1)
+	if err != nil {
+		t.Fatalf("GetGroupMessages() error = %v", err)
+	}
+	if len(messages) == 0 {
+		t.Fatalf("GetGroupMessages() returned no messages")
+	}
+}
+
+func TestUploadImage(t *testing.T) {
+	image := structs.Image{
+		Data: []byte("test image data"),
+	}
+
+	err := UploadImage(image)
+	if err != nil {
+		t.Fatalf("UploadImage() error = %v", err)
+	}
+}
+func TestUpdateImage(t *testing.T) {
+	err := UpdateImage(1, []byte("updated image data"))
+	if err != nil {
+		t.Fatalf("UpdateImage() error = %v", err)
+	}
+}
+func TestGetImageByID(t *testing.T) {
+	image, err := GetImageByID(1)
+	if err != nil {
+		t.Fatalf("GetImageByID() error = %v", err)
+	}
+	if image == nil {
+		t.Fatalf("GetImageByID() returned nil")
+	}
+}
+
+func TestCheckResponse(t *testing.T) {
+	eventID := 1
+	userID := 1
+
+	// Assuming the response exists
+	exists, err := CheckResponse(eventID, userID)
+	if err != nil {
+		t.Fatalf("CheckResponse() error = %v", err)
+	}
+	if !exists {
+		t.Fatalf("CheckResponse() returned false, expected true")
+	}
+
+	// Assuming the response does not exist
+	eventID = 999
+	exists, err = CheckResponse(eventID, userID)
+	if err != nil {
+		t.Fatalf("CheckResponse() error = %v", err)
+	}
+	if exists {
+		t.Fatalf("CheckResponse() returned true, expected false")
+	}
+}
+
+func TestDeletePost(t *testing.T) {
+	postID := 1
+	err := DeletePost(postID)
+	if err != nil {
+		t.Errorf("DeletePost failed: %v", err)
+	}
+}
+
+func TestDeleteFollower(t *testing.T) {
+	// Define a mock follower to delete
+	mockFollower := structs.Follower{
+		FollowingID: 1,
+		FollowerID:  2,
+	}
+
+	// Call the DeleteFollower function
+	err := DeleteFollower(mockFollower)
+	if err != nil {
+		t.Fatalf("Failed to delete follower: %v", err)
+	}
+}
+func TestDeleteEventResponse(t *testing.T) {
+	eventID := 1
+	userID := 1
+	err := DeleteEventResponse(eventID, userID)
+	if err != nil {
+		t.Fatalf("DeleteEventResponse() error = %v", err)
+	}
+}
 func TestRemoveMember(t *testing.T) {
 	err := RemoveMember(1, 2)
 	if err != nil {
@@ -490,6 +1026,69 @@ func TestRemoveInvite(t *testing.T) {
 		t.Fatalf("RemoveInvite() error = %v", err)
 	}
 }
+
+func TestRemovePrivateMessage(t *testing.T) {
+	message := structs.UserChat{
+		ID: 1,
+	}
+
+	err := RemovePrivateMessage(message)
+	if err != nil {
+		t.Fatalf("RemovePrivateMessage() error = %v", err)
+	}
+}
+
+func TestRemoveGroupMessage(t *testing.T) {
+	message := structs.GroupChat{
+		ID: 1,
+	}
+
+	err := RemoveGroupMessage(message)
+	if err != nil {
+		t.Fatalf("RemoveGroupMessage() error = %v", err)
+	}
+}
+
+func TestRemoveEvent(t *testing.T) {
+	eventID := 1
+	err := RemoveEvent(eventID)
+	if err != nil {
+		t.Fatalf("RemoveEvent() error = %v", err)
+	}
+}
+
+func TestDeleteUserSession(t *testing.T) {
+	// Define a mock user ID to delete the session for
+	userID := "1" // Replace with a valid user ID
+
+	// Call the DeleteUserSession function
+	err := DeleteUserSession(userID)
+	if err != nil {
+		t.Fatalf("Failed to delete user session: %v", err)
+	}
+}
+
+func TestDeleteImage(t *testing.T) {
+	err := DeleteImage(1)
+	if err != nil {
+		t.Fatalf("DeleteImage() error = %v", err)
+	}
+}
+
+func TestDeleteUserNotifications(t *testing.T) {
+	err := DeleteUserNotifications(1)
+	if err != nil {
+		t.Fatalf("DeleteUserNotifications() error = %v", err)
+	}
+}
+
+func TestDeleteNotification(t *testing.T) {
+	err := DeleteNotification(1)
+	if err != nil {
+		t.Fatalf("DeleteNotification() error = %v", err)
+	}
+}
+
 func TestRemoveGroup(t *testing.T) {
 	groupID := 1
 	err := RemoveGroup(groupID)

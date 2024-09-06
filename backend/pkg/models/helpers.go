@@ -4,10 +4,16 @@ import (
 	"backend/pkg/db"
 	"database/sql"
 	"fmt"
+	"sync"
 )
+
+var mutex = &sync.Mutex{}
 
 // Create inserts a new record into the specified table.
 func Create(tableName string, columns []string, values []interface{}) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	colNames := ""
 	placeholders := ""
 	for i, col := range columns {
@@ -26,6 +32,9 @@ func Create(tableName string, columns []string, values []interface{}) error {
 
 // Update updates existing records in the specified table with multiple conditions.
 func Update(tableName string, columnsToSet []string, valuesToSet []interface{}, conditionColumns []string, conditionValues []interface{}) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if len(conditionColumns) != len(conditionValues) {
 		return fmt.Errorf("number of condition columns does not match number of condition values")
 	}
@@ -58,6 +67,9 @@ func Update(tableName string, columnsToSet []string, valuesToSet []interface{}, 
 
 // Read retrieves records from the specified table based on multiple conditions.
 func Read(tableName string, columns []string, conditionColumns []string, conditionValues []interface{}) (*sql.Rows, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	// Ensure the number of condition columns matches the number of condition values
 	if len(conditionColumns) != len(conditionValues) {
 		return nil, fmt.Errorf("number of condition columns does not match number of condition values")
@@ -99,6 +111,8 @@ func Read(tableName string, columns []string, conditionColumns []string, conditi
 }
 
 func Delete(tableName string, conditionColumns []string, conditionValues []interface{}) error {
+	mutex.Lock()
+	defer mutex.Unlock()
 	whereClause := ""
 	if len(conditionColumns) > 0 {
 		whereClause = " WHERE "

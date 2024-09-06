@@ -6,6 +6,7 @@ type User struct {
 	ID             int       // Primary key
 	Username       string    // Unique username (VARCHAR(10))
 	UserType       string    // Required user type (VARCHAR(10))
+	Email          string    // Email address (VARCHAR(100))
 	HashedPassword string    // Hashed password (CHAR(60))
 	FirstName      string    // First name (VARCHAR(16))
 	LastName       string    // Last name (VARCHAR(16))
@@ -79,5 +80,58 @@ type GroupRequest struct {
 	UserID       int
 	Status       string // 'pending', 'accepted', 'rejected'
 	Type         string // 'invite', 'request'
+	CreationDate time.Time
+}
+
+type Event struct {
+	ID           int
+	GroupID      int
+	CreatorID    int
+	Title        string
+	Description  string
+	EventTime    time.Time
+	CreationDate time.Time
+}
+
+type EventResponse struct {
+	ID           int
+	EventID      int
+	UserID       int
+	Response     string // 'accept', 'decline'
+	ResponseDate time.Time
+}
+
+type Notification struct {
+	ID               int
+	UserID           int
+	SenderID         *int
+	NotificationType string
+	GroupID          *int
+	EventID          *int
+	IsRead           bool
+	CreationDate     time.Time
+}
+
+type Image struct {
+	ID   int
+	Data []byte
+}
+
+type UserChat struct {
+	ID           int
+	SenderID     int
+	ReceiverID   int
+	Message      string
+	ImageID      int
+	IsRead       bool
+	CreationDate time.Time
+}
+
+type GroupChat struct {
+	ID           int
+	GroupID      int
+	SenderID     int
+	Message      string
+	ImageID      int
 	CreationDate time.Time
 }

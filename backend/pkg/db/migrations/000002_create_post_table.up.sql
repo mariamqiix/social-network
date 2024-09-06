@@ -2,10 +2,10 @@
 CREATE TABLE Post (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES User(id),
-    group_id INTEGER REFERENCES GroupTable(id),
-    parent_id INTEGER REFERENCES Post(id),
+    group_id INTEGER REFERENCES GroupTable(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    parent_id INTEGER REFERENCES Post(id) ON UPDATE CASCADE ON DELETE CASCADE,
     content TEXT,
-    image_id INTEGER REFERENCES Image(id),
+    image_id INTEGER REFERENCES Image(id) ON UPDATE CASCADE ON DELETE CASCADE,
     privacy VARCHAR(10) CHECK (privacy IN ('Public', 'Private', 'Almost')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -13,14 +13,14 @@ CREATE TABLE Post (
 -- Recipient Table
 CREATE TABLE Recipient (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    post_id INTEGER REFERENCES Post(id),
-    recipient_id INTEGER REFERENCES User(id)
+    post_id INTEGER REFERENCES Post(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    recipient_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE Reaction (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER REFERENCES User(id),
-    post_id INTEGER REFERENCES Post(id),
+    user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    post_id INTEGER REFERENCES Post(id) ON UPDATE CASCADE ON DELETE CASCADE,
     reaction_type VARCHAR(10) CHECK (reaction_type IN ('Like', 'Dislike')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_id, post_id) -- Ensures a user can only react once per post

@@ -1,8 +1,8 @@
 -- Event Table
 CREATE TABLE Event (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    group_id INTEGER REFERENCES GroupTable(id),
-    creator_id INTEGER REFERENCES User(id),
+    group_id INTEGER REFERENCES GroupTable(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    creator_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     title VARCHAR(20),
     description TEXT,
     event_time TIMESTAMP,
@@ -12,8 +12,8 @@ CREATE TABLE Event (
 -- EventResponse Table
 CREATE TABLE EventResponse (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    event_id INTEGER REFERENCES Event(id),
-    user_id INTEGER REFERENCES User(id),
+    event_id INTEGER REFERENCES Event(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     response VARCHAR(100),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

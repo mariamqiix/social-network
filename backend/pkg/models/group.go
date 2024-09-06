@@ -2,7 +2,6 @@ package models
 
 import (
 	"backend/pkg/structs"
-	"fmt"
 )
 
 func CreateGroup(g structs.Group) error {
@@ -171,7 +170,6 @@ func GetUserInvites(userID int) ([]structs.GroupRequest, error) {
 
 	// Iterate over the rows and scan each row into a GroupRequest struct
 	for rows.Next() {
-		fmt.Print("hello")
 		var request structs.GroupRequest
 		err := rows.Scan(
 			&request.ID,
@@ -276,4 +274,51 @@ func GetAllGroups() ([]structs.Group, error) {
 	}
 	// Return the groups if everything was successful
 	return groups, nil
+}
+func GetGroupTitleById(groupID int) (string, error) {
+	// Execute a read query to fetch the group title by ID
+	rows, err := Read("GroupTable", []string{"title"}, []string{"id"}, []interface{}{groupID})
+	if err != nil {
+		return "", err
+	}
+	defer rows.Close()
+	// Check if a result is found
+	if !rows.Next() {
+		return "", nil // No group found, return nil without error
+	}
+	// Create a Group struct to hold the scanned data
+	var group structs.Group
+	// Scan the row into the Group struct fields
+	err = rows.Scan(
+		&group.Title,
+	)
+	if err != nil {
+		return "", err
+	}
+	// Return the group struct if everything was successful
+	return group.Title, nil
+}
+
+func CheckGroupMember(groupID, userID int) (bool, error) {
+	rows, err := Read("GroupMember", []string{"group_id"}, []string{"group_id", "user_id"}, []interface{}{groupID, userID})
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return false, nil
+	}
+	return true, nil
+}
+
+func CheckGroupCreator(groupID, userID int) (bool, error) {
+	rows, err := Read("GroupTable", []string{"*"}, []string{"id", "creator_id"}, []interface{}{groupID, userID})
+	if err != nil {
+		return false, err
+	}
+	defer rows.Close()
+	if rows.Next() {
+		return true, nil
+	}
+	return false, nil
 }

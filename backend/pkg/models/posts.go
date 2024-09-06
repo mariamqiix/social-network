@@ -284,6 +284,8 @@ func GetAllPosts() ([]structs.Post, error) {
 		err := rows.Scan(
 			&post.ID,
 			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
 			&post.Content,
 			&post.ImageID,
 			&post.Privacy,

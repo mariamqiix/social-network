@@ -8,8 +8,8 @@ import (
 
 func CreateUser(u structs.User) error {
 	// Create a new record in the User table
-	columns := []string{"username", "user_type", "hashed_password", "first_name", "last_name", "date_of_birth", "profile_type", "image_id"}
-	values := []interface{}{u.Username, u.UserType, u.HashedPassword, u.FirstName, u.LastName, u.DateOfBirth, u.ProfileType, "-1"}
+	columns := []string{"username", "user_type", "email", "hashed_password", "first_name", "last_name","profile_type", "date_of_birth", "profile_type", "image_id"}
+	values := []interface{}{u.Username, u.UserType, u.Email, u.HashedPassword, u.FirstName, u.LastName,u.ProfileType, u.DateOfBirth, u.ProfileType, "-1"}
 	return Create("User", columns, values)
 }
 
@@ -33,6 +33,7 @@ func GetUserByUsername(username string) (*structs.User, error) {
 		&user.ID,
 		&user.Username,
 		&user.UserType,
+		&user.Email,
 		&user.HashedPassword,
 		&user.FirstName,
 		&user.LastName,
@@ -69,6 +70,7 @@ func GetUserByID(id int) (*structs.User, error) {
 		&user.ID,
 		&user.Username,
 		&user.UserType,
+		&user.Email,
 		&user.HashedPassword,
 		&user.FirstName,
 		&user.LastName,
@@ -104,6 +106,7 @@ func GetAllUsers() ([]structs.User, error) {
 			&user.ID,
 			&user.Username,
 			&user.UserType,
+			&user.Email,
 			&user.HashedPassword,
 			&user.FirstName,
 			&user.LastName,
@@ -131,6 +134,7 @@ func UpdateUser(u structs.User) error {
 	// Iterate over the map to populate the slices
 	updates := map[string]interface{}{
 		"username":        u.Username,
+		"email":           u.Email,
 		"user_type":       u.UserType,
 		"hashed_password": u.HashedPassword,
 		"first_name":      u.FirstName,
@@ -282,4 +286,101 @@ func GetFollows(userID int, followType string) ([]structs.Follower, error) {
 
 	// Return the slice of followers if everything was successful
 	return followers, nil
+}
+
+func GetUserEmailByUsername(username string) (string, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"email"}, []string{"username"}, []interface{}{username})
+	if err != nil {
+		return "", fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return "", fmt.Errorf("no user found")
+	}
+	var email string
+	err = rows.Scan(&email)
+	if err != nil {
+		return "", fmt.Errorf("error scanning row: %v", err)
+	}
+	return email, nil
+}
+func GetUserEmailByID(id int) (string, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"email"}, []string{"id"}, []interface{}{id})
+	if err != nil {
+		return "", fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return "", fmt.Errorf("no user found")
+	}
+	var email string
+	err = rows.Scan(&email)
+	if err != nil {
+		return "", fmt.Errorf("error scanning row: %v", err)
+	}
+	return email, nil
+}
+
+func GetUsernameByUserId(userId int) (string, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"username"}, []string{"id"}, []interface{}{userId})
+	if err != nil {
+		return "", fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return "", fmt.Errorf("no user found")
+	}
+	var username string
+	err = rows.Scan(&username)
+	if err != nil {
+		return "", fmt.Errorf("error scanning row: %v", err)
+	}
+	return username, nil
+}
+
+func GetUsernameByEmail(email string) (string, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"username"}, []string{"email"}, []interface{}{email})
+	if err != nil {
+		return "", fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return "", fmt.Errorf("no user found")
+	}
+	var username string
+	err = rows.Scan(&username)
+	if err != nil {
+		return "", fmt.Errorf("error scanning row: %v", err)
+	}
+	return username, nil
+}
+
+func CheckUsernameExists(username string) (bool, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"username"}, []string{"username"}, []interface{}{username})
+	if err != nil {
+		return false, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return false, nil
+	}
+	return true, nil
+}
+
+func CheckEmailExists(email string) (bool, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"email"}, []string{"email"}, []interface{}{email})
+	if err != nil {
+		return false, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return false, nil
+	}
+	return true, nil
 }
