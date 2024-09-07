@@ -1,13 +1,14 @@
 package models
 
 import (
+	"backend/pkg/db"
 	"backend/pkg/structs"
 )
 
 func CreateGroup(g structs.Group) error {
 	// Create a new record in the Group table
-	columns := []string{"creator_id", "title", "description"}
-	values := []interface{}{g.CreatorID, g.Title, g.Description}
+	columns := []string{"creator_id", "title", "description", "image_id"}
+	values := []interface{}{g.CreatorID, g.Title, g.Description, g.ImageID}
 	return Create("GroupTable", columns, values)
 }
 
@@ -38,6 +39,7 @@ func GetGroupByID(id int) (*structs.Group, error) {
 		&group.CreatorID,
 		&group.Title,
 		&group.Description,
+		&group.ImageID,
 		&group.CreationDate,
 	)
 	if err != nil {
@@ -211,6 +213,7 @@ func GetGroupsCreatedByTheUser(userID int) ([]structs.Group, error) {
 			&group.CreatorID,
 			&group.Title,
 			&group.Description,
+			&group.ImageID,
 			&group.CreationDate,
 		)
 		if err != nil {
@@ -265,6 +268,7 @@ func GetAllGroups() ([]structs.Group, error) {
 			&group.CreatorID,
 			&group.Title,
 			&group.Description,
+			&group.ImageID,
 			&group.CreationDate,
 		)
 		if err != nil {
@@ -321,4 +325,30 @@ func CheckGroupCreator(groupID, userID int) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+func SearchGroup(subString string) ([]structs.Group, error) {
+	query := `SELECT * FROM GroupTable WHERE title LIKE ? OR description LIKE ?`
+	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var groups []structs.Group
+	for rows.Next() {
+		var group structs.Group
+		err := rows.Scan(
+			&group.ID,
+			&group.CreatorID,
+			&group.Title,
+			&group.Description,
+			&group.ImageID,
+			&group.CreationDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		groups = append(groups, group)
+	}
+	return groups, nil
 }

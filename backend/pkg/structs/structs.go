@@ -65,6 +65,7 @@ type Group struct {
 	CreatorID    int
 	Title        string
 	Description  string
+	ImageID      int
 	CreationDate time.Time
 }
 

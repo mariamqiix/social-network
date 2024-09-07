@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/pkg/db"
 	"backend/pkg/structs"
 	"fmt"
 )
@@ -14,15 +15,22 @@ func CreateUserPost(p structs.Post) error {
 
 func CreateGroupPost(p structs.Post) error {
 	// Create a new record in the Post table
-	columns := []string{"group_id", "content", "image_id", "privacy"}
-	values := []interface{}{p.GroupID, p.Content, p.ImageID, "Public"}
+	columns := []string{"user_id", "group_id", "content", "image_id", "privacy"}
+	values := []interface{}{p.UserID, p.GroupID, p.Content, p.ImageID, "Public"}
 	return Create("Post", columns, values)
 }
 
-func CreateComment(p structs.Post) error {
+func CreateNormalComment(p structs.Post) error {
 	// Create a new record in the Post table
 	columns := []string{"user_id", "parent_id", "content", "image_id", "privacy"}
 	values := []interface{}{p.UserID, p.ParentID, p.Content, p.ImageID, "Public"}
+	return Create("Post", columns, values)
+}
+
+func CreateGroupComment(p structs.Post) error {
+	// Create a new record in the Post table
+	columns := []string{"user_id", "group_id", "parent_id", "content", "image_id", "privacy"}
+	values := []interface{}{p.UserID, p.GroupID, p.ParentID, p.Content, p.ImageID, "Public"}
 	return Create("Post", columns, values)
 }
 
@@ -71,17 +79,17 @@ func GetGroupPosts(groupID int) ([]structs.Post, error) {
 
 // GetUserPosts retrieves posts for a user and filters them to include only top-level posts (ParentID = -1)
 func GetUserPosts(userID int) ([]structs.Post, error) {
-	return GetPosts(userID, "user_id", -1)
+	return GetPosts(userID, "group_id IS NULL AND user_id", -1)
 }
 
 // GetUserPosts retrieves posts for a user and filters them to include only top-level posts (ParentID = -1)
 func GetUserComments(userID int) ([]structs.Post, error) {
 	// Retrieve posts for the given user ID
-	return GetPosts(userID, "user_id", 1)
+	return GetPosts(userID, "group_id IS NULL AND user_id", 1)
 }
 
 func GetPostComments(postID int) ([]structs.Post, error) {
-	return GetPosts(postID, "parent_id", 1)
+	return GetPosts(postID, "group_id IS NULL parent_id", 1)
 }
 func GetPosts(id int, column string, parentID int) ([]structs.Post, error) {
 	// Define the WHERE clause and parameters
@@ -298,4 +306,196 @@ func GetAllPosts() ([]structs.Post, error) {
 	}
 	// Return the posts if everything was successful
 	return posts, nil
+}
+
+func GetLikedPosts(userId int) ([]structs.Post, error) {
+	return GetPostsByReaction(userId, "Like")
+}
+
+func GetDisLikedPosts(userId int) ([]structs.Post, error) {
+	return GetPostsByReaction(userId, "Dislike")
+}
+
+func GetPostsByReaction(userId int, reaction string) ([]structs.Post, error) {
+	query := fmt.Sprintf(`SELECT * FROM post WHERE id IN (
+                SELECT post_id FROM reaction 
+                WHERE user_id = ? AND reaction_type = '%s'
+              ) AND privacy = 'Public'`, reaction)
+	rows, err := db.Database.Query(query, userId)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the posts
+	var posts []structs.Post
+
+	// Iterate over the rows and scan each row into a Post struct
+	for rows.Next() {
+		var post structs.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+
+	// Check if any error occurred during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
+	}
+
+	// Return the posts if everything was successful
+	return posts, nil
+}
+
+func DidUserReact(userId int, postId int) (bool, error) {
+	rows, err := Read("Reaction", []string{"*"}, []string{"user_id", "post_id"}, []interface{}{userId, postId})
+	if err != nil {
+		return false, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if rows.Next() {
+		return true, nil
+	}
+	return false, nil
+}
+
+func GetGroupPostsForUser(userId int) ([]structs.Post, error) {
+	query := `SELECT * FROM post WHERE group_id IN (
+                SELECT group_id FROM group_member WHERE user_id = ?
+              )`
+	rows, err := db.Database.Query(query, userId)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	// Create a slice to hold the posts
+	var posts []structs.Post
+	// Iterate over the rows and scan each row into a Post struct
+	for rows.Next() {
+		var post structs.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+	// Return the posts if everything was successful
+	return posts, nil
+}
+
+func GetPostsForUser(userId int) ([]structs.Post, error) {
+	query := `
+        SELECT * FROM Post WHERE privacy = 'Public'
+        UNION
+        SELECT * FROM Post WHERE id IN (SELECT post_id FROM Recipient WHERE recipient_id = ?)
+        UNION
+        SELECT * FROM Post WHERE privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?)
+    `
+	rows, err := db.Database.Query(query, userId, userId)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the posts
+	var posts []structs.Post
+
+	// Iterate over the rows and scan each row into a Post struct
+	for rows.Next() {
+		var post structs.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+
+	// Check if any error occurred during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
+	}
+
+	// Return the posts if everything was successful
+	return posts, nil
+}
+
+func SearchUserPosts(subString string) ([]structs.Group, error) {
+	query := `SELECT * FROM Post WHERE ( content LIKE ? ) AND group_id IS NULL AND private = 'Public'`
+	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var groups []structs.Group
+	for rows.Next() {
+		var group structs.Group
+		err := rows.Scan(
+			&group.ID,
+			&group.CreatorID,
+			&group.Title,
+			&group.Description,
+			&group.ImageID,
+			&group.CreationDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		groups = append(groups, group)
+	}
+	return groups, nil
+}
+
+func SearchGroupPosts(subString string) ([]structs.Group, error) {
+	query := `SELECT * FROM Post WHERE ( content LIKE ? ) AND group_id IS NOT NULL AND private = 'Public'`
+	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var groups []structs.Group
+	for rows.Next() {
+		var group structs.Group
+		err := rows.Scan(
+			&group.ID,
+			&group.CreatorID,
+			&group.Title,
+			&group.Description,
+			&group.ImageID,
+			&group.CreationDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		groups = append(groups, group)
+	}
+	return groups, nil
 }

@@ -1,6 +1,5 @@
 import Post from "../components/GroupPostContent"; // Adjust the path if necessary
-import { randomColor } from "../components/colors"; // Adjust the path if necessary
-
+import { randomColor } from "../components/colors"; 
 export default function Page() {
     return (
         <div

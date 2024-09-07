@@ -353,7 +353,7 @@ func TestCreateComment(t *testing.T) {
 		Privacy:  "Public",
 	}
 
-	err := CreateComment(post)
+	err := CreateNormalComment(post)
 	if err != nil {
 		t.Errorf("CreateComment failed: %v", err)
 	}
