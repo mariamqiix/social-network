@@ -1,13 +1,6 @@
-// import AuthorInfo from '../components/Author-info';
 import PostContent from '../components/PostContent';
 import PostActions from '../components/PostActions';
 import CommentList from '../components/CommentList';
-
-
-
-export function page() {
-    return <h1>You have no posts</h1>;
-}
 
 export default function PostPage() {
   const post = {
@@ -15,19 +8,19 @@ export default function PostPage() {
       name: "Jessy Lincolin",
       avatar: "/placeholder.jpg",
     },
-    time: "2 hours ago",
+    time: "April 16, 2024",
     content: "Hi everyone, today I was on the most beautiful mountain in the world 🏔, I also want to say hi to Silena, Olya, and Davis!",
     images: [
-      "/placeholder.jpg",
+      "/placeholder.jpg", // Your uploaded image
     ],
-    likes: "6355 likes",
+    likes: "1",
     comments: [
       {
         author: {
           name: "Vitaliy Boyko",
           avatar: "/placeholder.jpg",
         },
-        content: "Thats very nice! enjoy your time.",
+        content: "That's very nice! enjoy your time.",
         time: "15 minutes ago",
         likes: "4 likes"
       },
@@ -44,33 +37,29 @@ export default function PostPage() {
   };
 
   return (
-    <div className="bg-gray-100 min-h-screen flex">
-      <main className="flex-1 p-4">
-        <div className="col-span-9">
-          <div className="p-4 bg-white rounded-lg shadow-md">
-          <div className="postBody">
-          
-            {/* Post Content */}
-            <PostContent 
-              avatar={post.author.avatar} 
-              name={post.author.name} 
-              time={post.time} 
-              content={post.content} 
-              images={post.images} 
-            />
-            {/* Post Actions */}
-            {/* <PostActions likes={post.likes} /> */}
-            </div>
-        </div>
-            <br></br>
-        <div className="card">   
-          <div className="card-body">
-            {/* Comments Section */}
+    <div className="container my-4">
+      <div className="row justify-content-center">
+        {/* Use a wider column */}
+        <div className="col-lg-10">
+          {/* Post Content */}
+          <PostContent 
+            avatar={post.author.avatar} 
+            name={post.author.name} 
+            time={post.time} 
+            content={post.content} 
+            images={post.images} 
+          />
+
+          {/* Post Actions */}
+          <PostActions likes={post.likes} />
+
+          {/* Comments Section */}
+          <div className="mt-4">
             <CommentList comments={post.comments} />
-            </div>
-            </div>
+          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
+
