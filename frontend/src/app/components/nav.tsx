@@ -73,7 +73,7 @@ export default function Nav() {
                             fill={pathName == link ? "white" : "black"}
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
-                            stroke="currentColor"
+                            // stroke="currentColor"
                             className="icon"
                         >
                             {icons[i]}

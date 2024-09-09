@@ -23,8 +23,7 @@ export default function loginPage() {
                     setIsRegister(false);
                 }}>Register</a>
             </span>
-            <br />
-            <button type="submit" className="btn btn-dark">Login</button>
+            <button type="submit" className="btn btn-dark mt-3">Login</button>
         </form>
     </Card> : <Card title="Register" color={color}>
         <form className="d-flex flex-column">
@@ -48,7 +47,7 @@ export default function loginPage() {
                 }}>Login</a>
             </span>
             <br />
-            <button type="submit" className="btn btn-dark">Register</button>
+            <button type="submit" className="btn btn-dark mt-3">Register</button>
         </form>
     </Card>;
 }
