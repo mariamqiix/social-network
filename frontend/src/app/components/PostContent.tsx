@@ -1,10 +1,13 @@
 import Image from 'next/image';
+import { randomColor } from "../components/colors"; 
 
 const PostContent = ({ content, images, avatar, name, time }) => {
     return (
       <div className="card mb-4 shadow-sm">
         {/* Author Info */}
-        <div className="card-header d-flex align-items-center">
+        <div className="card-header d-flex align-items-center" style={{
+        backgroundColor: randomColor(), // Set the background color to a random color
+            }}>
           <Image
             src={"/placeholder.jpg"}
             alt="Author's Avatar"
