@@ -4,6 +4,7 @@ import "./globals.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Nav from "./components/nav";
 import SearchBar from "./components/search_bar";
+import Toasts from "./components/toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
           <SearchBar />
           {children}
         </div>
+        <Toasts />
       </body>
     </html>
   );
