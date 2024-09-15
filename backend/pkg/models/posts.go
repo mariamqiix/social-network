@@ -358,8 +358,8 @@ func GetPostsByReaction(userId int, reaction string) ([]structs.Post, error) {
 	return posts, nil
 }
 
-func DidUserReact(userId int, postId int) (bool, error) {
-	rows, err := Read("Reaction", []string{"*"}, []string{"user_id", "post_id"}, []interface{}{userId, postId})
+func DidUserReact(userId, postId int, Reaction string) (bool, error) {
+	rows, err := Read("Reaction", []string{"*"}, []string{"user_id", "post_id", "reaction_type"}, []interface{}{userId, postId, Reaction})
 	if err != nil {
 		return false, fmt.Errorf("error executing query: %v", err)
 	}
@@ -406,12 +406,14 @@ func GetGroupPostsForUser(userId int) ([]structs.Post, error) {
 func GetPostsForUser(userId int) ([]structs.Post, error) {
 	query := `
         SELECT * FROM Post WHERE privacy = 'Public'
+		UNION
+		SELECT * FROM Post WHERE user_id = ?
         UNION
         SELECT * FROM Post WHERE id IN (SELECT post_id FROM Recipient WHERE recipient_id = ?)
         UNION
         SELECT * FROM Post WHERE privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?)
     `
-	rows, err := db.Database.Query(query, userId, userId)
+	rows, err := db.Database.Query(query, userId, userId, userId)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)
 	}
@@ -447,31 +449,32 @@ func GetPostsForUser(userId int) ([]structs.Post, error) {
 	// Return the posts if everything was successful
 	return posts, nil
 }
-
-func SearchUserPosts(subString string) ([]structs.Group, error) {
-	query := `SELECT * FROM Post WHERE ( content LIKE ? ) AND group_id IS NULL AND private = 'Public'`
-	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%")
+func SearchUserPosts(userId int, subString string) ([]structs.Post, error) {
+	query := `SELECT * FROM Post WHERE (( content LIKE ? ) AND group_id IS NULL AND private = 'Public') OR (( content LIKE ? ) AND user_id = ?)`
+	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%", userId)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var groups []structs.Group
+	var posts []structs.Post
 	for rows.Next() {
-		var group structs.Group
+		var post structs.Post
 		err := rows.Scan(
-			&group.ID,
-			&group.CreatorID,
-			&group.Title,
-			&group.Description,
-			&group.ImageID,
-			&group.CreationDate,
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
 		)
 		if err != nil {
 			return nil, err
 		}
-		groups = append(groups, group)
+		posts = append(posts, post)
 	}
-	return groups, nil
+	return posts, nil
 }
 
 func SearchGroupPosts(subString string) ([]structs.Group, error) {
@@ -498,4 +501,31 @@ func SearchGroupPosts(subString string) ([]structs.Group, error) {
 		groups = append(groups, group)
 	}
 	return groups, nil
+}
+
+func GetPostsForGuest() ([]structs.Post, error) {
+	Rows, err := Read("Post", []string{"*"}, []string{"privacy"}, []interface{}{"Public"})
+	if err != nil {
+		return nil, err
+	}
+	defer Rows.Close()
+	var posts []structs.Post
+	for Rows.Next() {
+		var post structs.Post
+		err := Rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, post)
+	}
+	return posts, nil
 }

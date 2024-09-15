@@ -28,7 +28,7 @@ type Follower struct {
 type Session struct {
 	ID           int       // Primary key
 	Token        string    // Session token (VARCHAR(64))
-	UserID       int       // Foreign key to User table
+	UserID       *int       // Foreign key to User table
 	CreationTime time.Time // Timestamp, defaults to CURRENT_TIMESTAMP
 }
 

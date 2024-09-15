@@ -270,9 +270,10 @@ func TestUpdateUser(t *testing.T) {
 
 func TestCreateUserSession(t *testing.T) {
 	// Define a mock session to create
+	UserId := 1
 	mockSession := structs.Session{
 		Token:  "testtoken",
-		UserID: 1, // Replace with a valid user ID
+		UserID: &UserId, // Replace with a valid user ID
 	}
 
 	// Call the CreateUserSession function

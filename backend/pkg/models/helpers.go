@@ -130,3 +130,33 @@ func Delete(tableName string, conditionColumns []string, conditionValues []inter
 	}
 	return nil
 }
+
+// checks if a value exists on a certain table
+func CheckExistance(tablename, columnname, value string) (bool, error) {
+	// Prepare the SQL statement with a placeholder
+	mutex.Lock()
+	defer mutex.Unlock()
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s = ?", tablename, columnname)
+
+	stmt, err := db.Database.Prepare(query)
+
+	if err != nil {
+		return false, err
+	}
+	defer stmt.Close()
+
+	// Execute the SQL statement and retrieve the count
+	var count int
+	err = stmt.QueryRow(value).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	if count > 0 {
+		// value exists in the database
+		return true, nil
+	}
+
+	// value does not exist in the database
+	return false, nil
+}
