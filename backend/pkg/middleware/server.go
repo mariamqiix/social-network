@@ -12,6 +12,7 @@ var userLimiter *UserRateLimiter
 func GoLive() {
 
 	http.HandleFunc("/homePage", HomePageHandler)
+	http.HandleFunc("/postPage/{id}", PostPageHandler)
 
 	fmt.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
