@@ -1,7 +1,9 @@
 package models
 
 import (
+	"backend/pkg/db"
 	"backend/pkg/structs"
+	"log"
 	"time"
 )
 
@@ -281,3 +283,38 @@ func CheckResponse(eventID, userID int) (bool, error) {
 	return true, nil
 }
 
+func GetUserEvents(userID int) ([]structs.Event, error) {
+	query := `SELECT * FROM events WHERE group_id IN (SELECT group_id FROM group_members WHERE user_id = ?) AND event_time > NOW()`
+	rows, err := db.Database.Query(query, userID)
+	if err != nil {
+		log.Printf("error getting user events: %s\n", err.Error())
+		return nil, err
+	}
+	defer rows.Close()
+
+	var events []structs.Event
+	for rows.Next() {
+		var event structs.Event
+		err = rows.Scan(
+			&event.ID,
+			&event.GroupID,
+			&event.CreatorID,
+			&event.Title,
+			&event.Description,
+			&event.EventTime,
+			&event.CreationDate,
+		)
+		if err != nil {
+			log.Printf("error scanning event row: %s\n", err.Error())
+			return nil, err
+		}
+		events = append(events, event)
+	}
+
+	if err = rows.Err(); err != nil {
+		log.Printf("error iterating over event rows: %s\n", err.Error())
+		return nil, err
+	}
+
+	return events, nil
+}

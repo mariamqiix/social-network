@@ -91,7 +91,7 @@ func GroupsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !userLimiter.Allow(limiterUsername) {
-		view := GroupsPageView{
+		view := GroupsHomePageView{
 			User:   nil,
 			Groups: mapGroups(*sessionUser, groups),
 		}
@@ -105,7 +105,7 @@ func GroupsPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	User := ReturnUserResponse(sessionUser)
-	view := GroupsPageView{
+	view := GroupsHomePageView{
 		User:   User,
 		Posts:  mapPosts(sessionUser, posts),
 		Groups: mapGroups(*sessionUser, groups),

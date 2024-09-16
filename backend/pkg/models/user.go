@@ -8,8 +8,8 @@ import (
 
 func CreateUser(u structs.User) error {
 	// Create a new record in the User table
-	columns := []string{"username", "user_type", "email", "hashed_password", "first_name", "last_name","profile_type", "date_of_birth", "profile_type", "image_id"}
-	values := []interface{}{u.Username, u.UserType, u.Email, u.HashedPassword, u.FirstName, u.LastName,u.ProfileType, u.DateOfBirth, u.ProfileType, "-1"}
+	columns := []string{"username", "user_type", "email", "hashed_password", "first_name", "last_name", "profile_type", "date_of_birth", "profile_type", "image_id"}
+	values := []interface{}{u.Username, u.UserType, u.Email, u.HashedPassword, u.FirstName, u.LastName, u.ProfileType, u.DateOfBirth, u.ProfileType, "-1"}
 	return Create("User", columns, values)
 }
 
@@ -383,4 +383,22 @@ func CheckEmailExists(email string) (bool, error) {
 		return false, nil
 	}
 	return true, nil
+}
+
+func GetUserIdByUsername(username string) (int, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"id"}, []string{"username"}, []interface{}{username})
+	if err != nil {
+		return 0, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return 0, fmt.Errorf("no user found")
+	}
+	var id int
+	err = rows.Scan(&id)
+	if err != nil {
+		return 0, fmt.Errorf("error scanning row: %v", err)
+	}
+	return id, nil
 }

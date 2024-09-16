@@ -5,8 +5,11 @@ import (
 	"backend/pkg/structs"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 func GetUser(r *http.Request) *structs.User {
@@ -177,4 +180,125 @@ func mapGroups(sessionUser structs.User, groups []structs.Group) []structs.Group
 		})
 	}
 	return groupResponses
+}
+
+func MapMembers(members []structs.GroupMember) []structs.UserResponse {
+	var memberResponses []structs.UserResponse
+	for _, User := range members {
+		member, err := models.GetUserByID(User.ID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		memberResponses = append(memberResponses, structs.UserResponse{
+			Id:          member.ID,
+			Username:    member.Username,
+			Nickname:    *member.Nickname,
+			Email:       member.Email,
+			FirstName:   member.FirstName,
+			LastName:    member.LastName,
+			DateOfBirth: member.DateOfBirth,
+			Bio:         *member.Bio,
+			Image:       GetImageData(*member.ImageID),
+		})
+	}
+	return memberResponses
+}
+
+func mapEvents(sessionUser structs.User, events []structs.Event) []structs.GroupEventResponse {
+	var eventResponses []structs.GroupEventResponse
+	for _, event := range events {
+		user, err := models.GetUserByID(event.CreatorID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		Group, err := models.GetGroupByID(event.GroupID)
+		if err != nil {
+			log.Printf("error getting group by group id: %s\n", err.Error())
+			continue
+		}
+		DidUserRespone, err := models.CheckExistance("EventResponse", []string{"event_id", "user_id"}, []interface{}{event.ID, sessionUser.ID})
+		if err != nil {
+			log.Printf("error checking if user is member of group: %s\n", err.Error())
+			continue
+		}
+		GroupResponse := mapGroups(sessionUser, []structs.Group{*Group})[0]
+		EventCreator := ReturnUserResponse(user)
+		eventResponses = append(eventResponses, structs.GroupEventResponse{
+			Id:             event.ID,
+			Creator:        *EventCreator,
+			Group:          GroupResponse,
+			Title:          event.Title,
+			Description:    event.Description,
+			EventTime:      event.EventTime,
+			DidUserRespone: DidUserRespone,
+			CreationDate:   event.CreationDate,
+		})
+	}
+	return eventResponses
+}
+
+func mapChats(sessionuser structs.User, chats []structs.GroupChat) []structs.GroupChatResponse {
+	var chatResponses []structs.GroupChatResponse
+	for _, chat := range chats {
+		user, err := models.GetUserByID(chat.SenderID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		IsItTheUserMessage := chat.SenderID == sessionuser.ID
+		chatResponses = append(chatResponses, structs.GroupChatResponse{
+			Id:           chat.ID,
+			Sender:       *ReturnUserResponse(user),
+			Content:      chat.Message,
+			CreationDate: chat.CreationDate,
+			Sended:       IsItTheUserMessage, /// if the user is the one who sent the message or not
+			Image:        GetImageData(*user.ImageID),
+			Color:        randomLightColor(),
+		})
+	}
+	return chatResponses
+}
+
+// randomLightColor generates a random light color in hexadecimal format.
+func randomLightColor() string {
+	rand.Seed(time.Now().UnixNano())
+	r := 128 + rand.Intn(128) // Range: 128-255
+	g := 128 + rand.Intn(128) // Range: 128-255
+	b := 128 + rand.Intn(128) // Range: 128-255
+	return fmt.Sprintf("#%02X%02X%02X", r, g, b)
+}
+
+// TODO: Implement mapNotifications, which should return a slice of structs.NotificatoinResponse.
+// use case statment for teh Type , we should determine the type of the notification and map it to the correct struct
+// example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
+func mapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
+	return nil
+}
+
+func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
+	var chatResponses []structs.ChatResponse
+	for _, chat := range Messages {
+		Sender, err := models.GetUserByID(chat.SenderID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		Receiver, err := models.GetUserByID(chat.ReceiverID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		chatResponses = append(chatResponses, structs.ChatResponse{
+			Id:           chat.ID,
+			Sender:       *ReturnUserResponse(Sender),
+			Receiver:     *ReturnUserResponse(Receiver),
+			Content:      chat.Message,
+			CreationDate: chat.CreationDate,
+			Image:        GetImageData(chat.ImageID),
+			Color:        randomLightColor(),
+		})
+	}
+	return chatResponses
 }
