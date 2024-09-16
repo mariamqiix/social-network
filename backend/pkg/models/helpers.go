@@ -4,6 +4,7 @@ import (
 	"backend/pkg/db"
 	"database/sql"
 	"fmt"
+	"strings"
 	"sync"
 )
 
@@ -131,32 +132,40 @@ func Delete(tableName string, conditionColumns []string, conditionValues []inter
 	return nil
 }
 
-// checks if a value exists on a certain table
-func CheckExistance(tablename, columnname, value string) (bool, error) {
-	// Prepare the SQL statement with a placeholder
+// checks if values exist on a certain table for multiple columns
+func CheckExistance(tablename string, columnnames []string, values []interface{}) (bool, error) {
+	// Check if column names and values are aligned in length
+	if len(columnnames) != len(values) {
+		return false, fmt.Errorf("the number of column names and values do not match")
+	}
+
+	// Prepare the SQL query with placeholders for each column
+	var conditions []string
+	for _, col := range columnnames {
+		conditions = append(conditions, fmt.Sprintf("%s = ?", col))
+	}
+	whereClause := strings.Join(conditions, " AND ")
+
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s", tablename, whereClause)
+
+	// Lock the mutex
 	mutex.Lock()
 	defer mutex.Unlock()
-	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s = ?", tablename, columnname)
 
+	// Prepare the statement
 	stmt, err := db.Database.Prepare(query)
-
 	if err != nil {
 		return false, err
 	}
 	defer stmt.Close()
 
-	// Execute the SQL statement and retrieve the count
+	// Execute the query with the provided values and scan the result
 	var count int
-	err = stmt.QueryRow(value).Scan(&count)
+	err = stmt.QueryRow(values...).Scan(&count)
 	if err != nil {
 		return false, err
 	}
 
-	if count > 0 {
-		// value exists in the database
-		return true, nil
-	}
-
-	// value does not exist in the database
-	return false, nil
+	// Check if the count indicates existence
+	return count > 0, nil
 }

@@ -14,7 +14,7 @@ func GetUser(r *http.Request) *structs.User {
 	if err == http.ErrNoCookie {
 		return nil
 	}
-	sessionExists, _ := models.CheckExistance("UserSession", "token", sessionCookie.Value)
+	sessionExists, _ := models.CheckExistance("UserSession", []string{"token"}, []interface{}{sessionCookie.Value})
 	if !sessionExists {
 		return nil
 	}
@@ -79,11 +79,23 @@ func mapPosts(sessionuser *structs.User, posts []structs.Post) []structs.PostRes
 				log.Printf("error getting group by group id: %s\n", err.Error())
 				continue
 			}
+			user, err = models.GetUserByID(group.CreatorID)
+			if err != nil {
+				log.Printf("error getting user by user id: %s\n", err.Error())
+				continue
+			}
+			IsUserMember, err := models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, user.ID})
+			if err != nil {
+				log.Printf("error checking if user is member of group: %s\n", err.Error())
+				continue
+			}
+			GroupCreator := ReturnUserResponse(user)
 			Group = &structs.GroupResponse{
 				Id:           group.ID,
-				CreatorId:    group.CreatorID,
+				Creator:      *GroupCreator,
 				Title:        group.Title,
 				Description:  group.Description,
+				IsUserMember: IsUserMember,
 				Image:        GetImageData(group.ImageID),
 				CreationDate: group.CreationDate,
 			}
@@ -138,4 +150,31 @@ func MapReaction(User *structs.User, post *structs.Post, reactionType string) *s
 		Count:        len(count),
 	}
 
+}
+
+func mapGroups(sessionUser structs.User, groups []structs.Group) []structs.GroupResponse {
+	var groupResponses []structs.GroupResponse
+	for _, group := range groups {
+		user, err := models.GetUserByID(group.CreatorID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		IsUserMember, err := models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
+		if err != nil {
+			log.Printf("error checking if user is member of group: %s\n", err.Error())
+			continue
+		}
+		GroupCreator := ReturnUserResponse(user)
+		groupResponses = append(groupResponses, structs.GroupResponse{
+			Id:           group.ID,
+			Creator:      *GroupCreator,
+			Title:        group.Title,
+			Description:  group.Description,
+			IsUserMember: IsUserMember,
+			Image:        GetImageData(group.ImageID),
+			CreationDate: group.CreationDate,
+		})
+	}
+	return groupResponses
 }

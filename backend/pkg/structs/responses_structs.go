@@ -34,12 +34,13 @@ type ReactionResponse struct {
 }
 
 type GroupResponse struct {
-	Id           int       `json:"id"`
-	CreatorId    int       `json:"creator_id"`
-	Title        string    `json:"title"`
-	Description  string    `json:"description"`
-	Image        string    `json:"image_url"`
-	CreationDate time.Time `json:"created_at"`
+	Id           int          `json:"id"`
+	Creator      UserResponse `json:"creator"`
+	Title        string       `json:"title"`
+	Description  string       `json:"description"`
+	Image        string       `json:"image_url"`
+	IsUserMember bool         `json:"is_user_member"`
+	CreationDate time.Time    `json:"created_at"`
 }
 
 type GroupMemberResponse struct {
