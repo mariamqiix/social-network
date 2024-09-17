@@ -9,8 +9,15 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"regexp"
 	"time"
 )
+
+var emailRegex = regexp.MustCompile(`^[\w]+@[\w]+\.[a-zA-Z]{2,}$`)
+
+func IsValidEmail(email string) bool {
+	return emailRegex.MatchString(email)
+}
 
 func GetUser(r *http.Request) *structs.User {
 	sessionCookie, err := r.Cookie("session")

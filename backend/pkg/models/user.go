@@ -50,6 +50,42 @@ func GetUserByUsername(username string) (*structs.User, error) {
 	return &user, nil
 }
 
+func GetUserByEmail(username string) (*structs.User, error) {
+	// Execute a read query to fetch the user by username
+	rows, err := Read("User", []string{"*"}, []string{"email"}, []interface{}{username})
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Check if a result is found
+	if !rows.Next() {
+		return nil, nil // No user found, return nil without error
+	}
+
+	// Create a User struct to hold the scanned data
+	var user structs.User
+	// Scan the row into the User struct fields
+	err = rows.Scan(
+		&user.ID,
+		&user.Username,
+		&user.UserType,
+		&user.Email,
+		&user.HashedPassword,
+		&user.FirstName,
+		&user.LastName,
+		&user.DateOfBirth,
+		&user.ImageID,
+		&user.Bio,
+		&user.ProfileType,
+		&user.Nickname,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("error scanning row: %v", err)
+	}
+	// Return the user struct if everything was successful
+	return &user, nil
+}
 func GetUserByID(id int) (*structs.User, error) {
 	// Execute a read query to fetch the user by ID
 	rows, err := Read("User", []string{"*"}, []string{"id"}, []interface{}{id})

@@ -314,10 +314,12 @@ func TestCreateFollower(t *testing.T) {
 
 func TestCreateUserPost(t *testing.T) {
 	userId := 1
+	ImageId := -1
+
 	post := structs.Post{
 		UserID:  &userId,
 		Content: "This is a test post",
-		ImageID: -1,
+		ImageID: &ImageId,
 		Privacy: "Public",
 	}
 
@@ -329,10 +331,12 @@ func TestCreateUserPost(t *testing.T) {
 
 func TestCreateGroupPost(t *testing.T) {
 	groupId := 1
+	ImageId := -1
+
 	post := structs.Post{
 		GroupID: &groupId,
 		Content: "This is a test group post",
-		ImageID: -1,
+		ImageID: &ImageId,
 		Privacy: "Public",
 	}
 
@@ -345,12 +349,13 @@ func TestCreateGroupPost(t *testing.T) {
 func TestCreateComment(t *testing.T) {
 	UserID := 1
 	ParentID := 1
+	ImageId := -1
 
 	post := structs.Post{
 		UserID:   &UserID,
 		ParentID: &ParentID,
 		Content:  "This is a test comment",
-		ImageID:  -1,
+		ImageID:  &ImageId,
 		Privacy:  "Public",
 	}
 
