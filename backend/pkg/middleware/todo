@@ -1,0 +1,9 @@
+Need to create :
+
+-   signup handler
+-   createpost handler
+-   chat handler (create a new chat using websocket)
+-   create notificatoin
+-   create reaction handler
+-   comment handler
+-   edit profile handler

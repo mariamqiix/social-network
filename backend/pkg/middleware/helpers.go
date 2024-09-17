@@ -279,13 +279,6 @@ func randomLightColor() string {
 	return fmt.Sprintf("#%02X%02X%02X", r, g, b)
 }
 
-// TODO: Implement mapNotifications, which should return a slice of structs.NotificatoinResponse.
-// use case statment for teh Type , we should determine the type of the notification and map it to the correct struct
-// example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
-func mapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
-	return nil
-}
-
 func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
 	var chatResponses []structs.ChatResponse
 	for _, chat := range Messages {
@@ -324,4 +317,11 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 		NewFollowers = append(NewFollowers, *UserResponse)
 	}
 	return NewFollowers
+}
+
+// TODO: Implement mapNotifications, which should return a slice of structs.NotificatoinResponse.
+// use case statment for teh Type , we should determine the type of the notification and map it to the correct struct
+// example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
+func mapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
+	return nil
 }
