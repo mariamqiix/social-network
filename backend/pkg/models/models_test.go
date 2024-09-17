@@ -417,7 +417,7 @@ func TestGetUserPosts(t *testing.T) {
 	}
 
 	// Test: Retrieve posts for the user
-	posts, err := GetUserPosts(userID)
+	posts, err := GetUserPosts("Public", userID)
 	if err != nil {
 		t.Errorf("GetUserPosts failed: %v", err)
 	}

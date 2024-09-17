@@ -30,3 +30,13 @@ type ChatPageView struct {
 	User     *structs.UserResponse // nil if not logged in
 	Messages []structs.ChatResponse
 }
+
+type ProfilePageView struct {
+	User          *structs.UserResponse // nil if not logged in
+	ProfileUser   *structs.UserResponse
+	Posts         []structs.PostResponse
+	Following     []structs.UserResponse
+	Followers     []structs.UserResponse
+	LikedPosts    []structs.PostResponse
+	DislikedPosts []structs.PostResponse
+}

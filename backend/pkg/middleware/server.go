@@ -11,23 +11,16 @@ var userLimiter *UserRateLimiter
 
 func GoLive() {
 
-	http.HandleFunc("/homePage", HomePageHandler)
+	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/postPage/{id}", PostPageHandler)
+	http.HandleFunc("/Profile", ProfilePageHandler)
 
 	fmt.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
-
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
-	limiterUsername := "[GUESTS]"
-	if sessionUser != nil {
-		limiterUsername = sessionUser.Username
-	}
-	if !userLimiter.Allow(limiterUsername) {
-		errorServer(w, http.StatusTooManyRequests)
-		return
-	}
+
 	view := homeView{
 		Posts: nil,
 		User:  nil,
@@ -43,9 +36,10 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 			LastName:    sessionUser.LastName,
 			DateOfBirth: sessionUser.DateOfBirth,
 			Bio:         *sessionUser.Bio,
-			Image:       GetImageData(*sessionUser.ImageID), // will use it as url(data:image/jpeg;base64,base64string)
+			Image:       GetImageData(sessionUser.ImageID), // will use it as url(data:image/jpeg;base64,base64string)
 		}
 	}
+
 	var posts []structs.Post
 	var err error
 	if sessionUser != nil {
@@ -56,6 +50,7 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		posts, err = models.GetPostsForGuest()
+		fmt.Print(posts)
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
 			return

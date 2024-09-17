@@ -50,9 +50,12 @@ func writeToJson(v any, w http.ResponseWriter) error {
 	return err
 }
 
-func GetImageData(imageID int) string {
+func GetImageData(imageID *int) string {
+	if imageID == nil {
+		return ""
+	}
 	// Retrieve the image data from the database
-	imageData, err := models.GetImageByID(imageID)
+	imageData, err := models.GetImageByID(*imageID)
 	if err != nil {
 		return ""
 	}
@@ -65,8 +68,7 @@ func GetImageData(imageID int) string {
 	base64Image := base64.StdEncoding.EncodeToString(imageData.Data)
 	return base64Image
 }
-
-func mapPosts(sessionuser *structs.User, posts []structs.Post) []structs.PostResponse {
+func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostResponse {
 	var postResponses []structs.PostResponse
 	for _, post := range posts {
 		user, err := models.GetUserByID(*post.UserID)
@@ -75,7 +77,7 @@ func mapPosts(sessionuser *structs.User, posts []structs.Post) []structs.PostRes
 			continue
 		}
 
-		var Group *structs.GroupResponse
+		var Group structs.GroupResponse
 		if post.GroupID != nil {
 			group, err := models.GetGroupByID(*post.GroupID)
 			if err != nil {
@@ -93,7 +95,7 @@ func mapPosts(sessionuser *structs.User, posts []structs.Post) []structs.PostRes
 				continue
 			}
 			GroupCreator := ReturnUserResponse(user)
-			Group = &structs.GroupResponse{
+			Group = structs.GroupResponse{
 				Id:           group.ID,
 				Creator:      *GroupCreator,
 				Title:        group.Title,
@@ -107,18 +109,17 @@ func mapPosts(sessionuser *structs.User, posts []structs.Post) []structs.PostRes
 		postResponses = append(postResponses, structs.PostResponse{
 			Id:           post.ID,
 			Author:       *auther,
-			Group:        *Group,
+			Group:        Group,
 			Content:      post.Content,
 			Image:        GetImageData(post.ImageID),
 			Privacy:      post.Privacy,
 			CreationDate: post.CreationDate,
-			Likes:        *MapReaction(sessionuser, &post, "Like"),
-			Dislikes:     *MapReaction(sessionuser, &post, "Dislike"),
+			Likes:        *MapReaction(sessionUser, &post, "Like"),
+			Dislikes:     *MapReaction(sessionUser, &post, "Dislike"),
 		})
 	}
 	return postResponses
 }
-
 func ReturnUserResponse(user *structs.User) *structs.UserResponse {
 	if user == nil {
 		return nil
@@ -132,17 +133,18 @@ func ReturnUserResponse(user *structs.User) *structs.UserResponse {
 		LastName:    user.LastName,
 		DateOfBirth: user.DateOfBirth,
 		Bio:         *user.Bio,
-		Image:       GetImageData(*user.ImageID), // will use it as url(data:image/jpeg;base64,base64string)
+		Image:       GetImageData(user.ImageID), // will use it as url(data:image/jpeg;base64,base64string)
 	}
 	return &userResponse
 }
 
 func MapReaction(User *structs.User, post *structs.Post, reactionType string) *structs.ReactionResponse {
-	didUserReact, err := models.DidUserReact(post.ID, User.ID, reactionType)
-	if err != nil {
-		log.Printf("error getting reaction by post id and user id: %s\n", err.Error())
-		return nil
+	didUserReact := false
+	if User != nil {
+		didUserReact, _ = models.DidUserReact(post.ID, User.ID, reactionType)
+
 	}
+
 	count, err := models.GetPostReactions(post.ID)
 	if err != nil {
 		log.Printf("error counting reactions by post id: %s\n", err.Error())
@@ -199,7 +201,7 @@ func MapMembers(members []structs.GroupMember) []structs.UserResponse {
 			LastName:    member.LastName,
 			DateOfBirth: member.DateOfBirth,
 			Bio:         *member.Bio,
-			Image:       GetImageData(*member.ImageID),
+			Image:       GetImageData(member.ImageID),
 		})
 	}
 	return memberResponses
@@ -254,7 +256,7 @@ func mapChats(sessionuser structs.User, chats []structs.GroupChat) []structs.Gro
 			Content:      chat.Message,
 			CreationDate: chat.CreationDate,
 			Sended:       IsItTheUserMessage, /// if the user is the one who sent the message or not
-			Image:        GetImageData(*user.ImageID),
+			Image:        GetImageData(user.ImageID),
 			Color:        randomLightColor(),
 		})
 	}
@@ -296,9 +298,23 @@ func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
 			Receiver:     *ReturnUserResponse(Receiver),
 			Content:      chat.Message,
 			CreationDate: chat.CreationDate,
-			Image:        GetImageData(chat.ImageID),
+			Image:        GetImageData(&chat.ImageID),
 			Color:        randomLightColor(),
 		})
 	}
 	return chatResponses
+}
+
+func mapUsers(followers []structs.Follower) []structs.UserResponse {
+	var NewFollowers []structs.UserResponse
+	for _, follower := range followers {
+		user, err := models.GetUserByID(follower.FollowerID)
+		if err != nil {
+			log.Printf("error getting user by user id: %s\n", err.Error())
+			continue
+		}
+		UserResponse := ReturnUserResponse(user)
+		NewFollowers = append(NewFollowers, *UserResponse)
+	}
+	return NewFollowers
 }

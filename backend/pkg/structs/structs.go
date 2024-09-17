@@ -39,7 +39,7 @@ type Post struct {
 	GroupID      *int
 	ParentID     *int
 	Content      string
-	ImageID      int
+	ImageID      *int
 	Privacy      string
 	CreationDate time.Time
 }
@@ -65,7 +65,7 @@ type Group struct {
 	CreatorID    int
 	Title        string
 	Description  string
-	ImageID      int
+	ImageID      *int
 	CreationDate time.Time
 }
 

@@ -78,8 +78,11 @@ func GetGroupPosts(groupID int) ([]structs.Post, error) {
 }
 
 // GetUserPosts retrieves posts for a user and filters them to include only top-level posts (ParentID = -1)
-func GetUserPosts(userID int) ([]structs.Post, error) {
-	return GetPosts(userID, "group_id IS NULL AND user_id", -1)
+func GetUserPosts(Privacy string, userID int) ([]structs.Post, error) {
+	if Privacy == "" {
+		return GetPosts(userID, "group_id IS NULL AND user_id", -1)
+	}
+	return GetPosts(userID, fmt.Sprintf("Privacy = '%s' AND group_id IS NULL AND user_id", Privacy), -1)
 }
 
 // GetUserPosts retrieves posts for a user and filters them to include only top-level posts (ParentID = -1)
@@ -309,18 +312,74 @@ func GetAllPosts() ([]structs.Post, error) {
 }
 
 func GetLikedPosts(userId int) ([]structs.Post, error) {
-	return GetPostsByReaction(userId, "Like")
+	return GetPostsByReaction(userId, -1, "Like")
 }
 
 func GetDisLikedPosts(userId int) ([]structs.Post, error) {
-	return GetPostsByReaction(userId, "Dislike")
+	return GetPostsByReaction(userId, -1, "Dislike")
 }
 
-func GetPostsByReaction(userId int, reaction string) ([]structs.Post, error) {
-	query := fmt.Sprintf(`SELECT * FROM post WHERE id IN (
-                SELECT post_id FROM reaction 
-                WHERE user_id = ? AND reaction_type = '%s'
-              ) AND privacy = 'Public'`, reaction)
+func GetPostsByReaction(userId, sessionUserId int, reaction string) ([]structs.Post, error) {
+	query := fmt.Sprintf(`
+    SELECT * FROM post WHERE id IN (
+        SELECT post_id FROM reaction 
+        WHERE user_id = ? AND reaction_type = '%s'
+    ) AND (
+        privacy = 'Public' 
+        OR user_id = ? 
+        OR id IN (
+            SELECT post_id FROM Recipient WHERE recipient_id = ?
+        )
+        OR (privacy = 'Private' AND user_id IN (
+            SELECT following_id FROM Follower WHERE follower_id = ?
+        ))
+    )`, reaction)
+	rows, err := db.Database.Query(query, userId, sessionUserId, sessionUserId, sessionUserId)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the posts
+	var posts []structs.Post
+
+	// Iterate over the rows and scan each row into a Post struct
+	for rows.Next() {
+		var post structs.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+
+	// Check if any error occurred during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
+	}
+
+	// Return the posts if everything was successful
+	return posts, nil
+}
+
+
+func GetPostsByReactionForGuest(userId, reaction string) ([]structs.Post, error) {
+	query := fmt.Sprintf(`
+    SELECT * FROM post WHERE id IN (
+        SELECT post_id FROM reaction 
+        WHERE user_id = ? AND reaction_type = '%s'
+    ) AND (
+        privacy = 'Public' 
+    )`, reaction)
 	rows, err := db.Database.Query(query, userId)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)
@@ -449,6 +508,52 @@ func GetPostsForUser(userId int) ([]structs.Post, error) {
 	// Return the posts if everything was successful
 	return posts, nil
 }
+
+func ProfilePagePosts(userId, FollowerID int) ([]structs.Post, error) {
+	query := `
+		SELECT * FROM Post WHERE user_id = ? AND privacy = 'Public'
+        UNION
+        SELECT * FROM Post WHERE user_id = ? AND id IN (SELECT post_id FROM Recipient WHERE recipient_id = ?) 
+        UNION
+        SELECT * FROM Post WHERE user_id = ? AND privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?)
+    `
+	rows, err := db.Database.Query(query, userId, userId, FollowerID, userId, FollowerID)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the posts
+	var posts []structs.Post
+
+	// Iterate over the rows and scan each row into a Post struct
+	for rows.Next() {
+		var post structs.Post
+		err := rows.Scan(
+			&post.ID,
+			&post.UserID,
+			&post.GroupID,
+			&post.ParentID,
+			&post.Content,
+			&post.ImageID,
+			&post.Privacy,
+			&post.CreationDate,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		posts = append(posts, post)
+	}
+
+	// Check if any error occurred during row iteration
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
+	}
+
+	// Return the posts if everything was successful
+	return posts, nil
+}
+
 func SearchUserPosts(userId int, subString string) ([]structs.Post, error) {
 	query := `SELECT * FROM Post WHERE (( content LIKE ? ) AND group_id IS NULL AND private = 'Public') OR (( content LIKE ? ) AND user_id = ?)`
 	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%", userId)
