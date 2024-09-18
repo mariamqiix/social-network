@@ -113,3 +113,4 @@ func GroupsPage(w http.ResponseWriter, r *http.Request) {
 
 	writeToJson(view, w)
 }
+
