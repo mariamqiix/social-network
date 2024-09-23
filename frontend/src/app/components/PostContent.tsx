@@ -31,8 +31,8 @@ const PostContent = ({ content, images, avatar, name, time }) => {
               <Image
                 src={"/placeholder.jpg"} // Assuming only one image is used
                 alt="Post Image"
-                width={600}
-                height={300}
+                width={200}
+                height={200}
                 className="img-fluid rounded"
               />
             </div>

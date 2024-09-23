@@ -49,13 +49,12 @@ export default function Home() {
 
 
   return (
-
     <main style={{ display: 'flex', flexDirection: 'column' }}>
       {posts.map((post, index) => (
         <div key={index} style={{
           width: '100%',
           maxWidth: '900px',
-          height: '150px', // Set a fixed height
+          // height: '150px', // Set a fixed height
           margin: '10px 0',
           padding: '10px',
           border: '1px solid #e1e1e1',
