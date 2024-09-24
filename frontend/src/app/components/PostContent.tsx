@@ -1,13 +1,15 @@
 import Image from 'next/image';
-import { randomColor } from "../components/colors"; 
+import { randomColor } from "../components/colors";
+import Link from 'next/link';
 
-const PostContent = ({ content, images, avatar, name, time }) => {
-    return (
+const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
+  return (
+    <Link href={id == "" ? "" : "/posts/" + id} className='text-decoration-none'>
       <div className="card mb-4 shadow-sm">
         {/* Author Info */}
         <div className="card-header d-flex align-items-center" style={{
-        backgroundColor: randomColor(), // Set the background color to a random color
-            }}>
+          backgroundColor: randomColor(), // Set the background color to a random color
+        }}>
           <Image
             src={"/placeholder.jpg"}
             alt="Author's Avatar"
@@ -29,7 +31,7 @@ const PostContent = ({ content, images, avatar, name, time }) => {
           {images && images.length > 0 && (
             <div className="mb-4">
               <Image
-                src={"/placeholder.jpg"} // Assuming only one image is used
+                src={images[0]} // Assuming only one image is used
                 alt="Post Image"
                 width={200}
                 height={200}
@@ -39,7 +41,8 @@ const PostContent = ({ content, images, avatar, name, time }) => {
           )}
         </div>
       </div>
-    );
+    </Link>
+  );
 };
 
 export default PostContent;

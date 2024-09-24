@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const links = ["posts", "chat", "groups", "profile", "notifications", "login"];
+const links = ["/", "chat", "groups", "profile", "notifications", "login"];
 
 const icons = [
     <path
@@ -64,13 +64,13 @@ export default function Nav() {
                         href={link}
                         key={link}
                         className={
-                            (pathName == link ? "btn-dark" : "") +
+                            (pathName == link || (pathName == "" && link == "/") ? "btn-dark" : "") +
                             " btn nav-item rounded-4 m-1 d-flex align-items-center"
                         }
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            fill={pathName == link ? "white" : "black"}
+                            fill={pathName == link || (pathName == "" && link == "/") ? "white" : "black"}
                             viewBox="0 0 24 24"
                             strokeWidth={1.5}
                             // stroke="currentColor"
@@ -80,11 +80,11 @@ export default function Nav() {
                         </svg>
                         <span
                             className={
-                                (pathName == link ? "text-white" : "text-black") +
+                                (pathName == link || (pathName == "" && link == "/") ? "text-white" : "text-black") +
                                 " text-start nav-link"
                             }
                         >
-                            {link[0].toLocaleUpperCase() + link.slice(1)}
+                            {link == "/" ? "Posts" : link[0].toLocaleUpperCase() + link.slice(1)}
                         </span>
                         {link == "notifications" ? "0" : ""}
                     </Link>
