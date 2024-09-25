@@ -22,6 +22,6 @@ func UserNotificationsHandlers(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	notificationsRespone := mapNotifications(*sessionUser, notifications)
+	notificationsRespone := MapNotifications(*sessionUser, notifications)
 	writeToJson(notificationsRespone, w)
 }

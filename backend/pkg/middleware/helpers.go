@@ -323,12 +323,12 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 // TODO: Implement mapNotifications, which should return a slice of structs.NotificatoinResponse.
 // use case statment for teh Type , we should determine the type of the notification and map it to the correct struct
 // example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
-func mapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
+func MapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
 	return nil
 }
 
 // Unmarshal function that takes an io.Reader (such as r.Body) and unmarshals JSON into the provided struct
-func unmarshalData(body io.Reader, v interface{}) error {
+func UnmarshalData(body io.Reader, v interface{}) error {
 	// Use json.NewDecoder to decode directly from the io.Reader (in this case, r.Body)
 	err := json.NewDecoder(body).Decode(v)
 	if err != nil {
