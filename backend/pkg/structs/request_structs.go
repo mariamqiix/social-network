@@ -2,45 +2,47 @@ package structs
 
 import "time"
 
+// /// for http.HandleFunc("/signup", SignupHandler)
 type UserRquest struct {
-	Username    string    `json:"username"`
-	Password    string    `json:"password"`
-	Nickname    string    `json:"nickname"`
-	Email       string    `json:"email"`
 	FirstName   string    `json:"first_name"`
 	LastName    string    `json:"last_name"`
+	Username    string    `json:"username"`
+	Password    string    `json:"password"`
+	Email       string    `json:"email"`
 	DateOfBirth time.Time `json:"date_of_birth"`
-	Bio         string    `json:"bio"`
 	Image       []byte    `json:"image"`
+	Bio         string    `json:"bio"`
+	Nickname    string    `json:"nickname"`
 }
 
+// // used for http.HandleFunc("/post/addComment", AddCommentHandler)
+// // http.HandleFunc("/post/createPost", CreatePostHandler)
 type PostRequest struct {
-	Title       string   `json:"title"`
-	GroupID     int      `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
-	Description string   `json:"description"`
-	Image       []byte   `json:"image"`
-	Privacy     string   `json:"privacy"`
-	Recipient   []string `json:"recipient"` /// wil return array of the user names
+	Title       string `json:"title"`
+	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
+	ParentID    int    `json:"parent_id"`
+	Description string `json:"description"`
+	Image       []byte `json:"image"`
+	Privacy     string `json:"privacy"`
+	Recipient   []int  `json:"recipient"` /// wil return array of the user names
 }
 
 type CreateGroupRequest struct {
-	Creator     string `json:"creator"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Image       []byte `json:"image"`
 }
 
 type EventRequest struct {
-	Creator     string    `json:"creator"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
+	Options     []string  `json:"options"`
 	EventDate   time.Time `json:"event_date"`
 }
 
-type EventResponeRequesr struct {
-	EventID  int    `json:"event_id"`
-	Username string `json:"username"`
-	Response string `json:"response"`
+type EventResponseRequest struct {
+	EventID  int `json:"event_id"`
+	OptionID int `json:"option_id"`
 }
 
 type MessageRequest struct {
