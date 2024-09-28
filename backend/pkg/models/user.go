@@ -125,7 +125,7 @@ func GetUserByID(id int) (*structs.User, error) {
 
 func GetAllUsers() ([]structs.User, error) {
 	// Execute a read query to fetch all users
-	rows, err := Read("User", []string{"*"}, []string{}, []interface{}{})
+	rows, err := Read("User", []string{"id", "username"}, []string{}, []interface{}{})
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)
 	}
@@ -141,16 +141,6 @@ func GetAllUsers() ([]structs.User, error) {
 		err = rows.Scan(
 			&user.ID,
 			&user.Username,
-			&user.UserType,
-			&user.Email,
-			&user.HashedPassword,
-			&user.FirstName,
-			&user.LastName,
-			&user.DateOfBirth,
-			&user.ImageID,
-			&user.Bio,
-			&user.ProfileType,
-			&user.Nickname,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
