@@ -7,3 +7,7 @@ Need to create :
 -   create reaction handler
 -   comment handler
 -   edit profile handler
+
+
+** make the password hashed before adding it to the db
+** 

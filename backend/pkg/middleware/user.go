@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"backend/pkg/models"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
+	fmt.Println(sessionUser)
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}

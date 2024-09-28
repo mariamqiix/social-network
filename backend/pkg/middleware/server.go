@@ -14,6 +14,7 @@ func GoLive() {
 	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/postPage/{id}", PostPageHandler)
 	http.HandleFunc("/Profile", ProfilePageHandler)
+	http.HandleFunc("/login", LoginHandler)
 
 	fmt.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
