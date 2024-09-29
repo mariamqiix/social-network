@@ -28,7 +28,7 @@ type Follower struct {
 type Session struct {
 	ID           int       // Primary key
 	Token        string    // Session token (VARCHAR(64))
-	UserID       *int       // Foreign key to User table
+	UserID       *int      // Foreign key to User table
 	CreationTime time.Time // Timestamp, defaults to CURRENT_TIMESTAMP
 }
 
@@ -100,6 +100,12 @@ type EventResponse struct {
 	UserID       int
 	Response     string // 'accept', 'decline'
 	ResponseDate time.Time
+}
+
+type EventOptions struct {
+	ID         int
+	EventID    int
+	OptionName string
 }
 
 type Notification struct {

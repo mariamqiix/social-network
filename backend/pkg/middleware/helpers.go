@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -97,10 +98,15 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 				log.Printf("error getting user by user id: %s\n", err.Error())
 				continue
 			}
-			IsUserMember, err := models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, user.ID})
-			if err != nil {
-				log.Printf("error checking if user is member of group: %s\n", err.Error())
-				continue
+			var IsUserMember bool
+			if sessionUser != nil {
+				IsUserMember, err = models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
+				if err != nil {
+					log.Printf("error checking if user is member of group: %s\n", err.Error())
+					continue
+				}
+			} else {
+				IsUserMember = false
 			}
 			GroupCreator := ReturnUserResponse(user)
 			Group = structs.GroupResponse{
@@ -120,7 +126,6 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 			Group:        Group,
 			Content:      post.Content,
 			Image:        GetImageData(post.ImageID),
-			Privacy:      post.Privacy,
 			CreationDate: post.CreationDate,
 			Likes:        *MapReaction(sessionUser, &post, "Like"),
 			Dislikes:     *MapReaction(sessionUser, &post, "Dislike"),
@@ -165,7 +170,7 @@ func MapReaction(User *structs.User, post *structs.Post, reactionType string) *s
 
 }
 
-func mapGroups(sessionUser structs.User, groups []structs.Group) []structs.GroupResponse {
+func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.GroupResponse {
 	var groupResponses []structs.GroupResponse
 	for _, group := range groups {
 		user, err := models.GetUserByID(group.CreatorID)
@@ -173,11 +178,17 @@ func mapGroups(sessionUser structs.User, groups []structs.Group) []structs.Group
 			log.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
-		IsUserMember, err := models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
-		if err != nil {
-			log.Printf("error checking if user is member of group: %s\n", err.Error())
-			continue
+		var IsUserMember bool
+		if sessionUser != nil {
+			IsUserMember, err = models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
+			if err != nil {
+				log.Printf("error checking if user is member of group: %s\n", err.Error())
+				continue
+			}
+		} else {
+			IsUserMember = false
 		}
+
 		GroupCreator := ReturnUserResponse(user)
 		groupResponses = append(groupResponses, structs.GroupResponse{
 			Id:           group.ID,
@@ -192,25 +203,11 @@ func mapGroups(sessionUser structs.User, groups []structs.Group) []structs.Group
 	return groupResponses
 }
 
-func MapMembers(members []structs.GroupMember) []structs.UserResponse {
-	var memberResponses []structs.UserResponse
+func MapMembers(members []structs.GroupMember) []structs.BasicUserResponse {
+	var memberResponses []structs.BasicUserResponse
 	for _, User := range members {
-		member, err := models.GetUserByID(User.ID)
-		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
-			continue
-		}
-		memberResponses = append(memberResponses, structs.UserResponse{
-			Id:          member.ID,
-			Username:    member.Username,
-			Nickname:    *member.Nickname,
-			Email:       member.Email,
-			FirstName:   member.FirstName,
-			LastName:    member.LastName,
-			DateOfBirth: member.DateOfBirth,
-			Bio:         *member.Bio,
-			Image:       GetImageData(member.ImageID),
-		})
+		member := ReturnBasicUser(User.UserID)
+		memberResponses = append(memberResponses, *member)
 	}
 	return memberResponses
 }
@@ -228,25 +225,81 @@ func mapEvents(sessionUser structs.User, events []structs.Event) []structs.Group
 			log.Printf("error getting group by group id: %s\n", err.Error())
 			continue
 		}
-		DidUserRespone, err := models.CheckExistance("EventResponse", []string{"event_id", "user_id"}, []interface{}{event.ID, sessionUser.ID})
+		// DidUserRespone, err := models.CheckExistance("EventResponse", []string{"event_id", "user_id"}, []interface{}{event.ID, sessionUser.ID})
 		if err != nil {
 			log.Printf("error checking if user is member of group: %s\n", err.Error())
 			continue
 		}
-		GroupResponse := mapGroups(sessionUser, []structs.Group{*Group})[0]
+		GroupResponse := mapGroups(&sessionUser, []structs.Group{*Group})[0]
 		EventCreator := ReturnUserResponse(user)
 		eventResponses = append(eventResponses, structs.GroupEventResponse{
-			Id:             event.ID,
-			Creator:        *EventCreator,
-			Group:          GroupResponse,
-			Title:          event.Title,
-			Description:    event.Description,
-			EventTime:      event.EventTime,
-			DidUserRespone: DidUserRespone,
-			CreationDate:   event.CreationDate,
+			Id:           event.ID,
+			Creator:      *EventCreator,
+			Group:        GroupResponse,
+			Title:        event.Title,
+			Description:  event.Description,
+			Options:      MapOptions(event.ID, &sessionUser),
+			EventTime:    event.EventTime,
+			CreationDate: event.CreationDate,
 		})
 	}
 	return eventResponses
+}
+
+func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsResponse {
+	var optionResponses []structs.EventOptionsResponse
+	options, err := models.GetEventOptions(groupId)
+	if err != nil {
+		log.Printf("error getting event options by group id: %s\n", err.Error())
+		return nil
+	}
+	for _, option := range options {
+		responses, err := models.GetEventResponsesByEventIdAndEventOptionId(option.EventID, option.ID)
+		if err != nil {
+			log.Printf("error getting event responses by event id and event option id: %s\n", err.Error())
+			continue
+		}
+		var users []structs.BasicUserResponse
+		for _, response := range responses {
+			users = append(users, *ReturnBasicUser(response.UserID))
+		}
+		var didRespone bool
+		if sessionUser == nil {
+			didRespone = false
+		} else {
+			didRespone, err = models.CheckExistance("EventResponse", []string{"event_id", "user_id", "option-id"}, []interface{}{option.EventID, sessionUser, option.ID})
+			if err != nil {
+				log.Printf("error checking if user is member of group: %s\n", err.Error())
+				continue
+			}
+		}
+		optionResponses = append(optionResponses, structs.EventOptionsResponse{
+			Option:         option.OptionName,
+			Count:          len(responses),
+			UserResponde:   users,
+			DidUserRespone: didRespone,
+		})
+
+	}
+	return optionResponses
+}
+
+func ReturnBasicUser(userId int) *structs.BasicUserResponse {
+	user, err := models.GetUserByID(userId)
+	if err != nil {
+		log.Printf("error getting user by user id: %s\n", err.Error())
+		return nil
+	}
+	nickname := user.FirstName + " " + user.LastName
+	if user.Nickname != nil {
+		nickname = *user.Nickname
+	}
+	return &structs.BasicUserResponse{
+		Id:       user.ID,
+		Username: user.Username,
+		Nickname: nickname,
+		Image:    GetImageData(user.ImageID),
+	}
 }
 
 func mapChats(sessionuser structs.User, chats []structs.GroupChat) []structs.GroupChatResponse {
@@ -327,12 +380,18 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 	return nil
 }
 
-// Unmarshal function that takes an io.Reader (such as r.Body) and unmarshals JSON into the provided struct
 func UnmarshalData(body io.Reader, v interface{}) error {
-	// Use json.NewDecoder to decode directly from the io.Reader (in this case, r.Body)
+	// Use json.NewDecoder to decode directly from the io.Reader
 	err := json.NewDecoder(body).Decode(v)
 	if err != nil {
 		return err
 	}
+	fmt.Print(v)
 	return nil
+}
+
+func IsDataImage(buff []byte) (bool, string) {
+	// the function that actually does the trick
+	t := http.DetectContentType(buff)
+	return strings.HasPrefix(t, "image"), t
 }

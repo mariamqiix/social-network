@@ -938,7 +938,7 @@ func TestUploadImage(t *testing.T) {
 		Data: []byte("test image data"),
 	}
 
-	err := UploadImage(image)
+	_, err := UploadImage(image.Data)
 	if err != nil {
 		t.Fatalf("UploadImage() error = %v", err)
 	}

@@ -93,7 +93,7 @@ func GroupsPage(w http.ResponseWriter, r *http.Request) {
 	if !userLimiter.Allow(limiterUsername) {
 		view := GroupsHomePageView{
 			User:   nil,
-			Groups: mapGroups(*sessionUser, groups),
+			Groups: mapGroups(sessionUser, groups),
 		}
 		writeToJson(view, w)
 		return
@@ -108,7 +108,7 @@ func GroupsPage(w http.ResponseWriter, r *http.Request) {
 	view := GroupsHomePageView{
 		User:   User,
 		Posts:  mapPosts(sessionUser, posts),
-		Groups: mapGroups(*sessionUser, groups),
+		Groups: mapGroups(sessionUser, groups),
 	}
 
 	writeToJson(view, w)

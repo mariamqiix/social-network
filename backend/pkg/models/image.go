@@ -4,10 +4,15 @@ import (
 	"backend/pkg/structs"
 )
 
-func UploadImage(image structs.Image) error {
+// UploadImage uploads an image and returns its ID
+func UploadImage(image []byte) (int, error) {
 	columns := []string{"image"}
-	values := []interface{}{image.Data}
-	return Create("Image", columns, values)
+	values := []interface{}{image}
+	id, err := CreateAndReturnID("Image", columns, values)
+	if err != nil {
+		return 0, err
+	}
+	return int(id), nil
 }
 
 func DeleteImage(imageID int) error {

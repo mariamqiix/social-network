@@ -225,29 +225,32 @@ func GetGroupsCreatedByTheUser(userID int) ([]structs.Group, error) {
 	return groups, nil
 }
 
-func GetUserGroups(userID int) ([]structs.GroupMember, error) {
-	// Execute a read query to fetch the group requests
-	rows, err := Read("GroupMember", []string{"*"}, []string{"user_id"}, []interface{}{userID})
+func GetUserGroups(userID int) ([]structs.Group, error) {
+	query := `SELECT * FROM GroupTable WHERE id IN (SELECT group_id FROM GroupMember WHERE user_id = ?)`
+	rows, err := db.Database.Query(query, userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	// Create a slice to hold the group requests
-	var groups []structs.GroupMember
+	// Create a slice to hold the groups
+	var groups []structs.Group
 	// Iterate over the rows and scan each row into a Group struct
 	for rows.Next() {
-		var group structs.GroupMember
+		var group structs.Group
 		err := rows.Scan(
 			&group.ID,
-			&group.GroupID,
-			&group.UserID,
+			&group.CreatorID,
+			&group.Title,
+			&group.Description,
+			&group.ImageID,
+			&group.CreationDate,
 		)
 		if err != nil {
 			return nil, err
 		}
 		groups = append(groups, group)
 	}
-	// Return the group requests if everything was successful
+	// Return the groups if everything was successful
 	return groups, nil
 }
 
@@ -347,6 +350,32 @@ func SearchGroup(subString string) ([]structs.Group, error) {
 		)
 		if err != nil {
 			return nil, err
+		}
+		groups = append(groups, group)
+	}
+	return groups, nil
+}
+
+func GetGroupByRequest(requestType string, userId int) ([]structs.Group, error) {
+	query := `SELECT * FROM GroupTable WHERE id IN (SELECT group_id FROM GroupRequest WHERE user_id = ? AND type = ?)`
+	rows, err := db.Database.Query(query, userId, requestType)
+	if err != nil {
+		return []structs.Group{}, err
+	}
+	defer rows.Close()
+	var groups []structs.Group
+	for rows.Next() {
+		var group structs.Group
+		err := rows.Scan(
+			&group.ID,
+			&group.CreatorID,
+			&group.Title,
+			&group.Description,
+			&group.ImageID,
+			&group.CreationDate,
+		)
+		if err != nil {
+			return []structs.Group{}, err
 		}
 		groups = append(groups, group)
 	}

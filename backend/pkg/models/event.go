@@ -142,7 +142,7 @@ func GetEventByGroupAndCreator(groupID, creatorID int) ([]structs.Event, error) 
 }
 
 func CreateEventResponse(r structs.EventResponse) error {
-	columns := []string{"event_id", "user_id", "response"}
+	columns := []string{"event_id", "user_id", "response_id"}
 	values := []interface{}{r.EventID, r.UserID, r.Response}
 	return Create("EventResponse", columns, values)
 }
@@ -155,30 +155,58 @@ func UpdateEventResponse(r structs.EventResponse) error {
 	return Update("EventResponse", columnsToSet, valuesToSet, conditionColumns, conditionValues)
 }
 
-func GetEventResponsesByEventId(eventID int) (*structs.EventResponse, error) {
+func GetEventResponsesByEventId(eventID int) ([]structs.EventResponse, error) {
 	rows, err := Read("EventResponse", []string{"*"}, []string{"event_id"}, []interface{}{eventID})
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-
 	if !rows.Next() {
 		return nil, nil
 	}
+	var responses []structs.EventResponse
+	for rows.Next() {
+		var response structs.EventResponse
+		err = rows.Scan(
+			&response.ID,
+			&response.EventID,
+			&response.UserID,
+			&response.Response,
+			&response.ResponseDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		responses = append(responses, response)
+	}
+	return responses, nil
+}
 
-	var response structs.EventResponse
-
-	err = rows.Scan(
-		&response.ID,
-		&response.EventID,
-		&response.UserID,
-		&response.Response,
-		&response.ResponseDate,
-	)
+func GetEventResponsesByEventIdAndEventOptionId(eventID, option int) ([]structs.EventResponse, error) {
+	rows, err := Read("EventResponse", []string{"*"}, []string{"event_id", "option_id"}, []interface{}{eventID, option})
 	if err != nil {
 		return nil, err
 	}
-	return &response, nil
+	defer rows.Close()
+	if !rows.Next() {
+		return nil, nil
+	}
+	var responses []structs.EventResponse
+	for rows.Next() {
+		var response structs.EventResponse
+		err = rows.Scan(
+			&response.ID,
+			&response.EventID,
+			&response.UserID,
+			&response.Response,
+			&response.ResponseDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		responses = append(responses, response)
+	}
+	return responses, nil
 }
 
 func GetUserEventsResponseByUserId(userID int) ([]structs.EventResponse, error) {
@@ -317,4 +345,50 @@ func GetUserEvents(userID int) ([]structs.Event, error) {
 	}
 
 	return events, nil
+}
+
+func AddEventOption(eventID int, optionID string) error {
+	columns := []string{"event_id", "option_name"}
+	values := []interface{}{eventID, optionID}
+	return Create("EventOptions", columns, values)
+}
+
+func GetEventOptions(eventID int) ([]structs.EventOptions, error) {
+	rows, err := Read("EventOptions", []string{"*"}, []string{"event_id"}, []interface{}{eventID})
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var options []structs.EventOptions
+	for rows.Next() {
+		var option structs.EventOptions
+		err = rows.Scan(
+			&option.ID,
+			&option.EventID,
+			&option.OptionName,
+		)
+		if err != nil {
+			return nil, err
+		}
+		options = append(options, option)
+	}
+	return options, nil
+}
+
+func GetEventOptionCount(eventID, OptionID int) (int, error) {
+	rows, err := Read("EventOptions", []string{"COUNT(*)"}, []string{"event_id", "option_id"}, []interface{}{eventID, OptionID})
+	if err != nil {
+		return 0, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return 0, nil
+	}
+	var count int
+	err = rows.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

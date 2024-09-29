@@ -29,18 +29,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusInternalServerError)
 			return
 		}
-		followers, err := models.GetFollowers(sessionUser.ID)
-		if err != nil {
-			log.Printf("error getting followers: %s\n", err.Error())
-			errorServer(w, http.StatusInternalServerError)
-			return
-		}
-		following, err := models.GetFollowings(sessionUser.ID)
-		if err != nil {
-			log.Printf("error getting following: %s\n", err.Error())
-			errorServer(w, http.StatusInternalServerError)
-			return
-		}
 		likedPosts, err := models.GetPostsByReaction(sessionUser.ID, sessionUser.ID, "Like")
 		if err != nil {
 			log.Printf("error getting liked posts: %s\n", err.Error())
@@ -59,8 +47,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 			Posts:         mapPosts(sessionUser, posts),
 			LikedPosts:    mapPosts(sessionUser, likedPosts),
 			DislikedPosts: mapPosts(sessionUser, DisLikePosts),
-			Followers:     mapUsers(followers),
-			Following:     mapUsers(following),
 		}
 		writeToJson(view, w)
 		return
@@ -70,18 +56,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	User, err := models.GetUserByID(profileUser)
 	if err != nil {
 		log.Printf("error getting user: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-	followers, err := models.GetFollowers(profileUser)
-	if err != nil {
-		log.Printf("error getting followers: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-	following, err := models.GetFollowings(profileUser)
-	if err != nil {
-		log.Printf("error getting following: %s\n", err.Error())
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
@@ -110,8 +84,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 			Posts:         mapPosts(sessionUser, Posts),
 			LikedPosts:    mapPosts(sessionUser, likedPosts),
 			DislikedPosts: mapPosts(sessionUser, DisLikePosts),
-			Followers:     mapUsers(followers),
-			Following:     mapUsers(following),
 		}
 		writeToJson(view, w)
 		return
@@ -140,8 +112,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		Posts:         mapPosts(sessionUser, Posts),
 		LikedPosts:    mapPosts(sessionUser, likedPosts),
 		DislikedPosts: mapPosts(sessionUser, DisLikePosts),
-		Followers:     mapUsers(followers),
-		Following:     mapUsers(following),
 	}
 	writeToJson(view, w)
 }

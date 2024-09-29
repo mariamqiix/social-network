@@ -169,3 +169,25 @@ func CheckExistance(tablename string, columnnames []string, values []interface{}
 	// Check if the count indicates existence
 	return count > 0, nil
 }
+
+// CreateAndReturnID inserts a new record into the specified table and returns the last inserted ID
+func CreateAndReturnID(table string, columns []string, values []interface{}) (int64, error) {
+	// Construct the SQL query
+	columnsStr := "(" + strings.Join(columns, ", ") + ")"
+	placeholders := "(" + strings.Repeat("?, ", len(values)-1) + "?)"
+	query := fmt.Sprintf("INSERT INTO %s %s VALUES %s", table, columnsStr, placeholders)
+
+	// Execute the query
+	result, err := db.Database.Exec(query, values...)
+	if err != nil {
+		return 0, err
+	}
+
+	// Get the last inserted ID
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
+}

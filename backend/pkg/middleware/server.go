@@ -14,27 +14,26 @@ func GoLive() {
 	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/postPage/{id}", PostPageHandler)
 	http.HandleFunc("/login", LoginHandler)
-	http.HandleFunc("/logout", LogoutHandler)
-	http.HandleFunc("/signup", SignupHandler)
-	http.HandleFunc("/socket", socketHanddler)
+	// http.HandleFunc("/logout", LogoutHandler)
+	// http.HandleFunc("/signup", SignupHandler)
+	// http.HandleFunc("/socket", socketHanddler)
 
-	///// the /post api's
-	http.HandleFunc("/post/addReaction", AddReactionHandler)
-	http.HandleFunc("/post/removeReaction", RemoveReactionHandler)
-	http.HandleFunc("/post/addComment", AddCommentHandler)
-	http.HandleFunc("/post/createPost", CreatePostHandler)
+	// ///// the /post api's
+	// http.HandleFunc("/post/addReaction", AddReactionHandler)
+	// http.HandleFunc("/post/removeReaction", RemoveReactionHandler)
+	// http.HandleFunc("/post/addComment", AddCommentHandler)
+	// http.HandleFunc("/post/createPost", CreatePostHandler)
 
 	///// the /group api's
-	http.HandleFunc("/group/Messages/{id}", GroupChatsHandler) // to return the messages between two users
-	http.HandleFunc("/group/list", GroupListHandler)           // list to all groups/requested to join groups/joined groups
-	http.HandleFunc("/group/createGroup", CreateGroupHandler)  // to create a group
-	http.HandleFunc("/group/requestToJoin", JoinGroupHandler)  // to join a group
-	http.HandleFunc("/group/leaveGroup", LeaveGroupHandler)    // to leave a group
-	http.HandleFunc("/group/page/{id}", GroupPageHandler)
-	http.HandleFunc("/group/inviteUser", GroupPageHandler)
-	http.HandleFunc("/group/event/list", GroupPageHandler)
-	http.HandleFunc("/group/event/create", GroupPageHandler)
-	http.HandleFunc("/group/event/userResponse", GroupPageHandler)
+	http.HandleFunc("/group/Messages/{id}", GroupChatsHandler)     //  DONE >>>>>	to return the messages between two users
+	http.HandleFunc("/group/list", GroupsHandler)                  //  DONE >>>>>	list to all groups/requested/invited/joined groups
+	http.HandleFunc("/group/createGroup", CreateGroupHandler)      //  DONE >>>>>	to create a group
+	http.HandleFunc("/group/requestToJoin/{id}", JoinGroupHandler) //  DONE >>>>>	to request joing a group
+	http.HandleFunc("/group/leaveGroup/{id}", LeaveGroupHandler)   //  DONE >>>>>	to leave a group
+	http.HandleFunc("/group/page/{id}", GroupPageHandler)          //  DONE >>>>>	to return the group page
+	http.HandleFunc("/group/inviteUser", InviteUserHandler)        //  DONE >>>>>	to Add user Invite
+	http.HandleFunc("/group/event/list", ListEventHandler)         //  DONE >>>>>	to list the events , all the events for the user in the groups page , and the group event for the group page
+	http.HandleFunc("/group/event/create", CreateEventHandler)     //  DONE >>>>>	to create an event
 
 	///// the /user api's
 	http.HandleFunc("/user/profile", ProfilePageHandler)
@@ -42,16 +41,16 @@ func GoLive() {
 	http.HandleFunc("/user/profile/followeing", ProfilePageHandler)
 	http.HandleFunc("/user/profile/like", ProfilePageHandler)
 	http.HandleFunc("/user/profile/dislike", ProfilePageHandler)
-	http.HandleFunc("/user/userMessages/{id}", UserChatHandler)                      // to return the messages between two users
-	http.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler)                  // to return the users that can be talked with
-	http.HandleFunc("/user/Chats", UserChatsHandler)                                 // to return the chats of the user
-	http.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)  // to return the user information that will be showen in the front
-	http.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler) // to update the user information
-	http.HandleFunc("/user/notifications", NotificationsHandler)                    // to return the notifications of the user
-	http.HandleFunc("/user/notifications/groupInviteResponse", NotificationsHandler)            // to return the notifications of the user
-	http.HandleFunc("/user/notifications/adminGroupRequestResponse", NotificationsHandler)            // to return the notifications of the user
-	http.HandleFunc("/user/notifications/followResponse", NotificationsHandler)            // to return the notifications of the user
-	http.HandleFunc("/user/requestToFollow", FollowUserHandler) // to request to follow a user
+	http.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
+	// http.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler)                        // to return the users that can be talked with
+	// http.HandleFunc("/user/Chats", UserChatsHandler)                                       // to return the chats of the user
+	// http.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)        // to return the user information that will be showen in the front
+	// http.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler)       // to update the user information
+	// http.HandleFunc("/user/notifications", NotificationsHandler)                           // to return the notifications of the user
+	// http.HandleFunc("/user/notifications/groupInviteResponse", NotificationsHandler)       // to return the notifications of the user
+	// http.HandleFunc("/user/notifications/adminGroupRequestResponse", NotificationsHandler) // to return the notifications of the user
+	// http.HandleFunc("/user/notifications/followResponse", NotificationsHandler)            // to return the notifications of the user
+	// http.HandleFunc("/user/requestToFollow", FollowUserHandler)                            // to request to follow a user
 
 	fmt.Println("Server is running on http://localhost:8080")
 	http.ListenAndServe(":8080", nil)

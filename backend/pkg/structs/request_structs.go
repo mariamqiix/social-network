@@ -36,10 +36,15 @@ type CreateGroupRequest struct {
 type EventRequest struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
+	GroupID     int       `json:"group_id"`
 	Options     []string  `json:"options"`
 	EventDate   time.Time `json:"event_date"`
 }
 
+type GroupInviteRequest struct {
+	GroupID int `json:"group_id"`
+	UserID  int `json:"user_id"`
+}
 type EventResponseRequest struct {
 	EventID  int `json:"event_id"`
 	OptionID int `json:"option_id"`
