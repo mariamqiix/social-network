@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -379,17 +378,6 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 func MapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
 	return nil
 }
-
-func UnmarshalData(body io.Reader, v interface{}) error {
-	// Use json.NewDecoder to decode directly from the io.Reader
-	err := json.NewDecoder(body).Decode(v)
-	if err != nil {
-		return err
-	}
-	fmt.Print(v)
-	return nil
-}
-
 func IsDataImage(buff []byte) (bool, string) {
 	// the function that actually does the trick
 	t := http.DetectContentType(buff)

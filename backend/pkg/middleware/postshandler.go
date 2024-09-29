@@ -3,6 +3,7 @@ package middleware
 import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -77,40 +78,81 @@ func GroupPostsHandler(w http.ResponseWriter, r *http.Request) {
 	writeToJson(view, w)
 }
 
-func GroupsPage(w http.ResponseWriter, r *http.Request) {
+func AddReactionHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-
-	groups, err := models.GetAllGroups()
-	if err != nil {
-		log.Printf("error getting user groups: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
 	if !userLimiter.Allow(limiterUsername) {
-		view := GroupsHomePageView{
-			User:   nil,
-			Groups: mapGroups(sessionUser, groups),
-		}
-		writeToJson(view, w)
+		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
-	posts, err := models.GetGroupPostsForUser(sessionUser.ID)
+	if sessionUser == nil {
+		errorServer(w, http.StatusUnauthorized)
+		return
+	}
+	var ReactoinRequest structs.ReactoinRequest
+	err := json.NewDecoder(r.Body).Decode(ReactoinRequest)
 	if err != nil {
-		log.Printf("error getting user group posts: %s\n", err.Error())
+		log.Printf("error unmarshalling data: %s\n", err.Error())
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+	didReact, err := models.CheckExistance("Rections", []string{"user_id", "post_id"}, []interface{}{sessionUser.ID, ReactoinRequest.PostID})
+	if err != nil {
+		log.Printf("error checking if user reacted: %s\n", err.Error())
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	User := ReturnUserResponse(sessionUser)
-	view := GroupsHomePageView{
-		User:   User,
-		Posts:  mapPosts(sessionUser, posts),
-		Groups: mapGroups(sessionUser, groups),
+	if didReact {
+		err := models.DeleteReaction(sessionUser.ID, ReactoinRequest.PostID)
+		if err != nil {
+			log.Printf("error deleting reaction: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusNoContent)
+		return
 	}
-
-	writeToJson(view, w)
+	reaction := structs.Reaction{
+		UserID:       sessionUser.ID,
+		ReactionType: ReactoinRequest.Reaction,
+		PostID:       ReactoinRequest.PostID,
+	}
+	err = models.AddReaction(reaction)
+	if err != nil {
+		log.Printf("error adding reaction: %s\n", err.Error())
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusCreated)
 }
 
+func RemoveReactionHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+	limiterUsername := "[GUESTS]"
+	if sessionUser != nil {
+		limiterUsername = sessionUser.Username
+	}
+	if !userLimiter.Allow(limiterUsername) {
+		errorServer(w, http.StatusTooManyRequests)
+		return
+	}
+	if sessionUser == nil {
+		errorServer(w, http.StatusUnauthorized)
+		return
+	}
+	postId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		log.Printf("error parsing post id: %s\n", err.Error())
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+	err = models.DeleteReaction(sessionUser.ID, postId)
+	if err != nil {
+		log.Printf("error deleting reaction: %s\n", err.Error())
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+}

@@ -1065,7 +1065,7 @@ func TestRemoveEvent(t *testing.T) {
 
 func TestDeleteUserSession(t *testing.T) {
 	// Define a mock user ID to delete the session for
-	userID := "1" // Replace with a valid user ID
+	userID := 1 // Replace with a valid user ID
 
 	// Call the DeleteUserSession function
 	err := DeleteUserSession(userID)

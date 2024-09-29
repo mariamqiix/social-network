@@ -14,13 +14,13 @@ func GoLive() {
 	http.HandleFunc("/", HomePageHandler)
 	http.HandleFunc("/postPage/{id}", PostPageHandler)
 	http.HandleFunc("/login", LoginHandler)
-	// http.HandleFunc("/logout", LogoutHandler)
+	http.HandleFunc("/logout", LogoutHandler)
 	// http.HandleFunc("/signup", SignupHandler)
 	// http.HandleFunc("/socket", socketHanddler)
 
 	// ///// the /post api's
-	// http.HandleFunc("/post/addReaction", AddReactionHandler)
-	// http.HandleFunc("/post/removeReaction", RemoveReactionHandler)
+	http.HandleFunc("/post/addReaction", AddReactionHandler)       //  DONE >>>>>	to add a reaction to a post
+	http.HandleFunc("/post/removeReaction", RemoveReactionHandler) //  DONE >>>>>	to remove a reaction from a post
 	// http.HandleFunc("/post/addComment", AddCommentHandler)
 	// http.HandleFunc("/post/createPost", CreatePostHandler)
 
@@ -34,6 +34,7 @@ func GoLive() {
 	http.HandleFunc("/group/inviteUser", InviteUserHandler)        //  DONE >>>>>	to Add user Invite
 	http.HandleFunc("/group/event/list", ListEventHandler)         //  DONE >>>>>	to list the events , all the events for the user in the groups page , and the group event for the group page
 	http.HandleFunc("/group/event/create", CreateEventHandler)     //  DONE >>>>>	to create an event
+	// http.HandleFunc("/group/event/userResponse", JoinEventHandler)       //  DONE >>>>>	to join an event
 
 	///// the /user api's
 	http.HandleFunc("/user/profile", ProfilePageHandler)

@@ -63,3 +63,8 @@ type GroupMessageRequest struct {
 	Message string `json:"message"`
 	Image   []byte `json:"image"`
 }
+
+type ReactoinRequest struct {
+	PostID   int    `json:"post_id"`
+	Reaction string `json:"reaction"`
+}

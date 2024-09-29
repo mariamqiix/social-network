@@ -191,9 +191,9 @@ func CreateUserSession(s structs.Session) error {
 	return Create("Session", columns, values)
 }
 
-func DeleteUserSession(userId string) error {
+func DeleteUserSession(userId int) error {
 	// Execute a delete query to delete the session
-	return Delete("Session", []string{"user_id"}, []interface{}{userId})
+	return Delete("Session", []string{"id"}, []interface{}{userId})
 }
 
 func GetPassword(colomn, username string) (string, error) {

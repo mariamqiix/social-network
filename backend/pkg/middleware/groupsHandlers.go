@@ -3,6 +3,7 @@ package middleware
 import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -99,7 +100,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var createGroupRequest structs.CreateGroupRequest
-	err := UnmarshalData(r.Body, &createGroupRequest)
+	err := json.NewDecoder(r.Body).Decode(createGroupRequest)
 	if err != nil {
 		log.Printf("Error unmarshalling data: %s\n", err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -266,7 +267,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var Invite structs.GroupInviteRequest
-	err := UnmarshalData(r.Body, &Invite)
+	err := json.NewDecoder(r.Body).Decode(Invite)
 	if err != nil {
 		log.Printf("error unmarshalling data: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
@@ -280,6 +281,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusCreated)
 }
+
 /// end function
 
 func ListEventHandler(w http.ResponseWriter, r *http.Request) {
@@ -352,8 +354,7 @@ func GroupChatsHandler(w http.ResponseWriter, r *http.Request) {
 	writeToJson(Chats, w)
 }
 
-
-//// create event handler
+// // create event handler
 func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
@@ -369,7 +370,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var eventRequest structs.EventRequest
-	err := UnmarshalData(r.Body, &eventRequest)
+	err := json.NewDecoder(r.Body).Decode(eventRequest)
 	if err != nil {
 		log.Printf("error unmarshalling data: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)

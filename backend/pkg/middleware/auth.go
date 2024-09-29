@@ -3,9 +3,10 @@ package middleware
 import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
+	"fmt"
 	"log"
 	"net/http"
-	"fmt"
+	"time"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,4 +63,25 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		http.Error(w, "Not logged in", http.StatusUnauthorized)
+		return
+	}
+	sessionToken := cookie.Value
+	TokenInfo, err1 := models.GetSession(sessionToken)
+	if err1 != nil {
+		http.Error(w, "Something went wrong, contact server administrator", http.StatusInternalServerError)
+		return
+	}
+	err2 := models.DeleteUserSession(TokenInfo.ID)
+	if err2 != nil {
+		http.Error(w, "Something went wrong, contact server administrator", http.StatusInternalServerError)
+		return
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:    "session",
+		Expires: time.Unix(0, 0),
+	})
+}
