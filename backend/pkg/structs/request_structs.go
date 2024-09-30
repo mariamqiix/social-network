@@ -27,6 +27,18 @@ type PostRequest struct {
 	Recipient   []int  `json:"recipient"` /// wil return array of the user names
 }
 
+
+type CommentGroupRequest struct {
+	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
+	ParentID    int    `json:"parent_id"`
+	Description string `json:"description"`
+}
+type CommentRequest struct {
+	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
+	ParentID    int    `json:"parent_id"`
+	Description string `json:"description"`
+}
+
 type CreateGroupRequest struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`

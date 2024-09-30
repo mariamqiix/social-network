@@ -21,8 +21,8 @@ func GoLive() {
 	// ///// the /post api's
 	http.HandleFunc("/post/addReaction", AddReactionHandler)       //  DONE >>>>>	to add a reaction to a post
 	http.HandleFunc("/post/removeReaction", RemoveReactionHandler) //  DONE >>>>>	to remove a reaction from a post
-	// http.HandleFunc("/post/addComment", AddCommentHandler)
-	// http.HandleFunc("/post/createPost", CreatePostHandler)
+	http.HandleFunc("/post/addComment", AddCommentHandler)         //  Done >>>>>>	to add a comment to a post
+	http.HandleFunc("/post/createPost", CreatePostHandler)
 
 	///// the /group api's
 	http.HandleFunc("/group/Messages/{id}", GroupChatsHandler)     //  DONE >>>>>	to return the messages between two users

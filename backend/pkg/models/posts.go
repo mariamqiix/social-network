@@ -22,15 +22,15 @@ func CreateGroupPost(p structs.Post) error {
 
 func CreateNormalComment(p structs.Post) error {
 	// Create a new record in the Post table
-	columns := []string{"user_id", "parent_id", "content", "image_id", "privacy"}
-	values := []interface{}{p.UserID, p.ParentID, p.Content, p.ImageID, "Public"}
+	columns := []string{"user_id", "parent_id", "content", "privacy"}
+	values := []interface{}{p.UserID, p.ParentID, p.Content, "Public"}
 	return Create("Post", columns, values)
 }
 
 func CreateGroupComment(p structs.Post) error {
 	// Create a new record in the Post table
-	columns := []string{"user_id", "group_id", "parent_id", "content", "image_id", "privacy"}
-	values := []interface{}{p.UserID, p.GroupID, p.ParentID, p.Content, p.ImageID, "Public"}
+	columns := []string{"user_id", "group_id", "parent_id", "content", "privacy"}
+	values := []interface{}{p.UserID, p.GroupID, p.ParentID, p.Content, "Public"}
 	return Create("Post", columns, values)
 }
 
@@ -370,7 +370,6 @@ func GetPostsByReaction(userId, sessionUserId int, reaction string) ([]structs.P
 	// Return the posts if everything was successful
 	return posts, nil
 }
-
 
 func GetPostsByReactionForGuest(userId, reaction string) ([]structs.Post, error) {
 	query := fmt.Sprintf(`
