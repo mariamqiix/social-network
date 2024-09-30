@@ -8,6 +8,7 @@ import { selectPosts } from "./redux/selectors";
 import Card from "./components/card";
 import { addPost } from "./redux/actions";
 import { Post } from "./types/Types";
+import { useEffect } from "react";
 
 export default function Home() {
   const posts = useSelector(selectPosts);
@@ -23,14 +24,23 @@ export default function Home() {
       reader.onload = function (e) {
         imageContent = e.target?.result as string;
         console.log(imageContent);
-        dispatch(addPost({ author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [imageContent], likes: 0, }));
+        dispatch(addPost({ id: 0, author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [imageContent], likes: 0, }));
       }
       reader.readAsDataURL(form.children[1].files[0]);
     } else {
-      dispatch(addPost({ author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [], likes: 0, }));
+      dispatch(addPost({ id: 0, author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [], likes: 0, }));
     }
-
   }
+
+  useEffect(() => {
+    fetch("http://localhost:8080").then(res => {
+      res.json().then(data => {
+        data.Posts.forEach((post: any) => {
+          dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [post.image_url], likes: post.likes.count }));
+        });
+      });
+    });
+  }, [dispatch]);
 
   return <div>
     <Card title="Create Post" color={colors[9]} className="m-1">

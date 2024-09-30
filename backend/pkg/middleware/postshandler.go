@@ -19,7 +19,7 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
-	postID, err := strconv.Atoi(r.URL.Query().Get("id"))
+	postID, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		log.Printf("error parsing post id: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
