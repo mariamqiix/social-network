@@ -6,6 +6,7 @@ import PostContent from '../../components/PostContent';
 import PostActions from '../../components/PostActions';
 import CommentList from '../../components/CommentList';
 import { useEffect, useState } from "react";
+import ProgressBar from "@/app/components/progress_bar";
 
 export default function Page() {
   // const posts = useSelector(selectPosts);
@@ -34,43 +35,41 @@ export default function Page() {
   const [post, setPost] = useState(null)
   console.log("http://localhost:8080/postPage/" + id);
   useEffect(() => {
-    fetch("http://localhost:8080/postPage/" + id).then((res) => {
+    fetch("http://localhost:8080/postPage/" + id, { credentials: 'include' }).then((res) => {
       res.json().then((data) => {
         console.log(data);
-        // data.Posts.forEach((newPost: any) => {
-        //   // dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [post.image_url], likes: post.likes.count }));
-          // setPost(newPost);
-        // });
+        // setPost(data);
       });
     });
-  }, []);
+  }, [fetch]);
   if (post == null) {
-    return <p>Loading</p>;
-  }
-  return (
-    <div className="container my-4">
-      <div className="row justify-content-center">
-        {/* Use a wider column */}
-        <div className="col-lg-10">
-          {/* Post Content */}
-          <PostContent
-            avatar="/placeholder.jpg"
-            name={post.author.username}
-            time={post.created_at}
-            content={post.content}
-            images={post.image_url == "" ? [] : [post.image_url]}
-          />
+    return <ProgressBar progress={1}/>;
+  } else if (post != null) {
+    return (
+      <div className="container my-4">
+        <div className="row justify-content-center">
+          {/* Use a wider column */}
+          <div className="col-lg-10">
+            {/* Post Content */}
+            <PostContent
+              avatar="/placeholder.jpg"
+              name={post.author.username}
+              time={post.created_at}
+              content={post.content}
+              images={post.image_url == "" ? [] : [post.image_url]}
+            />
 
-          {/* Post Actions */}
-          <PostActions likes={15} />
+            {/* Post Actions */}
+            <PostActions likes={15} />
 
-          {/* Comments Section */}
-          <div className="mt-4">
-            {/* <CommentList comments={comments} /> */}
+            {/* Comments Section */}
+            <div className="mt-4">
+              {/* <CommentList comments={comments} /> */}
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 

@@ -8,10 +8,6 @@ export default function page() {
     const user = useSelector(selectUser);
     if (user) {
         return <Card title="Profile">
-            <h2>@{user.username}</h2>
-            <h2>{user.firstName} {user.lastName}</h2>
-            <p>{user.dob}</p>
-            <p>{user.email}</p>
             <Image
                 className="rounded-circle"
                 src={user.image ?? "/placeholder.jpg"}
@@ -19,6 +15,10 @@ export default function page() {
                 height={80}
                 alt="Avatar"
             />
+            <h2>@{user.username}</h2>
+            <h2>{user.firstName} {user.lastName}</h2>
+            <p>{user.dob}</p>
+            <p>{user.email}</p>
         </Card>;
     }
     return <h1>You need to login</h1>;

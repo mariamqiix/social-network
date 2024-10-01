@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { redirect, RedirectType, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { selectNotifications, selectUser } from "../redux/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/actions";
 
 const links = ["/", "/chat", "/groups", "/profile", "/notifications", "/login"];
 
@@ -44,18 +45,20 @@ const icons = [
 export default function Nav() {
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotifications);
+    const dispatch = useDispatch();
 
-    function logout() {
+    const router = useRouter()
+    function logoutButton() {
         if (user != null) {
             fetch("http://localhost:8080/logout",
-                { method: "POST" }).then(res => {
+                { method: "POST", credentials: 'include' }).then(res => {
                     console.log(res.status);
                     res.text().then(data => {
                         console.log(data);
                     });
                     if (res.ok) {
                         dispatch(logout());
-                        redirect('/login', RedirectType.replace);
+                        router.replace("/login");
                     }
                 });
         }
@@ -81,7 +84,7 @@ export default function Nav() {
                         <br />
                         <span className="text-body-tertiary">{user.username}</span>
                     </div> : <p>Not logged in</p>}
-                {links.map((link, i) => (
+                {links.map((link, i) => link != "/login" || user == null ? (
                     <Link
                         href={link}
                         key={link}
@@ -110,38 +113,35 @@ export default function Nav() {
                         </span>
                         {link == "/notifications" ? notifications.length : ""}
                     </Link>
-                ))}
-                <div
-                    className={
-                        "btn nav-item rounded-4 m-1 d-flex align-items-center"
-                    }
-                    onClick={() => {
-                        logout();
-                    }}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="black"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        // stroke="currentColor"
-                        className="icon"
-                    >
-                        {icons[5]}
-                    </svg>
-                    <span
+                ) : (<div key={link}></div>))}
+                {user ?
+                    <div
                         className={
-                            "text-black text-start nav-link"
+                            "btn nav-item rounded-4 m-1 d-flex align-items-center"
                         }
+                        onClick={() => {
+                            logoutButton();
+                        }}
                     >
-                        Logout
-                    </span>
-                </div>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="black"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            // stroke="currentColor"
+                            className="icon"
+                        >
+                            {icons[5]}
+                        </svg>
+                        <span
+                            className={
+                                "text-black text-start nav-link"
+                            }
+                        >
+                            Logout
+                        </span>
+                    </div> : <div></div>}
             </ul>
         </nav>
     );
 }
-function dispatch(arg0: void) {
-    throw new Error("Function not implemented.");
-}
-
