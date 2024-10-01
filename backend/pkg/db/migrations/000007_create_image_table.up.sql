@@ -1,5 +1,5 @@
 -- Image Table
-CREATE TABLE Image (
+CREATE TABLE ImageTable (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    image BLOB
+    image_data BLOB
 );

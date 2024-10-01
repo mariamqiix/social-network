@@ -323,7 +323,7 @@ func TestCreateUserPost(t *testing.T) {
 		Privacy: "Public",
 	}
 
-	err := CreateUserPost(post)
+	_, err := CreateUserPost(post)
 	if err != nil {
 		t.Errorf("CreateUserPost failed: %v", err)
 	}
@@ -416,7 +416,7 @@ func TestGetUserPosts(t *testing.T) {
 		Privacy:  "Public",
 		ParentID: nil, // Top-level post
 	}
-	err := CreateUserPost(post)
+	_, err := CreateUserPost(post)
 	if err != nil {
 		t.Fatalf("Setup failed: %v", err)
 	}
@@ -638,7 +638,7 @@ func TestCreateEvent(t *testing.T) {
 		EventTime:   time.Now(),
 	}
 
-	err := CreateEvent(event)
+	_, err := CreateEvent(event)
 	if err != nil {
 		t.Fatalf("CreateEvent() error = %v", err)
 	}
@@ -695,9 +695,8 @@ func TestGetEventsByCreator(t *testing.T) {
 
 func TestCreateEventResponse(t *testing.T) {
 	response := structs.EventResponse{
-		EventID:  1,
-		UserID:   1,
-		Response: "Yes",
+		EventID: 1,
+		UserID:  1,
 	}
 
 	err := CreateEventResponse(response)
@@ -766,10 +765,9 @@ func TestGetUserEventsResponseByUserId(t *testing.T) {
 
 func TestUpdateEventResponse(t *testing.T) {
 	response := structs.EventResponse{
-		ID:       1,
-		EventID:  1,
-		UserID:   1,
-		Response: "No",
+		ID:      1,
+		EventID: 1,
+		UserID:  1,
 	}
 
 	err := UpdateEventResponse(response)
@@ -866,7 +864,6 @@ func TestCreateGroupMessage(t *testing.T) {
 		GroupID:  1,
 		SenderID: 1,
 		Message:  "Hello Group",
-		ImageID:  0,
 	}
 
 	err := CreateGroupMessage(message)
@@ -904,7 +901,6 @@ func TestUpdateGroupMessage(t *testing.T) {
 		GroupID:  1,
 		SenderID: 1,
 		Message:  "Updated Group Message",
-		ImageID:  0,
 	}
 
 	err := UpdateGroupMessage(message)

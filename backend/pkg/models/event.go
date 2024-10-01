@@ -3,22 +3,34 @@ package models
 import (
 	"backend/pkg/db"
 	"backend/pkg/structs"
+	"fmt"
 	"log"
 	"time"
 )
 
-func CreateEvent(e structs.Event) error {
-	columns := []string{"group_id", "creator_id", "title", "description", "event_time"}
+func CreateEvent(e structs.Event) (int, error) {
+	columns := []string{"group_id", "creator_id", "title", "event_description", "event_time"}
 	values := []interface{}{e.GroupID, e.CreatorID, e.Title, e.Description, e.EventTime}
-	return Create("Event", columns, values)
+	err := Create("EventTable", columns, values)
+	if err != nil {
+		log.Printf("error creating event: %s\n", err.Error())
+		return 0, err
+	}
+	var eventID int
+	err = db.Database.QueryRow("SELECT id FROM EventTable WHERE group_id = ? AND creator_id = ? AND title = ? AND event_description = ? AND event_time = ?", e.GroupID, e.CreatorID, e.Title, e.Description, e.EventTime).Scan(&eventID)
+	if err != nil {
+		log.Printf("error getting event ID: %s\n", err.Error())
+		return 0, err
+	}
+	return eventID, nil
 }
 
 func UpdateEvent(e structs.Event) error {
-	columnsToSet := []string{"group_id", "creator_id", "title", "description", "event_time"}
+	columnsToSet := []string{"group_id", "creator_id", "title", "event_description", "event_time"}
 	valuesToSet := []interface{}{e.GroupID, e.CreatorID, e.Title, e.Description, e.EventTime}
 	conditionColumns := []string{"id"}
 	conditionValues := []interface{}{e.ID}
-	return Update("Event", columnsToSet, valuesToSet, conditionColumns, conditionValues)
+	return Update("EventTable", columnsToSet, valuesToSet, conditionColumns, conditionValues)
 }
 
 func UpdateEventTime(id int, eventTime time.Time) error {
@@ -26,11 +38,11 @@ func UpdateEventTime(id int, eventTime time.Time) error {
 	valuesToSet := []interface{}{eventTime}
 	conditionColumns := []string{"id"}
 	conditionValues := []interface{}{id}
-	return Update("Event", columnsToSet, valuesToSet, conditionColumns, conditionValues)
+	return Update("EventTable", columnsToSet, valuesToSet, conditionColumns, conditionValues)
 }
 
 func GetEventByID(id int) (*structs.Event, error) {
-	rows, err := Read("Event", []string{"*"}, []string{"id"}, []interface{}{id})
+	rows, err := Read("EventTable", []string{"*"}, []string{"id"}, []interface{}{id})
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +70,7 @@ func GetEventByID(id int) (*structs.Event, error) {
 }
 
 func GetGroupEvents(groupID int) ([]structs.Event, error) {
-	rows, err := Read("Event", []string{"*"}, []string{"group_id"}, []interface{}{groupID})
+	rows, err := Read("EventTable", []string{"*"}, []string{"group_id"}, []interface{}{groupID})
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +98,7 @@ func GetGroupEvents(groupID int) ([]structs.Event, error) {
 }
 
 func GetEventsByCreator(creatorID int) ([]structs.Event, error) {
-	rows, err := Read("Event", []string{"*"}, []string{"creator_id"}, []interface{}{creatorID})
+	rows, err := Read("EventTable", []string{"*"}, []string{"creator_id"}, []interface{}{creatorID})
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +126,7 @@ func GetEventsByCreator(creatorID int) ([]structs.Event, error) {
 }
 
 func GetEventByGroupAndCreator(groupID, creatorID int) ([]structs.Event, error) {
-	rows, err := Read("Event", []string{"*"}, []string{"group_id", "creator_id"}, []interface{}{groupID, creatorID})
+	rows, err := Read("EventTable", []string{"*"}, []string{"group_id", "creator_id"}, []interface{}{groupID, creatorID})
 	if err != nil {
 		return nil, err
 	}
@@ -183,14 +195,12 @@ func GetEventResponsesByEventId(eventID int) ([]structs.EventResponse, error) {
 }
 
 func GetEventResponsesByEventIdAndEventOptionId(eventID, option int) ([]structs.EventResponse, error) {
-	rows, err := Read("EventResponse", []string{"*"}, []string{"event_id", "option_id"}, []interface{}{eventID, option})
+	fmt.Print("eventID: ", eventID, "option: ", option)
+	rows, err := Read("EventResponse", []string{"*"}, []string{"event_id", "response_id"}, []interface{}{eventID, option})
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	if !rows.Next() {
-		return nil, nil
-	}
 	var responses []structs.EventResponse
 	for rows.Next() {
 		var response structs.EventResponse
@@ -295,7 +305,7 @@ func DeleteEventResponse(eventID, userID int) error {
 }
 
 func RemoveEvent(id int) error {
-	return Delete("Event", []string{"id"}, []interface{}{id})
+	return Delete("EventTable", []string{"id"}, []interface{}{id})
 }
 
 func CheckResponse(eventID, userID int) (bool, error) {
@@ -312,7 +322,7 @@ func CheckResponse(eventID, userID int) (bool, error) {
 }
 
 func GetUserEvents(userID int) ([]structs.Event, error) {
-	query := `SELECT * FROM events WHERE group_id IN (SELECT group_id FROM group_members WHERE user_id = ?) AND event_time > NOW()`
+	query := `SELECT * FROM EventTable WHERE group_id IN (SELECT group_id FROM GroupMember WHERE user_id = ?) AND event_time > datetime('now')`
 	rows, err := db.Database.Query(query, userID)
 	if err != nil {
 		log.Printf("error getting user events: %s\n", err.Error())
@@ -377,7 +387,7 @@ func GetEventOptions(eventID int) ([]structs.EventOptions, error) {
 }
 
 func GetEventOptionCount(eventID, OptionID int) (int, error) {
-	rows, err := Read("EventOptions", []string{"COUNT(*)"}, []string{"event_id", "option_id"}, []interface{}{eventID, OptionID})
+	rows, err := Read("EventOptions", []string{"COUNT(*)"}, []string{"event_id", "response_id"}, []interface{}{eventID, OptionID})
 	if err != nil {
 		return 0, err
 	}

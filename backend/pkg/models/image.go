@@ -6,9 +6,9 @@ import (
 
 // UploadImage uploads an image and returns its ID
 func UploadImage(image []byte) (int, error) {
-	columns := []string{"image"}
+	columns := []string{"image_data"}
 	values := []interface{}{image}
-	id, err := CreateAndReturnID("Image", columns, values)
+	id, err := CreateAndReturnID("ImageTable", columns, values)
 	if err != nil {
 		return 0, err
 	}
@@ -16,11 +16,11 @@ func UploadImage(image []byte) (int, error) {
 }
 
 func DeleteImage(imageID int) error {
-	return Delete("Image", []string{"id"}, []interface{}{imageID})
+	return Delete("ImageTable", []string{"id"}, []interface{}{imageID})
 }
 
 func GetImageByID(imageID int) (*structs.Image, error) {
-	rows, err := Read("Image", []string{"*"}, []string{"id"}, []interface{}{imageID})
+	rows, err := Read("ImageTable", []string{"*"}, []string{"id"}, []interface{}{imageID})
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func GetImageByID(imageID int) (*structs.Image, error) {
 }
 
 func UpdateImage(imageID int, imageData []byte) error {
-	columns := []string{"image"}
+	columns := []string{"image_data"}
 	values := []interface{}{imageData}
-	return Update("Image", columns, values, []string{"id"}, []interface{}{imageID})
+	return Update("ImageTable", columns, values, []string{"id"}, []interface{}{imageID})
 }

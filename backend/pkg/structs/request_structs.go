@@ -18,15 +18,19 @@ type UserRquest struct {
 // // used for http.HandleFunc("/post/addComment", AddCommentHandler)
 // // http.HandleFunc("/post/createPost", CreatePostHandler)
 type PostRequest struct {
-	Title       string `json:"title"`
-	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
-	ParentID    int    `json:"parent_id"`
 	Description string `json:"description"`
 	Image       []byte `json:"image"`
 	Privacy     string `json:"privacy"`
 	Recipient   []int  `json:"recipient"` /// wil return array of the user names
 }
 
+// // used for http.HandleFunc("/post/addComment", AddCommentHandler)
+// // http.HandleFunc("/post/createPost", CreatePostHandler)
+type GroupPostRequest struct {
+	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
+	Description string `json:"description"`
+	Image       []byte `json:"image"`
+}
 
 type CommentGroupRequest struct {
 	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
@@ -34,7 +38,6 @@ type CommentGroupRequest struct {
 	Description string `json:"description"`
 }
 type CommentRequest struct {
-	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
 	ParentID    int    `json:"parent_id"`
 	Description string `json:"description"`
 }
@@ -50,7 +53,6 @@ type EventRequest struct {
 	Description string    `json:"description"`
 	GroupID     int       `json:"group_id"`
 	Options     []string  `json:"options"`
-	EventDate   time.Time `json:"event_date"`
 }
 
 type GroupInviteRequest struct {
@@ -61,7 +63,6 @@ type GroupInviteRequest struct {
 type GroupInviteRequestResponse struct {
 	GroupID int `json:"group_id"`
 	UserID  int `json:"user_id"`
-	Status	string	`json:""`
 }
 
 type EventResponseRequest struct {

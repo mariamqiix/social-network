@@ -26,7 +26,7 @@ func GetUser(r *http.Request) *structs.User {
 		return nil
 	}
 
-	sessionExists, _ := models.CheckExistance("Session", []string{"token"}, []interface{}{sessionCookie.Value})
+	sessionExists, _ := models.CheckExistance("UserSession", []string{"token"}, []interface{}{sessionCookie.Value})
 	if !sessionExists {
 		return nil
 	}
@@ -103,7 +103,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 			if sessionUser != nil {
 				IsUserMember, err = models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
 				if err != nil {
-					log.Printf("error checking if user is member of group: %s\n", err.Error())
+					log.Printf("error sea: %s\n", err.Error())
 					continue
 				}
 			} else {
@@ -226,11 +226,6 @@ func mapEvents(sessionUser structs.User, events []structs.Event) []structs.Group
 			log.Printf("error getting group by group id: %s\n", err.Error())
 			continue
 		}
-		// DidUserRespone, err := models.CheckExistance("EventResponse", []string{"event_id", "user_id"}, []interface{}{event.ID, sessionUser.ID})
-		if err != nil {
-			log.Printf("error checking if user is member of group: %s\n", err.Error())
-			continue
-		}
 		GroupResponse := mapGroups(&sessionUser, []structs.Group{*Group})[0]
 		EventCreator := ReturnUserResponse(user)
 		eventResponses = append(eventResponses, structs.GroupEventResponse{
@@ -261,6 +256,7 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 			continue
 		}
 		var users []structs.BasicUserResponse
+		fmt.Println(responses)
 		for _, response := range responses {
 			users = append(users, *ReturnBasicUser(response.UserID))
 		}
@@ -268,11 +264,12 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 		if sessionUser == nil {
 			didRespone = false
 		} else {
-			didRespone, err = models.CheckExistance("EventResponse", []string{"event_id", "user_id", "option-id"}, []interface{}{option.EventID, sessionUser, option.ID})
+			didRespone, err = models.CheckExistance("EventResponse", []string{"event_id", "user_id", "response_id"}, []interface{}{option.EventID, sessionUser.ID, option.ID})
 			if err != nil {
 				log.Printf("error checking if user is member of group: %s\n", err.Error())
 				continue
 			}
+			fmt.Println(didRespone)
 		}
 		optionResponses = append(optionResponses, structs.EventOptionsResponse{
 			Option:         option.OptionName,

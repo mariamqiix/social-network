@@ -76,34 +76,34 @@ func AddUserRequestJoinGroup(groupID, userID int) error {
 
 func InsertToRequestTable(groupId, userId int, RequestType string) error {
 	// Create a new record in the Invite table
-	columns := []string{"group_id", "user_id", "type"}
+	columns := []string{"group_id", "user_id", "request_type"}
 	values := []interface{}{groupId, userId, RequestType}
 	return Create("GroupRequest", columns, values)
 }
 
 func RemoveInvite(groupID, userID int) error {
 	// Execute a delete query to remove the invite
-	return Delete("GroupRequest", []string{"group_id", "user_id", "type"}, []interface{}{groupID, userID, "Invite"})
+	return Delete("GroupRequest", []string{"group_id", "user_id", "request_type"}, []interface{}{groupID, userID, "Invite"})
 }
 
 func UpdateInviteStatus(groupID, userID int, status string) error {
 	// Update the invite status
-	return Update("GroupRequest", []string{"status"}, []interface{}{status}, []string{"group_id", "user_id", "type"}, []interface{}{groupID, userID, "Invite"})
+	return Update("GroupRequest", []string{"request_status"}, []interface{}{status}, []string{"group_id", "user_id", "type"}, []interface{}{groupID, userID, "Invite"})
 }
 
 func RemoveRequest(groupID, userID int) error {
 	// Execute a delete query to remove the invite
-	return Delete("GroupRequest", []string{"group_id", "user_id", "type"}, []interface{}{groupID, userID, "Request"})
+	return Delete("GroupRequest", []string{"group_id", "user_id", "request_type"}, []interface{}{groupID, userID, "Request"})
 }
 
 func UpdateRequestStatus(groupID, userID int, status string) error {
 	// Update the invite status
-	return Update("GroupRequest", []string{"status"}, []interface{}{status}, []string{"group_id", "user_id", "type"}, []interface{}{groupID, userID, "Request"})
+	return Update("GroupRequest", []string{"request_status"}, []interface{}{status}, []string{"group_id", "user_id", "type"}, []interface{}{groupID, userID, "Request"})
 }
 
 func GetGroupRequests(groupID int) ([]structs.GroupRequest, error) {
 	// Execute a read query to fetch the group requests
-	rows, err := Read("GroupRequest", []string{"*"}, []string{"group_id", "type"}, []interface{}{groupID, "Request"})
+	rows, err := Read("GroupRequest", []string{"*"}, []string{"group_id", "request_type"}, []interface{}{groupID, "Request"})
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +161,7 @@ func GetGroupMembers(groupID int) ([]structs.GroupMember, error) {
 // GetUserInvites fetches all group invites for a given user.
 func GetUserInvites(userID int) ([]structs.GroupRequest, error) {
 	// Execute a read query to fetch the group requests for the user with type 'Invite'
-	rows, err := Read("GroupRequest", []string{"*"}, []string{"user_id", "type"}, []interface{}{userID, "Invite"})
+	rows, err := Read("GroupRequest", []string{"*"}, []string{"user_id", "request_type"}, []interface{}{userID, "Invite"})
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +331,7 @@ func CheckGroupCreator(groupID, userID int) (bool, error) {
 }
 
 func SearchGroup(subString string) ([]structs.Group, error) {
-	query := `SELECT * FROM GroupTable WHERE title LIKE ? OR description LIKE ?`
+	query := `SELECT * FROM GroupTable WHERE title LIKE ? OR group_description LIKE ?`
 	rows, err := db.Database.Query(query, "%"+subString+"%", "%"+subString+"%")
 	if err != nil {
 		return nil, err
@@ -357,7 +357,7 @@ func SearchGroup(subString string) ([]structs.Group, error) {
 }
 
 func GetGroupByRequest(requestType string, userId int) ([]structs.Group, error) {
-	query := `SELECT * FROM GroupTable WHERE id IN (SELECT group_id FROM GroupRequest WHERE user_id = ? AND type = ?)`
+	query := `SELECT * FROM GroupTable WHERE id IN (SELECT group_id FROM GroupRequest WHERE user_id = ? AND request_type = ?)`
 	rows, err := db.Database.Query(query, userId, requestType)
 	if err != nil {
 		return []structs.Group{}, err

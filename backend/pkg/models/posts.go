@@ -6,11 +6,21 @@ import (
 	"fmt"
 )
 
-func CreateUserPost(p structs.Post) error {
+func CreateUserPost(p structs.Post) (int, error) {
 	// Create a new record in the Post table
 	columns := []string{"user_id", "content", "image_id", "privacy"}
 	values := []interface{}{p.UserID, p.Content, p.ImageID, p.Privacy}
-	return Create("Post", columns, values)
+	err := Create("Post", columns, values)
+	if err != nil {
+		return 0, err
+	}
+	// Get the ID of the newly created post
+	var postID int
+	err = db.Database.QueryRow("SELECT id FROM Post WHERE user_id = ? AND content = ? AND image_id = ? AND privacy = ?", p.UserID, p.Content, p.ImageID, p.Privacy).Scan(&postID)
+	if err != nil {
+		return 0, err
+	}
+	return postID, nil
 }
 
 func CreateGroupPost(p structs.Post) error {
@@ -92,7 +102,7 @@ func GetUserComments(userID int) ([]structs.Post, error) {
 }
 
 func GetPostComments(postID int) ([]structs.Post, error) {
-	return GetPosts(postID, "group_id IS NULL parent_id", 1)
+	return GetPosts(postID, "parent_id", 1)
 }
 func GetPosts(id int, column string, parentID int) ([]structs.Post, error) {
 	// Define the WHERE clause and parameters
@@ -430,7 +440,7 @@ func DidUserReact(userId, postId int, Reaction string) (bool, error) {
 
 func GetGroupPostsForUser(userId int) ([]structs.Post, error) {
 	query := `SELECT * FROM post WHERE group_id IN (
-                SELECT group_id FROM group_member WHERE user_id = ?
+                SELECT group_id FROM GroupMember WHERE user_id = ?
               )`
 	rows, err := db.Database.Query(query, userId)
 	if err != nil {

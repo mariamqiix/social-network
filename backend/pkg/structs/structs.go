@@ -98,7 +98,7 @@ type EventResponse struct {
 	ID           int
 	EventID      int
 	UserID       int
-	Response     string // 'accept', 'decline'
+	Response     int // 'accept', 'decline'
 	ResponseDate time.Time
 }
 
@@ -139,6 +139,6 @@ type GroupChat struct {
 	GroupID      int
 	SenderID     int
 	Message      string
-	ImageID      int
+	ImageID      *int
 	CreationDate time.Time
 }

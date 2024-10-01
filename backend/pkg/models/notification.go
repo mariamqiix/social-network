@@ -7,7 +7,7 @@ import (
 func CreateNotification(userID int, entityId *int, notificationType, notificationSender string, isRead bool) error {
 	columns := []string{"user_id", "notification_type", notificationSender, "is_read"}
 	values := []interface{}{userID, notificationType, entityId, isRead}
-	return Create("Notification", columns, values)
+	return Create("UserNotification", columns, values)
 }
 
 func CreateGroupsNotification(notification structs.Notification) error {
@@ -23,7 +23,7 @@ func CreateMessagesNotification(notification structs.Notification) error {
 }
 
 func GetUserNotifications(userId int) ([]structs.Notification, error) {
-	rows, err := Read("Notification", []string{"*"}, []string{"user_id"}, []interface{}{userId})
+	rows, err := Read("UserNotification", []string{"*"}, []string{"user_id"}, []interface{}{userId})
 	if err != nil {
 		return nil, err
 	}
@@ -52,17 +52,17 @@ func GetUserNotifications(userId int) ([]structs.Notification, error) {
 }
 
 func UpdateUserNotifications(UserId int) error {
-	return Update("Notification", []string{"is_read"}, []interface{}{true}, []string{"user_id"}, []interface{}{UserId})
+	return Update("UserNotification", []string{"is_read"}, []interface{}{true}, []string{"user_id"}, []interface{}{UserId})
 }
 
 func UpdateNotificationToRead(notificationId int) error {
-	return Update("Notification", []string{"is_read"}, []interface{}{true}, []string{"id"}, []interface{}{notificationId})
+	return Update("UserNotification", []string{"is_read"}, []interface{}{true}, []string{"id"}, []interface{}{notificationId})
 }
 
 func DeleteUserNotifications(userId int) error {
-	return Delete("Notification", []string{"user_id"}, []interface{}{userId})
+	return Delete("UserNotification", []string{"user_id"}, []interface{}{userId})
 }
 
 func DeleteNotification(notificationId int) error {
-	return Delete("Notification", []string{"id"}, []interface{}{notificationId})
+	return Delete("UserNotification", []string{"id"}, []interface{}{notificationId})
 }

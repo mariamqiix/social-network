@@ -11,7 +11,7 @@ type ErrorResponse struct {
 	Message string                `json:"message"`
 	User    *structs.UserResponse `json:"user,omitempty"`
 }
-
+ 
 func errorServer(w http.ResponseWriter, code int) {
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")

@@ -4,8 +4,8 @@ CREATE TABLE GroupTable (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     creator_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     title VARCHAR(20),
-    description TEXT,
-    image_id INTEGER REFERENCES Image(id) ON UPDATE CASCADE ON DELETE CASCADE,
+    group_description TEXT,
+    image_id INTEGER REFERENCES ImageTable(id) ON UPDATE CASCADE ON DELETE CASCADE,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -21,7 +21,7 @@ CREATE TABLE GroupRequest (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     group_id INTEGER REFERENCES GroupTable(id) ON UPDATE CASCADE ON DELETE CASCADE,
     user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    status VARCHAR(50) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Accepted', 'Rejected')),
-    type VARCHAR(50) CHECK (type IN ('Invite', 'Request')),
+    request_status VARCHAR(50) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
+    request_type VARCHAR(50) CHECK (request_type IN ('Invite', 'Request')),
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

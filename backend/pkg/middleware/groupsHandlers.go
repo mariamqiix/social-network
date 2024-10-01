@@ -4,6 +4,7 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -20,7 +21,7 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
-	splitPath := strings.Split(r.URL.Path, "/")
+	splitPath := strings.TrimPrefix(r.URL.Path, "/user/groups/")
 	AllGroups, err := models.GetAllGroups()
 	if err != nil {
 		log.Printf("error getting groups: %s\n", err.Error())
@@ -35,7 +36,11 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 		writeToJson(view, w)
 		return
 	}
-	if len(splitPath) == 3 {
+	fmt.Print("hi")
+	fmt.Print(len(splitPath))
+	if splitPath != "" {
+		fmt.Print("ss")
+
 		Posts, err := models.GetGroupPostsForUser(sessionUser.ID)
 		if err != nil {
 			log.Printf("error getting posts: %s\n", err.Error())
@@ -43,7 +48,8 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var groups []structs.Group
-		switch splitPath[2] {
+		fmt.Print("hello")
+		switch splitPath {
 		case "joind":
 			groups, err = models.GetUserGroups(sessionUser.ID)
 			if err != nil {
@@ -100,7 +106,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var createGroupRequest structs.CreateGroupRequest
-	err := json.NewDecoder(r.Body).Decode(createGroupRequest)
+	err := json.NewDecoder(r.Body).Decode(&createGroupRequest)
 	if err != nil {
 		log.Printf("Error unmarshalling data: %s\n", err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -136,6 +142,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 // // join group functoin
 func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
+	fmt.Print("request")
 	if sessionUser == nil {
 		errorServer(w, http.StatusBadRequest)
 		return
@@ -205,6 +212,7 @@ func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 // // group page handler
 func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
+	fmt.Print("hello group")
 	limiterUsername := "[GUESTS]"
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
@@ -234,7 +242,20 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		writeToJson(view, w)
 		return
 	}
-
+	IsMember, err := models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{groupId, sessionUser.ID})
+	if err != nil {
+		log.Printf("error checking group membership: %s\n", err.Error())
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+	if !IsMember {
+		view := GroupPageView{
+			User:  ReturnUserResponse(sessionUser),
+			Group: mapGroups(sessionUser, []structs.Group{*group})[0],
+		}
+		writeToJson(view, w)
+		return
+	}
 	posts, err := models.GetGroupPosts(groupId)
 	if err != nil {
 		log.Printf("error getting group posts: %s\n", err.Error())
@@ -253,6 +274,7 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		Posts:   mapPosts(sessionUser, posts),
 		Members: MapMembers(groupMembers),
 	}
+	fmt.Print(view)
 	writeToJson(view, w)
 
 }
@@ -267,7 +289,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var Invite structs.GroupInviteRequest
-	err := json.NewDecoder(r.Body).Decode(Invite)
+	err := json.NewDecoder(r.Body).Decode(&Invite)
 	if err != nil {
 		log.Printf("error unmarshalling data: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
@@ -285,6 +307,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 /// end function
 
 func ListEventHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("helloevent")
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
 	if sessionUser != nil {
@@ -292,13 +315,14 @@ func ListEventHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	if !userLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
-		return
 	}
 	if sessionUser == nil {
 		return
 	}
-	path := strings.Split(r.URL.Path, "/")
-	switch path[2] {
+	path := strings.TrimPrefix(r.URL.Path, "/group/event/list/")
+
+	fmt.Print(path)
+	switch path {
 	case "group":
 		groupId, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil {
@@ -330,26 +354,32 @@ func ListEventHandler(w http.ResponseWriter, r *http.Request) {
 
 func GroupChatsHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
-	limiterUsername := "[GUESTS]"
-	if sessionUser != nil {
-		limiterUsername = sessionUser.Username
-	}
-	if !userLimiter.Allow(limiterUsername) {
-		errorServer(w, http.StatusTooManyRequests)
+	if sessionUser == nil {
+		log.Println("sessionUser is nil")
+		errorServer(w, http.StatusInternalServerError)
 		return
 	}
+
 	groupId, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		log.Printf("error parsing group id: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
+
 	chats, err := models.GetGroupMessages(groupId)
 	if err != nil {
 		log.Printf("error getting chats: %s\n", err.Error())
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
+
+	if chats == nil {
+		log.Println("chats is nil")
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
 	Chats := mapChats(*sessionUser, chats)
 	writeToJson(Chats, w)
 }
@@ -370,7 +400,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var eventRequest structs.EventRequest
-	err := json.NewDecoder(r.Body).Decode(eventRequest)
+	err := json.NewDecoder(r.Body).Decode(&eventRequest)
 	if err != nil {
 		log.Printf("error unmarshalling data: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
@@ -381,11 +411,10 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		GroupID:     eventRequest.GroupID,
 		Title:       eventRequest.Title,
 		Description: eventRequest.Description,
-		EventTime:   eventRequest.EventDate,
 	}
-	err = models.CreateEvent(Event)
+	eventID, err := models.CreateEvent(Event)
 	for _, option := range eventRequest.Options {
-		err := models.AddEventOption(Event.ID, option)
+		err := models.AddEventOption(eventID, option)
 		if err != nil {
 			log.Printf("error adding event option: %s\n", err.Error())
 			errorServer(w, http.StatusInternalServerError)
@@ -401,3 +430,37 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // end function
+
+func CreateEventResponseHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+	limiterUsername := "[GUESTS]"
+	if sessionUser != nil {
+		limiterUsername = sessionUser.Username
+	}
+	if !userLimiter.Allow(limiterUsername) {
+		errorServer(w, http.StatusTooManyRequests)
+		return
+	}
+	if sessionUser == nil {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+	var eventResponse structs.EventResponseRequest
+	err := json.NewDecoder(r.Body).Decode(&eventResponse)
+	if err != nil {
+		log.Printf("error unmarshalling data: %s\n", err.Error())
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+	respone := structs.EventResponse{
+		UserID:   sessionUser.ID,
+		EventID:  eventResponse.EventID,
+		Response: eventResponse.OptionID,
+	}
+	err = models.CreateEventResponse(respone)
+	if err != nil {
+		log.Printf("error creating event response: %s\n", err.Error())
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+}

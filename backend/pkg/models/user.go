@@ -188,12 +188,12 @@ func CreateUserSession(s structs.Session) error {
 	// Create a new record in the Session table
 	columns := []string{"token", "user_id"}
 	values := []interface{}{s.Token, s.UserID}
-	return Create("Session", columns, values)
+	return Create("UserSession", columns, values)
 }
 
 func DeleteUserSession(userId int) error {
 	// Execute a delete query to delete the session
-	return Delete("Session", []string{"id"}, []interface{}{userId})
+	return Delete("UserSession", []string{"id"}, []interface{}{userId})
 }
 
 func GetPassword(colomn, username string) (string, error) {
@@ -228,7 +228,7 @@ func GetPasswordByEmail(email string) (string, error) {
 
 func GetSession(token string) (*structs.Session, error) {
 	// Execute a read query to fetch the session by token
-	rows, err := Read("Session", []string{"*"}, []string{"token"}, []interface{}{token})
+	rows, err := Read("UserSession", []string{"*"}, []string{"token"}, []interface{}{token})
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)
 	}

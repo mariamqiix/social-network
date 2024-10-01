@@ -51,7 +51,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// 	http.Error(w, "Invalid password", http.StatusConflict)
 	// 	return
 	// }
-	if "hashedpassword1" != Password {
+	if "123456789" != Password {
 		http.Error(w, "Invalid password", http.StatusConflict)
 		return
 	}

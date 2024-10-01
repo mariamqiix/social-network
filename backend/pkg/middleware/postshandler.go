@@ -20,7 +20,7 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
-	postID, err := strconv.Atoi(r.PathValue("id"))
+	postID, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		log.Printf("error parsing post id: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
@@ -94,13 +94,13 @@ func AddReactionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var ReactoinRequest structs.ReactoinRequest
-	err := json.NewDecoder(r.Body).Decode(ReactoinRequest)
+	err := json.NewDecoder(r.Body).Decode(&ReactoinRequest)
 	if err != nil {
 		log.Printf("error unmarshalling data: %s\n", err.Error())
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
-	didReact, err := models.CheckExistance("Rections", []string{"user_id", "post_id"}, []interface{}{sessionUser.ID, ReactoinRequest.PostID})
+	didReact, err := models.CheckExistance("Reaction", []string{"user_id", "post_id"}, []interface{}{sessionUser.ID, ReactoinRequest.PostID})
 	if err != nil {
 		log.Printf("error checking if user reacted: %s\n", err.Error())
 		errorServer(w, http.StatusInternalServerError)
@@ -173,9 +173,9 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := strings.Split(r.URL.Path, "/")
+	path := strings.TrimPrefix(r.URL.Path, "/post/addComment/")
 
-	switch path[2] {
+	switch path {
 	case "group":
 		var comment structs.CommentGroupRequest
 		err := json.NewDecoder(r.Body).Decode(&comment)
@@ -184,23 +184,17 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
-		exist, err := models.CheckExistance("Posts", []string{"id"}, []interface{}{comment.ParentID})
-		if !exist {
-			log.Printf("error checking if post exists: %s\n", err.Error())
-			errorServer(w, http.StatusBadRequest)
-			return
-		}
-		exist, err = models.CheckExistance("Groups", []string{"id"}, []interface{}{comment.GroupID})
-		if !exist {
-			log.Printf("error checking if group exists: %s\n", err.Error())
-			errorServer(w, http.StatusBadRequest)
+		Parent, err := models.GetPostByID(comment.ParentID)
+		if err != nil {
+			log.Printf("error getting post: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
 			return
 		}
 		post := structs.Post{
 			UserID:   &sessionUser.ID,
 			Content:  comment.Description,
 			ParentID: &comment.ParentID,
-			GroupID:  &comment.GroupID,
+			GroupID:  Parent.GroupID,
 		}
 		err = models.CreateGroupComment(post)
 		if err != nil {
@@ -216,7 +210,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
-		exist, err := models.CheckExistance("Posts", []string{"id"}, []interface{}{comment.ParentID})
+		exist, err := models.CheckExistance("Post", []string{"id"}, []interface{}{comment.ParentID})
 		if !exist {
 			log.Printf("error checking if post exists: %s\n", err.Error())
 			errorServer(w, http.StatusBadRequest)
@@ -238,42 +232,91 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-// func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
-// 	sessionUser := GetUser(r)
-// 	limiterUsername := "[GUESTS]"
-// 	if sessionUser != nil {
-// 		limiterUsername = sessionUser.Username
-// 	}
-// 	if !userLimiter.Allow(limiterUsername) {
-// 		errorServer(w, http.StatusTooManyRequests)
-// 		return
-// 	}
-// 	if sessionUser == nil {
-// 		errorServer(w, http.StatusUnauthorized)
-// 		return
-// 	}
-// 	var post structs.PostRequest
-// 	err := json.NewDecoder(r.Body).Decode(&post)
-// 	if err != nil {
-// 		log.Printf("error unmarshalling data: %s\n", err.Error())
-// 		errorServer(w, http.StatusBadRequest)
-// 		return
-// 	}
-// 	imageID := 0
-// 	if post.Image != nil {
-// 		isImage, _ := IsDataImage(post.Image)
-// 		if isImage {
-// 			imageID, err = models.UploadImage(post.Image)
-// 			if err != nil {
-// 				log.Printf("SignupHandler: %s\n", err.Error())
-// 			}
-// 		}
-// 	}
-// 	postToCreate := structs.Post{
-// 		UserID:  &sessionUser.ID,
-// 		Content: post.Description,
-// 		GroupID: &post.GroupID,
-// 		ImageID: &imageID,
-// 		Privacy: post.Privacy,
-// 	}
-// }
+func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+	limiterUsername := "[GUESTS]"
+	if sessionUser != nil {
+		limiterUsername = sessionUser.Username
+	}
+	if !userLimiter.Allow(limiterUsername) {
+		errorServer(w, http.StatusTooManyRequests)
+		return
+	}
+	if sessionUser == nil {
+		errorServer(w, http.StatusUnauthorized)
+		return
+	}
+	path := strings.TrimPrefix(r.URL.Path, "/post/createPost/")
+	switch path {
+	case "group":
+		var post structs.GroupPostRequest
+		err := json.NewDecoder(r.Body).Decode(&post)
+		if err != nil {
+			log.Printf("error unmarshalling data: %s\n", err.Error())
+			errorServer(w, http.StatusBadRequest)
+			return
+		}
+		imageID := -1
+		if post.Image != nil {
+			isImage, _ := IsDataImage(post.Image)
+			if isImage {
+				imageID, err = models.UploadImage(post.Image)
+				if err != nil {
+					log.Printf("SignupHandler: %s\n", err.Error())
+				}
+			}
+		}
+		postToCreate := structs.Post{
+			UserID:  &sessionUser.ID,
+			Content: post.Description,
+			GroupID: &post.GroupID,
+			ImageID: &imageID,
+		}
+		err = models.CreateGroupPost(postToCreate)
+		if err != nil {
+			log.Printf("error creating post: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+	case "user":
+		var post structs.PostRequest
+		err := json.NewDecoder(r.Body).Decode(&post)
+		if err != nil {
+			log.Printf("error unmarshalling data: %s\n", err.Error())
+			errorServer(w, http.StatusBadRequest)
+			return
+		}
+		imageID := 0
+		if post.Image != nil {
+			isImage, _ := IsDataImage(post.Image)
+			if isImage {
+				imageID, err = models.UploadImage(post.Image)
+				if err != nil {
+					log.Printf("SignupHandler: %s\n", err.Error())
+				}
+			}
+		}
+		postToCreate := structs.Post{
+			UserID:  &sessionUser.ID,
+			Content: post.Description,
+			ImageID: &imageID,
+			Privacy: post.Privacy,
+		}
+		id, err := models.CreateUserPost(postToCreate)
+		if err != nil {
+			log.Printf("error creating post: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+		for i := 0; i < len(post.Recipient); i++ {
+			err = models.AddPostRecipient(id, post.Recipient[i])
+			if err != nil {
+				log.Printf("error adding recipient: %s\n", err.Error())
+				errorServer(w, http.StatusInternalServerError)
+				return
+			}
+		}
+
+	}
+
+}
