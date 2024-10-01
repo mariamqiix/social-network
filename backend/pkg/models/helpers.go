@@ -148,6 +148,7 @@ func CheckExistance(tablename string, columnnames []string, values []interface{}
 
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s", tablename, whereClause)
 
+
 	// Lock the mutex
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -157,15 +158,15 @@ func CheckExistance(tablename string, columnnames []string, values []interface{}
 	if err != nil {
 		return false, err
 	}
-	defer stmt.Close()
 
 	// Execute the query with the provided values and scan the result
-	var count int
+	count := 0
 	err = stmt.QueryRow(values...).Scan(&count)
 	if err != nil {
 		return false, err
 	}
 
+	fmt.Println(count)
 	// Check if the count indicates existence
 	return count > 0, nil
 }

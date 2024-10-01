@@ -25,10 +25,12 @@ func GetUser(r *http.Request) *structs.User {
 	if err == http.ErrNoCookie {
 		return nil
 	}
-	sessionExists, _ := models.CheckExistance("UserSession", []string{"token"}, []interface{}{sessionCookie.Value})
+
+	sessionExists, _ := models.CheckExistance("Session", []string{"token"}, []interface{}{sessionCookie.Value})
 	if !sessionExists {
 		return nil
 	}
+
 	session, err := models.GetSession(sessionCookie.Value)
 	if err != nil {
 		log.Printf("error getting session: %s\n", err.Error())

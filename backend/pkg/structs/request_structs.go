@@ -57,6 +57,13 @@ type GroupInviteRequest struct {
 	GroupID int `json:"group_id"`
 	UserID  int `json:"user_id"`
 }
+
+type GroupInviteRequestResponse struct {
+	GroupID int `json:"group_id"`
+	UserID  int `json:"user_id"`
+	Status	string	`json:""`
+}
+
 type EventResponseRequest struct {
 	EventID  int `json:"event_id"`
 	OptionID int `json:"option_id"`
