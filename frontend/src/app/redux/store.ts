@@ -46,14 +46,15 @@ const initialState: State = {
     ],
 
     notifications: [
-        // {
-        //     id: 1,
-        //     message: "Not logged in",
-        //     title: "Authentication",
-        //     type: "error",
-        //     link: null,
-        // }
+        {
+            id: 1,
+            message: "Testing notifications",
+            title: "Test",
+            type: "error",
+            link: null,
+        }
     ],
+    user: null,
 };
 
 const reducer = (state = initialState, action: any) => {
@@ -81,6 +82,16 @@ const reducer = (state = initialState, action: any) => {
                 ...state,
                 notifications: [action.payload, ...state.notifications]
             };
+        case 'user/login':
+            return {
+                ...state,
+                user: action.payload,
+            }
+        case "user/logout":
+            return {
+                ...state,
+                user: null,
+            }
         default:
             return state;
     }

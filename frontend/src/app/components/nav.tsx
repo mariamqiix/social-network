@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, RedirectType, usePathname } from "next/navigation";
+import { selectNotifications, selectUser } from "../redux/selectors";
+import { useSelector } from "react-redux";
 
-const links = ["/", "chat", "groups", "profile", "notifications", "login"];
+const links = ["/", "/chat", "/groups", "/profile", "/notifications", "/login"];
 
 const icons = [
     <path
@@ -40,25 +42,45 @@ const icons = [
 ];
 
 export default function Nav() {
-    const pathName = usePathname().slice(1);
+    const user = useSelector(selectUser);
+    const notifications = useSelector(selectNotifications);
+
+    function logout() {
+        if (user != null) {
+            fetch("http://localhost:8080/logout",
+                { method: "POST" }).then(res => {
+                    console.log(res.status);
+                    res.text().then(data => {
+                        console.log(data);
+                    });
+                    if (res.ok) {
+                        dispatch(logout());
+                        redirect('/login', RedirectType.replace);
+                    }
+                });
+        }
+    }
+
+    const pathName = usePathname();
     return (
         <nav className="h-100">
             <ul className="nav flex-column p-5">
-                <div className="container-fluid d-flex flex-column align-items-center">
-                    <a className="navbar-brand m-0 p-0" href="#">
-                        <Image
-                            className="rounded-circle"
-                            src="/placeholder.jpg"
-                            width={80}
-                            height={80}
-                            alt="Avatar"
-                        />
-                    </a>
-                    <br />
-                    Hasan kadhem
-                    <br />
-                    <span className="text-body-tertiary">@hkadhem</span>
-                </div>
+                {user != null ?
+                    <div className="container-fluid d-flex flex-column align-items-center">
+                        <a className="navbar-brand m-0 p-0" href="#">
+                            <Image
+                                className="rounded-circle"
+                                src={user.image ?? "/placeholder.jpg"}
+                                width={80}
+                                height={80}
+                                alt="Avatar"
+                            />
+                        </a>
+                        <br />
+                        {user.firstName} {user.lastName}
+                        <br />
+                        <span className="text-body-tertiary">{user.username}</span>
+                    </div> : <p>Not logged in</p>}
                 {links.map((link, i) => (
                     <Link
                         href={link}
@@ -84,12 +106,42 @@ export default function Nav() {
                                 " text-start nav-link"
                             }
                         >
-                            {link == "/" ? "Posts" : link[0].toLocaleUpperCase() + link.slice(1)}
+                            {link == "/" ? "Posts" : link[1].toLocaleUpperCase() + link.slice(2)}
                         </span>
-                        {link == "notifications" ? "0" : ""}
+                        {link == "/notifications" ? notifications.length : ""}
                     </Link>
                 ))}
+                <div
+                    className={
+                        "btn nav-item rounded-4 m-1 d-flex align-items-center"
+                    }
+                    onClick={() => {
+                        logout();
+                    }}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="black"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        // stroke="currentColor"
+                        className="icon"
+                    >
+                        {icons[5]}
+                    </svg>
+                    <span
+                        className={
+                            "text-black text-start nav-link"
+                        }
+                    >
+                        Logout
+                    </span>
+                </div>
             </ul>
         </nav>
     );
 }
+function dispatch(arg0: void) {
+    throw new Error("Function not implemented.");
+}
+

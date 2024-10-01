@@ -1,14 +1,34 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "../components/card";
 import { colors } from "../components/colors";
+import { redirect, RedirectType } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../redux/actions";
+import { selectNotifications, selectUser } from "../redux/selectors";
 
 const color = colors[0];
 export default function loginPage() {
+    const user = useSelector(selectUser);
+
+    const dispatch = useDispatch();
     let [isRegister, setIsRegister] = useState(true);
     return isRegister ? <Card title="Login" color={color}>
-        <form className="d-flex flex-column">
+        <form className="d-flex flex-column" onSubmit={(e) => {
+            e.preventDefault();
+            let formData = new FormData(e.target as HTMLFormElement);
+            fetch("http://localhost:8080/login",
+                { method: "POST", body: formData }).then(res => {
+                    if (res.ok && formData.get("username")) {
+                        res.json().then(data => {
+                            console.log(data);
+                            dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
+                        });
+                        // redirect('/chat', RedirectType.replace);
+                    }
+                });
+        }}>
             {/* <h3 className="text-center">Please enter your login details</h3> */}
             <div className="mb-3">
                 <label className="form-label">User name</label>

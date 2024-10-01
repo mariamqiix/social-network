@@ -46,7 +46,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid username or email", http.StatusConflict)
 		return
 	}
-	fmt.Print(user)
+	fmt.Println(user)
 	// if err := CompareHashAndPassword(user.HashedPassword, Password); err != HasherErrorNone {
 	// 	http.Error(w, "Invalid password", http.StatusConflict)
 	// 	return
@@ -61,6 +61,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "something went wrong, please try again later", http.StatusInternalServerError)
 		return
 	}
+	writeToJson(user, w)
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {

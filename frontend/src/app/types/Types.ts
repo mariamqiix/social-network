@@ -1,6 +1,7 @@
 export type State = {
     posts: Post[]
     notifications: Notifi[]
+    user: null | User
 };
 
 export type Notifi = {
@@ -22,3 +23,14 @@ export type Post = {
     images: string[],
     likes: number,
 };
+
+export type User = {
+    id: number,
+    username: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    image: string | null,
+    bio: string,
+    dob: string,
+}
