@@ -84,7 +84,7 @@ export default function Home() {
             time={post.time}
             content={post.content}
             images={post.images}
-            id={index.toString()}
+            id={post.id.toString()}
           />
           <PostActions likes={post.likes} />
         </div>

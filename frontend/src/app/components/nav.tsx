@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { redirect, RedirectType, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { selectNotifications, selectUser } from "../redux/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/actions";
@@ -46,6 +46,8 @@ export default function Nav() {
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotifications);
     const dispatch = useDispatch();
+
+    const router = useRouter()
     function logoutButton() {
         if (user != null) {
             fetch("http://localhost:8080/logout",
@@ -56,7 +58,7 @@ export default function Nav() {
                     });
                     if (res.ok) {
                         dispatch(logout());
-                        redirect('/login', RedirectType.replace);
+                        router.replace("/login");
                     }
                 });
         }
@@ -82,7 +84,7 @@ export default function Nav() {
                         <br />
                         <span className="text-body-tertiary">{user.username}</span>
                     </div> : <p>Not logged in</p>}
-                {links.map((link, i) => (
+                {links.map((link, i) => link != "/login" || user == null ? (
                     <Link
                         href={link}
                         key={link}
@@ -111,7 +113,7 @@ export default function Nav() {
                         </span>
                         {link == "/notifications" ? notifications.length : ""}
                     </Link>
-                ))}
+                ) : (<div key={link}></div>))}
                 {user ?
                     <div
                         className={
