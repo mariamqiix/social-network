@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect, RedirectType, usePathname } from "next/navigation";
 import { selectNotifications, selectUser } from "../redux/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/actions";
 
 const links = ["/", "/chat", "/groups", "/profile", "/notifications", "/login"];
 
@@ -44,11 +45,11 @@ const icons = [
 export default function Nav() {
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotifications);
-
-    function logout() {
+    const dispatch = useDispatch();
+    function logoutButton() {
         if (user != null) {
             fetch("http://localhost:8080/logout",
-                { method: "POST" }).then(res => {
+                { method: "POST", credentials: 'include' }).then(res => {
                     console.log(res.status);
                     res.text().then(data => {
                         console.log(data);
@@ -111,37 +112,34 @@ export default function Nav() {
                         {link == "/notifications" ? notifications.length : ""}
                     </Link>
                 ))}
-                <div
-                    className={
-                        "btn nav-item rounded-4 m-1 d-flex align-items-center"
-                    }
-                    onClick={() => {
-                        logout();
-                    }}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="black"
-                        viewBox="0 0 24 24"
-                        strokeWidth={1.5}
-                        // stroke="currentColor"
-                        className="icon"
-                    >
-                        {icons[5]}
-                    </svg>
-                    <span
+                {user ?
+                    <div
                         className={
-                            "text-black text-start nav-link"
+                            "btn nav-item rounded-4 m-1 d-flex align-items-center"
                         }
+                        onClick={() => {
+                            logoutButton();
+                        }}
                     >
-                        Logout
-                    </span>
-                </div>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="black"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            // stroke="currentColor"
+                            className="icon"
+                        >
+                            {icons[5]}
+                        </svg>
+                        <span
+                            className={
+                                "text-black text-start nav-link"
+                            }
+                        >
+                            Logout
+                        </span>
+                    </div> : <div></div>}
             </ul>
         </nav>
     );
 }
-function dispatch(arg0: void) {
-    throw new Error("Function not implemented.");
-}
-

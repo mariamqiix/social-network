@@ -19,7 +19,7 @@ export default function loginPage() {
             e.preventDefault();
             let formData = new FormData(e.target as HTMLFormElement);
             fetch("http://localhost:8080/login",
-                { method: "POST", body: formData }).then(res => {
+                { method: "POST", credentials: 'include', body: formData }).then(res => {
                     if (res.ok && formData.get("username")) {
                         res.json().then(data => {
                             console.log(data);
@@ -45,7 +45,7 @@ export default function loginPage() {
             </span>
             <button type="submit" className="btn btn-dark mt-3">Login</button>
         </form>
-    </Card> : <Card title="Register" color={color}>
+    </Card > : <Card title="Register" color={color}>
         <form className="d-flex flex-column">
             {/* <h3 className="text-center">Please enter your account details</h3> */}
             <div className="mb-3">
