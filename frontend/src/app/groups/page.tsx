@@ -1,5 +1,6 @@
+"use client";
 import Post from "../components/GroupPostContent"; // Adjust the path if necessary
-import { randomColor } from "../components/colors"; 
+import { randomColor } from "../components/colors";
 export default function Page() {
     return (
         <div
@@ -13,7 +14,7 @@ export default function Page() {
                 backgroundColor: "#f0f4f7", // Light background
             }}
         >
-            <div
+            <a href="/groups/groupPage"> <div
                 className="group-card-container"
                 style={{
                     marginLeft: "2.5%",
@@ -117,6 +118,7 @@ export default function Page() {
                     </div>
                 ))}
             </div>
+            </a>
             <div
                 id="group-post"
                 style={{
@@ -138,6 +140,73 @@ export default function Page() {
         </div>
     );
 }
+
+
+import React from 'react';
+
+const GroupPage = () => {
+    return (
+        <div className="group-page-container">
+            {/* Profile Header */}
+            <div className="profile-header">
+                <div className="profile-info">
+                    <img
+                        src="/path/to/avatar.png"
+                        alt="Avatar"
+                        className="profile-avatar"
+                    />
+                    <div className="profile-details">
+                        <h1 className="profile-name">Fredy Mercury</h1>
+                        <p className="profile-desc">
+                            Alzea Arafat, an Indonesian based senior UI/UX designer with more than 10 years of experience in various industries from early-stage startups to unicorns. His hobby is playing games.
+                        </p>
+                        <div className="profile-follow-info">
+                            <span>1.25k Followers</span> | <span>455 Followings</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Navigation Bar */}
+            <div className="list-bar">
+                <ul>
+                    <li className="active">Posts</li>
+                    <li>Events</li>
+                    <li>Room</li>
+                    <li>Donations</li>
+                    <li>Followers</li>
+                </ul>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="content-area">
+                {/* Replace the following section with dynamic content */}
+                <div className="posts-section">
+                    <h2>Posts</h2>
+                    <p>Post content goes here...</p>
+                </div>
+
+                <div className="events-section">
+                    <h2>Events</h2>
+                    <p>Events content goes here...</p>
+                </div>
+
+                <div className="other-sections">
+                    <h2>Room</h2>
+                    <p>Room content goes here...</p>
+
+                    <h2>Donations</h2>
+                    <p>Donations content goes here...</p>
+
+                    <h2>Followers</h2>
+                    <p>Followers content goes here...</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
 
 const groupData = [
     {
