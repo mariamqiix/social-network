@@ -104,16 +104,16 @@ type ChatResponse struct {
 }
 
 type ProfileResponse struct {
-	Id              int       `json:"id"`
-	Username        string    `json:"username"`
-	Nickname        string    `json:"nickname"`
-	Email           string    `json:"email"`
-	FirstName       string    `json:"first_name"`
-	LastName        string    `json:"last_name"`
-	DateOfBirth     time.Time `json:"DateOfBirth"`
-	Bio             string    `json:"bio"`
-	Image           string    `json:"image_url"`
-	UserPosts       []Post    `json:"user_posts"`
-	UserLikedPost   []Post    `json:"user_posts"`
-	UserDislikedPst []Post    `json:"user_posts"`
+	Id               int       `json:"id"`
+	Username         string    `json:"username"`
+	Nickname         string    `json:"nickname"`
+	Email            string    `json:"email"`
+	FirstName        string    `json:"first_name"`
+	LastName         string    `json:"last_name"`
+	DateOfBirth      time.Time `json:"DateOfBirth"`
+	Bio              string    `json:"bio"`
+	Image            string    `json:"image_url"`
+	UserPosts        []Post    `json:"user_posts"`
+	UserLikedPost    []Post    `json:"user_posts"`
+	UserDislikedPost []Post    `json:"user_posts"`
 }

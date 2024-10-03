@@ -4,18 +4,14 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
-	var userProfile *structs.User
-	privcay := ""
 
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
@@ -33,63 +29,67 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Error unmarshalling JSON: %v", err)
 	}
 
-	// if userProfileRequest.UserID == -1 && sessionUser != nil {
-	// 	userProfile = sessionUser
-	// } else {
-	userProfile, err = models.GetUserByID(userProfileRequest.UserID)
+	userProfile, err := models.GetUserByID(userProfileRequest.UserID)
 	if err != nil {
 		log.Printf("error getting user: %s\n", err.Error())
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	// }
 
 	profile := structs.ProfileResponse{
-		Id:              userProfile.ID,
-		Username:        userProfile.Username,
-		Nickname:        *userProfile.Nickname,
-		Email:           userProfile.Email,
-		FirstName:       userProfile.FirstName,
-		LastName:        userProfile.LastName,
-		DateOfBirth:     userProfile.DateOfBirth,
-		Bio:             *userProfile.Bio,
-		Image:           GetImageData(userProfile.ImageID),
-		UserPosts:       []structs.Post{},
-		UserLikedPost:   []structs.Post{},
-		UserDislikedPst: []structs.Post{},
+		Id:               userProfile.ID,
+		Username:         userProfile.Username,
+		Nickname:         *userProfile.Nickname,
+		Email:            userProfile.Email,
+		FirstName:        userProfile.FirstName,
+		LastName:         userProfile.LastName,
+		DateOfBirth:      userProfile.DateOfBirth,
+		Bio:              *userProfile.Bio,
+		Image:            GetImageData(userProfile.ImageID),
+		UserPosts:        []structs.Post{},
+		UserLikedPost:    []structs.Post{},
+		UserDislikedPost: []structs.Post{},
 	}
 
 	if sessionUser == nil && userProfile.ProfileType == "Private" {
 		writeToJson(profile, w)
 		return
-	} else if sessionUser == nil && userProfile.ProfileType == "Public" {
-		privcay = "Public"
 	}
 
-	if sessionUser != nil && sessionUser != userProfile {
-		canSee, err := models.CheckIfUserFollows(userProfileRequest.UserID, sessionUser.ID)
+	if sessionUser != nil {
+		// canSee, err := models.CheckIfUserFollows(userProfileRequest.UserID, sessionUser.ID)
+		// if err != nil {
+		// 	log.Printf("error getting user fllowers: %s\n", err.Error())
+		// 	errorServer(w, http.StatusInternalServerError)
+		// 	return
+		// }
+
+		// if !canSee {
+		// 	writeToJson(profile, w)
+		// 	return
+		// }
+
+		profile.UserPosts, err = returnProfilePosts("", sessionUser.ID, sessionUser.ID)
 		if err != nil {
-			log.Printf("error getting user fllowers: %s\n", err.Error())
+			log.Printf("error getting user posts: %s\n", err.Error())
 			errorServer(w, http.StatusInternalServerError)
 			return
 		}
 
-		if !canSee {
-			writeToJson(profile, w)
+		profile.UserLikedPost, err = returnProfilePosts("like", sessionUser.ID, sessionUser.ID)
+		if err != nil {
+			log.Printf("error getting user posts: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
 			return
 		}
-	}
 
-	if sessionUser == userProfile {
+		profile.UserDislikedPost, err = returnProfilePosts("dislike", sessionUser.ID, sessionUser.ID)
+		if err != nil {
+			log.Printf("error getting user posts: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
 
-	}
-
-	view := ProfilePageView{
-		User:          ReturnUserResponse(sessionUser),
-		ProfileUser:   ReturnUserResponse(User),
-		Posts:         mapPosts(sessionUser, Posts),
-		LikedPosts:    mapPosts(sessionUser, likedPosts),
-		DislikedPosts: mapPosts(sessionUser, DisLikePosts),
 	}
 
 	// Extract the endpoint from the request path
@@ -97,70 +97,43 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch path {
 	case "":
+		writeToJson(profile, w)
+		return
+
+	case "like":
+		writeToJson(profile.UserLikedPost, w)
+		return
+
+	case "dislike":
+		writeToJson(profile.UserDislikedPost, w)
+		return
+
+	case "following":
+		following, err := models.GetFollowings(userProfile.ID)
+		if err != nil {
+			log.Printf("error getting user followings: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+		writeToJson(following, w)
+		return
 
 	case "followers":
-		// Handle the /followers endpoint
-		fmt.Fprintf(w, "Handling Followers Page")
-	case "following":
-		// Handle the /following endpoint
-		fmt.Fprintf(w, "Handling Following Page")
+		followers, err := models.GetFollowers(userProfile.ID)
+		if err != nil {
+			log.Printf("error getting user followers: %s\n", err.Error())
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+		writeToJson(followers, w)
+		return
+
 	default:
 		http.Error(w, "Invalid endpoint", http.StatusNotFound)
 	}
-
 }
 
-func profileHelper(w http.ResponseWriter, r *http.Request) {
-
-	profileUser, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil {
-		log.Printf("error getting id: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	privcay := ""
-	var User *structs.User
-
-	writeToJson(view, w)
-	return
-
-}
-
-func try(w http.ResponseWriter, user structs.User) {
-	posts, err := models.GetUserPosts("", user.ID)
-	if err != nil {
-		log.Printf("error getting posts: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	likedPosts, err := models.GetPostsByReaction(user.ID, user.ID, "Like")
-	if err != nil {
-		log.Printf("error getting liked posts: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	DisLikePosts, err := models.GetPostsByReaction(user.ID, user.ID, "Disike")
-	if err != nil {
-		log.Printf("error getting liked posts: %s\n", err.Error())
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	view := ProfilePageView{
-		User:          ReturnUserResponse(user),
-		ProfileUser:   ReturnUserResponse(user),
-		Posts:         mapPosts(user, posts),
-		LikedPosts:    mapPosts(user, likedPosts),
-		DislikedPosts: mapPosts(user, DisLikePosts),
-	}
-
-	return
-}
-
-func returnProfilePosts(mode string, profileUserId int, sessionUserID int) ([]structs.Post, err) {
+func returnProfilePosts(mode string, profileUserId int, sessionUserID int) ([]structs.Post, error) {
 	var posts []structs.Post
 	var err error
 	if mode == "like" {
@@ -183,5 +156,4 @@ func returnProfilePosts(mode string, profileUserId int, sessionUserID int) ([]st
 	}
 
 	return posts, nil
-
 }

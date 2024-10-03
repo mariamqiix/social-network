@@ -39,12 +39,12 @@ func GoLive() {
 
 	///// the /user api's
 	http.HandleFunc("/user/profile", ProfilePageHandler)
-	http.HandleFunc("/user/profile/followers", ProfilePageHandler)
-	http.HandleFunc("/user/profile/followeing", ProfilePageHandler)
-	http.HandleFunc("/user/profile/like", ProfilePageHandler)
-	http.HandleFunc("/user/profile/dislike", ProfilePageHandler)
+	// http.HandleFunc("/user/profile/followers", ProfilePageHandler)
+	// http.HandleFunc("/user/profile/followeing", ProfilePageHandler)
+	// http.HandleFunc("/user/profile/like", ProfilePageHandler)
+	// http.HandleFunc("/user/profile/dislike", ProfilePageHandler)
 
-	
+
 	http.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
 	//http.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //!!                      // to return the users that can be talked with
 	
