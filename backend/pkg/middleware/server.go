@@ -43,16 +43,17 @@ func GoLive() {
 	http.HandleFunc("/user/profile/followeing", ProfilePageHandler)
 	http.HandleFunc("/user/profile/like", ProfilePageHandler)
 	http.HandleFunc("/user/profile/dislike", ProfilePageHandler)
+
+	
 	http.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
 	//http.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //!!                      // to return the users that can be talked with
+	
 	http.HandleFunc("/user/Chats", UserChatsHandler) // to return the chats of the user
 	// http.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)        // to return the user information that will be showen in the front
 	// http.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler)       // to update the user information
 
 	http.HandleFunc("/user/notifications/", NotificationsHandler) // to return the notifications of the user
-	// http.HandleFunc("/user/notifications/groupInviteResponse", NotificationsHandler)
-	// http.HandleFunc("/user/notifications/adminGroupRequestResponse", NotificationsHandler)
-	// http.HandleFunc("/user/notifications/followResponse", NotificationsHandler)
+	http.HandleFunc("/user/responds/", UserResponde) 
 
 	// http.HandleFunc("/user/requestToFollow", FollowUserHandler)                            // to request to follow a user
 

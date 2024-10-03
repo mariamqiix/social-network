@@ -160,13 +160,12 @@ func CheckExistance(tablename string, columnnames []string, values []interface{}
 	}
 
 	// Execute the query with the provided values and scan the result
-	count := 0
+	var count int
 	err = stmt.QueryRow(values...).Scan(&count)
 	if err != nil {
 		return false, err
 	}
 
-	fmt.Println(count)
 	// Check if the count indicates existence
 	return count > 0, nil
 }

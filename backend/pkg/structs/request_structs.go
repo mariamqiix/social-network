@@ -37,6 +37,7 @@ type CommentGroupRequest struct {
 	ParentID    int    `json:"parent_id"`
 	Description string `json:"description"`
 }
+
 type CommentRequest struct {
 	ParentID    int    `json:"parent_id"`
 	Description string `json:"description"`
@@ -87,4 +88,13 @@ type GroupMessageRequest struct {
 type ReactoinRequest struct {
 	PostID   int    `json:"post_id"`
 	Reaction string `json:"reaction"`
+}
+
+type GroupInviteResponse struct {
+	GroupID  int    `json:"group_id"`
+	Response string `json:"response"`
+}
+
+type UserInfoRequest struct {
+	UserID int `json:"user_id"`
 }

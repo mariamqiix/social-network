@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/pkg/db"
 	"backend/pkg/structs"
 	"fmt"
 	"strconv"
@@ -273,6 +274,25 @@ func GetFollowers(userID int) ([]structs.Follower, error) {
 
 func GetFollowings(userID int) ([]structs.Follower, error) {
 	return GetFollows(userID, "follower_id")
+}
+
+func CheckIfUserFollows(userID, followUserID int) (bool, error) {
+	query := "SELECT COUNT(*) FROM Follower WHERE FollowingID = ? AND FollowerID = ?"
+    
+    var count int
+    err := db.Database.QueryRow(query, userID, followUserID).Scan(&count)
+	
+    if err != nil {
+        return false, fmt.Errorf("error executing query: %v", err)
+    }
+
+    // If count is greater than 0, it means the user with userID follows the user with followUserID
+    if count > 0 {
+        return true, nil
+    }
+    
+    // If count is 0, it means the user with userID does not follow the user with followUserID
+    return false, nil
 }
 
 func GetFollows(userID int, followType string) ([]structs.Follower, error) {

@@ -377,6 +377,7 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 func MapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
 	return nil
 }
+
 func IsDataImage(buff []byte) (bool, string) {
 	// the function that actually does the trick
 	t := http.DetectContentType(buff)

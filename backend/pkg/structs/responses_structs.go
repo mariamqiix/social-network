@@ -102,3 +102,18 @@ type ChatResponse struct {
 	Color        string       `json:"color"`
 	CreationDate time.Time    `json:"created_at"`
 }
+
+type ProfileResponse struct {
+	Id              int       `json:"id"`
+	Username        string    `json:"username"`
+	Nickname        string    `json:"nickname"`
+	Email           string    `json:"email"`
+	FirstName       string    `json:"first_name"`
+	LastName        string    `json:"last_name"`
+	DateOfBirth     time.Time `json:"DateOfBirth"`
+	Bio             string    `json:"bio"`
+	Image           string    `json:"image_url"`
+	UserPosts       []Post    `json:"user_posts"`
+	UserLikedPost   []Post    `json:"user_posts"`
+	UserDislikedPst []Post    `json:"user_posts"`
+}
