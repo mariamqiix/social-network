@@ -38,7 +38,7 @@ func GoLive() {
 	http.HandleFunc("/group/event/userResponse", CreateEventResponseHandler) 
 
 	///// the /user api's
-	http.HandleFunc("/user/profile", ProfilePageHandler)
+	http.HandleFunc("/user/profile/", ProfilePageHandler)
 	// http.HandleFunc("/user/profile/followers", ProfilePageHandler)
 	// http.HandleFunc("/user/profile/followeing", ProfilePageHandler)
 	// http.HandleFunc("/user/profile/like", ProfilePageHandler)
