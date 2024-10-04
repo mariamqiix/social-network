@@ -11,6 +11,56 @@ import (
 	"strings"
 )
 
+func GroupHandler(w http.ResponseWriter, r *http.Request){
+		// Extract the endpoint from the request path
+		path := strings.TrimPrefix(r.URL.Path, "/group/")
+
+		switch path {
+		case "messages":
+			GroupChatsHandler(w, r)		
+			return
+	
+		case "list":
+			GroupsHandler(w, r)
+			return
+	
+		case "createGroup":
+			CreateGroupHandler(w, r)
+			return
+	
+		case "requestToJoin":
+			JoinGroupHandler(w, r)
+			return
+
+		case "leaveGroup":
+			LeaveGroupHandler(w, r)
+			return
+
+		case "page":
+			GroupPageHandler(w, r)
+			return
+
+		case "inviteUser":
+			InviteUserHandler(w, r)
+			return
+
+		case "event/list":
+			ListEventHandler(w, r)
+			return
+
+		case "event/create":
+			CreateEventHandler(w, r)
+			return
+
+		case "event/userResponse":
+			CreateEventResponseHandler(w, r)
+			return
+	
+		default:
+			http.Error(w, "Invalid endpoint", http.StatusNotFound)
+		}
+}
+
 func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"

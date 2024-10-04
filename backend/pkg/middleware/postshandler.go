@@ -10,6 +10,32 @@ import (
 	"strings"
 )
 
+func PostHandler(w http.ResponseWriter, r *http.Request){
+	// Extract the endpoint from the request path
+	path := strings.TrimPrefix(r.URL.Path, "/post/")
+
+	switch path {
+	case "addReaction":
+		AddReactionHandler(w, r)		
+		return
+
+	case "removeReaction":
+		RemoveReactionHandler(w, r)
+		return
+
+	case "addComment":
+		AddCommentHandler(w, r)
+		return
+
+	case "createPost":
+		CreatePostHandler(w, r)
+		return
+
+	default:
+		http.Error(w, "Invalid endpoint", http.StatusNotFound)
+	}
+}
+
 func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"

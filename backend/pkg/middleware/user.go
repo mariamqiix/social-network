@@ -10,6 +10,9 @@ import (
 )
 
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
+	// Extract the endpoint from the request path
+	path := strings.TrimPrefix(r.URL.Path, "/user/profile/")
+
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
 
@@ -35,13 +38,37 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		profileUserId = sessionUser.ID
 	}
 
-	fmt.Println(profileUserId)
-
 	userProfile, err := models.GetUserByID(profileUserId)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
+
+	requestUserId := -1
+	if sessionUser != nil {
+		requestUserId = sessionUser.ID
+	}
+
+	UserPosts, err := returnProfilePosts("", profileUserId, requestUserId)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("General: \n", UserPosts)
+
+	UserLikedPost, err := returnProfilePosts("like", profileUserId, requestUserId)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("Like: \n", UserLikedPost)
+
+	UserDislikedPost, err := returnProfilePosts("dislike", profileUserId, requestUserId)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("DisLike: \n", UserDislikedPost)
 
 	profile := structs.ProfileResponse{
 		Id:               userProfile.ID,
@@ -53,44 +80,10 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		DateOfBirth:      userProfile.DateOfBirth,
 		Bio:              *userProfile.Bio,
 		Image:            GetImageData(userProfile.ImageID),
-		UserPosts:        []structs.Post{},
-		UserLikedPost:    []structs.Post{},
-		UserDislikedPost: []structs.Post{},
+		UserPosts:        UserPosts,
+		UserLikedPost:    UserLikedPost,
+		UserDislikedPost: UserDislikedPost,
 	}
-
-	if sessionUser == nil && userProfile.ProfileType == "Private" {
-		writeToJson(profile, w)
-		return
-	}
-
-	requestUserId := 0
-	if sessionUser == nil {
-		requestUserId = -1
-	} else {
-		requestUserId = sessionUser.ID
-	}
-
-	profile.UserPosts, err = returnProfilePosts("", profileUserId, requestUserId)
-	if err != nil {
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-	fmt.Print(profile.UserPosts)
-
-	profile.UserLikedPost, err = returnProfilePosts("like", profileUserId, requestUserId)
-	if err != nil {
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	profile.UserDislikedPost, err = returnProfilePosts("dislike", profileUserId, requestUserId)
-	if err != nil {
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	// Extract the endpoint from the request path
-	path := strings.TrimPrefix(r.URL.Path, "/user/profile/")
 
 	switch path {
 	case "":

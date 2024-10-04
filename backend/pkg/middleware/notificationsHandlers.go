@@ -71,6 +71,9 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 	case "followResponse":
 		w.Write([]byte("Returning notifications of the follow response"))
 
+	case "requestToFollow":
+		w.Write([]byte("Returning notifications of the follow request"))
+
 	default:
 		http.NotFound(w, r)
 	}
