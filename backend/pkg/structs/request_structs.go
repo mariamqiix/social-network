@@ -97,7 +97,7 @@ type GroupInviteResponse struct {
 
 type GroupRequestResponse struct {
 	GroupID  int    `json:"group_id"`
-	UserID   int    `json:"group_id"`
+	UserID   int    `json:"user_id"`
 	Response string `json:"response"`
 }
 

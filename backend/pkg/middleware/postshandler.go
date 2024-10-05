@@ -241,7 +241,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		exist, err := models.CheckExistance("Post", []string{"id"}, []interface{}{comment.ParentID})
-		if !exist {
+		if !exist || err != nil {
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
