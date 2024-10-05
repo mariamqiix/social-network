@@ -9,7 +9,7 @@ const Post = ({ index, post }) => (
             position: "relative",
             backgroundColor: "white",
             borderRadius: "30px",
-            boxShadow: "0 4px px rgba(0, 0, 0, 0.1)",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
             width: "100%", // Make width 100% to allow grid to control the size
             padding: "20px",
             marginBottom: "20px",

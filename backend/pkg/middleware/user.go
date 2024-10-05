@@ -87,6 +87,7 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch path {
 	case "":
+		fmt.Print("hello")
 		writeToJson(profile, w)
 		return
 

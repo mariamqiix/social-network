@@ -1,6 +1,7 @@
 'use client'; // Add this line at the very top to mark the component as a Client Component
+import React, { useState } from 'react';
+import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
 
-import React from 'react';
 const groupData = [
     {
         id: 1,
@@ -92,6 +93,26 @@ const groupData = [
 
 
 const GroupPage = () => {
+    const [activeTab, setActiveTab] = useState('Posts');
+
+    const [isMember, setIsMember] = useState(true); // Set this based on the group membership
+
+    const handleTabClick = (tabName: string) => {
+        switch (tabName) {
+            case 'Leave':
+                setIsMember(false);  // Update the membership status
+                setActiveTab('Posts');
+                // send a request to leave the group
+                break;
+            case 'Join':
+                setActiveTab('Posts');
+                // send a request to join the group
+                break;
+            default:
+                setActiveTab(tabName);
+        }
+    };
+
     return (
         <div className="group-page-container">
             {/* Profile Header */}
@@ -115,48 +136,117 @@ const GroupPage = () => {
             </div>
 
             {/* Navigation Bar */}
-            <div className="list-bar" >
+            <div className="list-bar">
                 <ul>
-                    <li className="active">Events</li>
-                    <li>posts</li>
-                    <li>members</li>
-                    <li>leave</li>
+                    <li
+                        className={activeTab === 'Posts' ? 'active' : ''}
+                        onClick={() => handleTabClick('Posts')}
+                    >
+                        Posts
+                    </li>
+                    <li
+                        className={activeTab === 'Events' ? 'active' : ''}
+                        onClick={() => handleTabClick('Events')}
+                    >
+                        Events
+                    </li>
+
+                    <li
+                        className={activeTab === 'Members' ? 'active' : ''}
+                        onClick={() => handleTabClick('Members')}
+                    >
+                        Members
+                    </li>
+                    <li onClick={() => handleTabClick(isMember ? 'Leave' : 'Join')}>
+                        {isMember ? 'Leave' : 'Join'}
+                    </li>
                 </ul>
             </div>
 
-            <div className="group-card-container">
-                {groupData.map((group) => (
-                    <div key={group.id} className="group-card">
-                        <img src={group.image} alt={group.name} className="group-image" />
+            {/* Main Content Area */}
+            <div className="content-area">
+                {activeTab === 'Events' && (
+                    <div className="events-section">
+                        <div className="group-card-container">
+                            {groupData.map((group) => (
+                                <div key={group.id} className="group-card">
+                                    <img src={group.image} alt={group.name} className="group-image" />
 
-                        <div className="group-details">
-                            <div className="event-icons">
-                                <span className="icon-check">✔️</span>
-                                <span className="icon-heart">❤️</span>
-                                <span className="icon-cross">❌</span>
-                            </div>
+                                    <div className="group-details">
+                                        <div className="event-icons">
+                                            <span className="icon-check">✔️</span>
+                                            <span className="icon-heart">❤️</span>
+                                            <span className="icon-cross">❌</span>
+                                        </div>
 
-                            <p className="group-date"><i className="icon-calendar"></i> {group.date}</p>
-                            <h3 className="eventTitle">{group.name}</h3>
-                            <p className="group-location">{group.location}</p>
+                                        <p className="group-date"><i className="icon-calendar"></i> {group.date}</p>
+                                        <h3 className="eventTitle">{group.name}</h3>
+                                        <p className="group-location">{group.location}</p>
 
-                            {/* Display images of friends, showing only the first three and a + if there are more */}
-                            <p className="group-friends">
-                                <i className="icon-friends"></i>
-                                {group.friends.slice(0, 3).map((friend, index) => (
-                                    <img key={index} src={friend} alt={`Friend ${index + 1}`} className="friend-image" />
-                                ))}
-                                {group.friends.length > 3 && (
-                                    <span className="frindsText"> + {group.friends.length - 3} friends are going</span>
-                                )}
-                                {group.friends.length <= 3 && (
-                                    <span className="frindsText">{group.friends.length} friends are going</span>
-                                )}
-                            </p>
+                                        {/* Display images of friends, showing only the first three and a + if there are more */}
+                                        <p className="group-friends">
+                                            <i className="icon-friends"></i>
+                                            {group.friends.slice(0, 3).map((friend, index) => (
+                                                <img key={index} src={friend} alt={`Friend ${index + 1}`} className="friend-image" />
+                                            ))}
+                                            {group.friends.length > 3 && (
+                                                <span className="frindsText"> + {group.friends.length - 3} friends are going</span>
+                                            )}
+                                            {group.friends.length <= 3 && (
+                                                <span className="frindsText">{group.friends.length} friends are going</span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                ))}
+                )}
+                {activeTab === 'Posts' && (
+                    <div className="posts-section" >
+                        <div
+                            id="group-post"
+                            style={{
+                                marginTop: "1.5%",
+                                width: "100%",
+                                display: "grid", // Use CSS Grid
+                                gridTemplateColumns: "repeat(2, minmax(450px, 1fr))", // Auto-adjust columns
+                                gap: "30px", // Space between posts
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            {postsData.map((post, index) => (
+                                <Post index={post.groupName} post={post} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+                {activeTab === 'Members' && (
+                    <div className="members-section">
+                        <ul className="member-list">
+                            {members.map((member) => (
+                                <li key={member.id} className="member-item">
+                                    <img src={member.image} alt={member.name} className="member-image" />
+                                    <div className="member-details">
+                                        <h3 className="member-name">{member.name}</h3>
+                                        <p className="member-username">{member.username}</p> {/* Username added here */}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {activeTab === 'Leave' && (
+                    <div className="leave-section">
+                        <h2>Leave</h2>
+                        <p>Leave content goes here...</p>
+                    </div>
+                )}
             </div>
+
+
 
 
 
@@ -267,6 +357,7 @@ const GroupPage = () => {
                 }
 
                 .group-card-container {
+                    padding: 25px;
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible grid */
                     margin-top: 40px;
@@ -372,12 +463,55 @@ const GroupPage = () => {
                 }
                 
                 .eventTitle {
-                font-size: auto;
+                    font-size: auto;
                 }
                 .frindsText {
-                float:left;
+                    float:left;
                     margin-left: 5px;}
 
+
+                .members-section {
+                    padding: 20px 30px; /* Increased padding */
+                }
+
+                .member-list {
+                    list-style-type: none;
+                    padding: 0;
+                    margin: 0;
+                }
+
+                .member-item {
+                    display: flex;
+                    align-items: center;
+                    padding: 20px 0; /* Increased padding between items */
+                    border-bottom: 1px solid #e0e0e0;
+                }
+
+                .member-image {
+                    width: 70px; /* Increased image size */
+                    height: 70px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    margin-right: 20px; /* Increased spacing between image and text */
+                }
+
+                .member-details {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .member-name {
+                    font-size: 20px; /* Increased font size for name */
+                    font-weight: 700; /* Bolder font for name */
+                    margin: 0;
+                    color: #333;
+                }
+
+                .member-username {
+                    font-size: 16px; /* Increased font size for username */
+                    color: #666; /* Slightly darker color */
+                    margin: 6px 0 0 0;
+                }
 
 
             `}</style>
@@ -386,3 +520,62 @@ const GroupPage = () => {
 };
 
 export default GroupPage;
+
+const members = [
+    {
+        id: 1,
+        name: 'Leila Byrd',
+        username: 'thisIsAUsername',
+        image: 'https://randomuser.me/api/portraits/women/65.jpg',
+    },
+    {
+        id: 2,
+        name: 'Matthew',
+        username: 'llimvx',
+        image: 'https://randomuser.me/api/portraits/men/76.jpg',
+    },
+    // Add more members as needed...
+];
+
+
+
+const postsData = [
+    {
+        groupName: "Dribbble Shots Community",
+        groupImage: 'https://picsum.photos/200/300?random=5',
+        username: "Jonathan",
+        userImage: "https://picsum.photos/200/300?random=2",
+        time: "Just Now",
+        content: "Hi guys, today I’m bringing you a UI design for Logistic Website.",
+        postImage: "https://picsum.photos/200/300?random=3",
+    },
+    {
+        groupName: "Code Newbie",
+        groupImage: 'https://picsum.photos/200/300?random=5',
+        username: "Alice",
+        userImage: "https://picsum.photos/200/300?random=5",
+        time: "2 hours ago",
+        content: "Excited to share my first open-source contribution!",
+        postImage: "https://picsum.photos/200/300?random=6",
+    },
+    // Extra posts
+    {
+        groupName: "Creative Designers",
+        groupImage: 'https://picsum.photos/200/300?random=5',
+        username: "Eve",
+        userImage: "https://picsum.photos/200/300?random=8",
+        time: "1 day ago",
+        content: "Here’s a sneak peek of my latest design project. Hope you like it!",
+        postImage: "https://picsum.photos/200/300?random=9",
+    },
+    {
+        groupName: "Tech Enthusiasts",
+        groupImage: 'https://picsum.photos/200/300?random=5',
+        username: "Mark",
+        userImage: "https://picsum.photos/200/300?random=11",
+        time: "3 days ago",
+        content: "Just started learning about blockchain technology. It’s fascinating!",
+        postImage: "https://picsum.photos/200/300?random=12",
+    },
+    // Add more posts as needed
+];

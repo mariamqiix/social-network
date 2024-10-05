@@ -20,7 +20,7 @@ func GroupHandler(w http.ResponseWriter, r *http.Request){
 			GroupChatsHandler(w, r)		
 			return
 	
-		case "list":
+		case "list/":
 			GroupsHandler(w, r)
 			return
 	

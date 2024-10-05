@@ -1,6 +1,7 @@
 package models
 
 import (
+	"backend/pkg/db"
 	"backend/pkg/structs"
 	"fmt"
 )
@@ -117,4 +118,51 @@ func GetGroupMessages(GroupID int) ([]structs.GroupChat, error) {
 
 	// Return the messages slice
 	return messages, nil
+}
+
+func GetChats(UserID int) ([]structs.User, error) {
+	// Query to fetch the user's chats
+	query := `
+        SELECT u.id, u.username, u.first_name, u.last_name, u.image_id, u.profile_type, u.nickname
+        FROM UserChat uc
+        JOIN User u ON uc.sender_id = u.id OR uc.receiver_id = u.id
+        WHERE (uc.sender_id = ? OR uc.receiver_id = ?) AND u.id != ?
+        GROUP BY u.id
+    `
+
+	// Execute the query
+	rows, err := db.Database.Query(query, UserID, UserID, UserID)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Initialize a slice to hold the users
+	var users []structs.User
+
+	// Iterate over the result set and scan the rows into the users slice
+	for rows.Next() {
+		var user structs.User
+		err = rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.FirstName,
+			&user.LastName,
+			&user.ImageID,
+			&user.ProfileType,
+			&user.Nickname,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		users = append(users, user)
+	}
+
+	// Check for errors from iterating over rows
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("error iterating over rows: %v", err)
+	}
+
+	// Return the users slice
+	return users, nil
 }
