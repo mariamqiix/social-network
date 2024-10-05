@@ -50,10 +50,10 @@ type CreateGroupRequest struct {
 }
 
 type EventRequest struct {
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	GroupID     int       `json:"group_id"`
-	Options     []string  `json:"options"`
+	Title       string   `json:"title"`
+	Description string   `json:"description"`
+	GroupID     int      `json:"group_id"`
+	Options     []string `json:"options"`
 }
 
 type GroupInviteRequest struct {
@@ -95,6 +95,14 @@ type GroupInviteResponse struct {
 	Response string `json:"response"`
 }
 
+type GroupRequestResponse struct {
+	GroupID  int    `json:"group_id"`
+	UserID   int    `json:"group_id"`
+	Response string `json:"response"`
+}
+
 type UserInfoRequest struct {
 	UserID int `json:"user_id"`
+	Response string `json:"response"`
 }
+

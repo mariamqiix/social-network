@@ -4,7 +4,6 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"errors"
-	"log"
 	"net/http"
 	"time"
 
@@ -20,7 +19,6 @@ func CreateSessionAndSetCookie(token string, w http.ResponseWriter, user *struct
 
 	}
 	if sID == "" {
-		log.Println("error generating session id")
 		return errors.New("error generating session id")
 	}
 
@@ -32,13 +30,11 @@ func CreateSessionAndSetCookie(token string, w http.ResponseWriter, user *struct
 	// Add the session to the database
 	err := models.CreateUserSession(*newSession)
 	if err != nil {
-		log.Printf("error adding session: %s\n", err.Error())
 		return errors.New("error adding session")
 	}
 
 	cookie := SessionToCookie(newSession)
 	if cookie == nil {
-		log.Println("error creating cookie")
 		return errors.New("error creating cookie")
 	}
 	http.SetCookie(w, cookie)

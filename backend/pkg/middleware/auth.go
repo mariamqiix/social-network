@@ -3,8 +3,6 @@ package middleware
 import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
-	"fmt"
-	"log"
 	"net/http"
 	"time"
 )
@@ -22,13 +20,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if IsValidEmail(Username) {
 		exist, err := models.CheckExistance("User", []string{"email"}, []interface{}{Username})
 		if err != nil {
-			log.Printf("loginPostHandler: %s\n", err.Error())
 			http.Error(w, "something went wrong, please try again later", http.StatusInternalServerError)
 			return
+
 		} else if !exist {
 			http.Error(w, "Invalid username or email or password", http.StatusConflict)
 			return
 		}
+
 		user, err = models.GetUserByEmail(Username)
 		if err != nil {
 			http.Error(w, "something went wrong, please try again later", http.StatusInternalServerError)
@@ -37,16 +36,15 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		user, err = models.GetUserByUsername(Username)
 		if err != nil {
-			log.Printf("loginPostHandler: %s\n", err.Error())
 			http.Error(w, "something went wrong, please try again later", http.StatusInternalServerError)
 			return
 		}
 	}
+
 	if user == nil {
 		http.Error(w, "Invalid username or email", http.StatusConflict)
 		return
 	}
-	fmt.Println(user)
 	// if err := CompareHashAndPassword(user.HashedPassword, Password); err != HasherErrorNone {
 	// 	http.Error(w, "Invalid password", http.StatusConflict)
 	// 	return

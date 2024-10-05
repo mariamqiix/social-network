@@ -4,7 +4,6 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -54,21 +53,18 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("General: \n", UserPosts)
 
 	UserLikedPost, err := returnProfilePosts("like", profileUserId, requestUserId)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("Like: \n", UserLikedPost)
 
 	UserDislikedPost, err := returnProfilePosts("dislike", profileUserId, requestUserId)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("DisLike: \n", UserDislikedPost)
 
 	profile := structs.ProfileResponse{
 		Id:               userProfile.ID,
@@ -87,7 +83,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch path {
 	case "":
-		fmt.Print("hello")
 		writeToJson(profile, w)
 		return
 

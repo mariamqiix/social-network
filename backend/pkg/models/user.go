@@ -87,6 +87,7 @@ func GetUserByEmail(username string) (*structs.User, error) {
 	// Return the user struct if everything was successful
 	return &user, nil
 }
+
 func GetUserByID(id int) (*structs.User, error) {
 	// Execute a read query to fetch the user by ID
 	rows, err := Read("User", []string{"*"}, []string{"id"}, []interface{}{id})
@@ -351,6 +352,7 @@ func GetUserEmailByUsername(username string) (string, error) {
 	}
 	return email, nil
 }
+
 func GetUserEmailByID(id int) (string, error) {
 	// Execute a read query to fetch the user by username
 	rows, err := Read("User", []string{"email"}, []string{"id"}, []interface{}{id})
