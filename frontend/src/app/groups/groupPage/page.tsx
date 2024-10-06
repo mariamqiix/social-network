@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
-
+import "./groupPage.css";
 const groupData = [
     {
         id: 1,
@@ -142,6 +142,35 @@ const GroupPage = () => {
     const filteredMembers = membersToInvite.filter(member =>
         member.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    const [postImage, setPostImage] = useState<string | null>(null);
+    const [description, setDescription] = useState<string>('');
+    const [isPostPopupOpen, setIsPostPopupOpen] = useState<boolean>(false);
+
+    // Function to close the popup
+    const closePopup = () => {
+        setIsPostPopupOpen(false);
+        setPostImage(null); // Reset image when closing
+        setDescription('');  // Reset description when closing
+    };
+
+    // Function to handle image upload
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setPostImage(URL.createObjectURL(file));
+        }
+    };
+
+    // Function to handle post creation
+    const handlePostCreation = () => {
+        if (description || postImage) {
+            // Here you would typically send the postData to your backend or state management
+            console.log("Post created:", { description, image: postImage });
+            closePopup();
+        } else {
+            alert("Please add a description or image before posting.");
+        }
+    };
 
 
     return (
@@ -165,7 +194,7 @@ const GroupPage = () => {
                     </div>
                 </div>
                 <div className="button-container">
-                    <button className="expandable-button button-1">
+                    <button className="expandable-button button-1" onClick={() => setIsPostPopupOpen(true) }>
                         <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} />
                         <span>Create Post</span>
                     </button>
@@ -335,475 +364,163 @@ const GroupPage = () => {
 
 
 
+            {/* Expandable div for Create Post Popup */}
+            {isPostPopupOpen && (
+                <div className="popup">
+                    <div className="popup-header">
+                        <h3>Create a Post</h3>
+                        <button className="close-button" onClick={closePopup}>
+                            X
+                        </button>
+                    </div>
 
+                    {/* Image Upload */}
+                    <label htmlFor="imageUpload" className="image-upload-label">
+                        {postImage ? (
+                            <img src={postImage} alt="Uploaded Preview" className="uploaded-image" />
+                        ) : (
+                            <div className="upload-placeholder">
+                                <p>Upload an Image</p>
+                            </div>
+                        )}
+                    </label>
+                    <input
+                        type="file"
+                        id="imageUpload"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        style={{ display: 'none' }}
+                    />
 
+                    {/* Description Input */}
+                    <textarea
+                        placeholder="Write a description..."
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        className="description-input"
+                    />
+
+                    {/* Create Post Button */}
+                    <button className="create-post-button" onClick={handlePostCreation}>
+                        Create Post
+                    </button>
+                </div>
+            )}
 
 
             {/* Embedded CSS */}
             <style jsx>{`
-            /* App Styles */
-                
-            .invite {
-            float: right;
-            background-color: #f35366;
-            color: white;
-            }
-            .group-post {
-                min-width: 900px;
-                margin-left: 40px;
-                left:40px;
-                position: absolute;
-            }
-                .memberName { 
-                    font-size: 1.2rem;
-                    font-weight: bold;}
+            /* Container Styles */
 
-                /* Container Styles */
-                .button-container {
-                position: absolute; /* Position it absolutely within the profile-header */
+            .button-container {
+                position: absolute;
+                /* Position it absolutely within the profile-header */
                 z-index: 100;
                 float: right;
                 right: 30px;
                 top: 30px;
                 display: flex;
-
-                gap: 15px; /* Space between buttons */
+                gap: 15px;
+                /* Space between buttons */
                 height: 40px;
-                }
+            }
 
-                .expandable-button {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background-color: transparent;
-                    border: 2px solid #f35366; /* Default border */
-                    border-radius: 50px;
-                    padding: 0 15px;
-                    height: 50px;
-                    width: 50px;
-                    cursor: pointer;
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: #f35366; /* Default text color */
-                    transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s ease, padding 0.4s ease; /* Smoother transition for width */
-                    white-space: nowrap;
-                    overflow: hidden;
-                    position: relative;
-                }
-
-                /* Icon styles: initially centered */
-                .expandable-button .icon {
-                position: absolute;
-                transform: translateX(-50%); /* Center the icon in the circle */
-                transition: left 0.9s ease, transform 0.4s ease;
-                }
-
-                /* Hover effect */
-                .expandable-button:hover {
-                 width: auto; /* Expand width on hover */
-                justify-content: flex-start; /* Align items to the left when expanded */
-                transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother width transition */
-                
-                }
-
-                /* Move the icon to the left of the text on hover */
-                .expandable-button:hover .icon {
-                left: 10px; /* Move the icon to the left inside the expanded button */
-                transform: translateX(0); /* No more centering */
-                }
-
-                /* Initially hide the text */
-                .expandable-button span {
-                margin-left: 5px; /* Reduce space between icon and text */
-                display: none;
-                }
-
-                /* Show the text on hover */
-                .expandable-button:hover span {
-                display: inline;
-                }
-
-                /* Different colors for each button border and icon */
-                .button-1 {
-                border-color: #f35366; /* Red for Add Post */
-                }
-                .button-2 {
-                border-color: #4CAF50; /* Green for Add Event */
-                }
-
-                .button-2 .icon {
-                background-color: #4CAF50; /* Icon matches the border color */
-                }
-
-                .button-3 {
-                border-color: #2196F3; /* Blue for Invite Member */
-                }
-
-                .button-3 .icon {
-                    background-color:: #2196F3; /* Icon matches the border color */
-                }
-
-                .profile-info {
-                    display: flex;
-                    width: 100%;
-                }
-
-                .group-page-container {
-                    width: 95%;
-                    margin-left: 2.5%;
-                    font-family: Arial, sans-serif;
-                    height: 100%; /* Ensure full height stretch */
-                }
-
-                .profile-header {
-                min-width: 800px; /* Ensure full width */
-                    position: relative; /* Ensure the button container is positioned relative to this */
-                    height: 300px;
-                    display: flex;
-                    align-items: center;
-                    background: #fff;
-                    padding: 20px;
-                    border-radius: 15px;
-                    margin-top: 20px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                    width: 100%; /* Stretch to full width */
-                }
-
-                .profile-avatar {
-                    margin: auto;
-                    margin-left: 40px;
-                    width: 255px;
-                    height: 210px; /* Adjust to keep it proportional */
-                    border-radius: 200px;
-                    border: 2px solid #e0e0e0;
-                }
-
-                .profile-details {
-                    margin-left: 40px;
-                    flex-grow: 1; /* Allows profile details to stretch */
-                    width: 100%; /* Ensures it fills available width */
-                }
-
-                .profile-name {
-                    font-size: 42px;
-                    font-weight: bold;
-                    margin: 10px 0;
-                }
-
-                .profile-desc {
-                    font-size: 20px;
-                    color: #555;
-                    margin: 20px 0;
-                }
-
-                .profile-follow-info {
-                margin-top: 30px;
-                    font-size: 16px;
-                    color: #888;
-                }
-
-                .list-bar {
-                min-width: 800px; /* Ensure full width */
-                    margin-top: 20px;
-                    background: #fff;
-                    border-radius: 10px;
-                    display: flex;
-                    justify-content: center; /* Aligns the entire list horizontally */
-                    align-items: center; /* Centers the items vertically */
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                    width: 100%; /* Stretches to full width */
-                }
-
-                .list-bar ul {
-                    height: 60px;
-                    margin: 10px;
-                    list-style: none;
-                    display: flex;
-                    justify-content: space-between; /* Adds space between the list items */
-                    width: 100%; /* Stretches to full width */
-                    padding: 0;
-                    gap: 10px; /* Adds space between the li elements */
-                }
-
-                .list-bar li {
-                    display: flex;
-                    justify-content: center; /* Center text horizontally */
-                    align-items: center; /* Center text vertically */
-                    font-size: 20px;
-                    cursor: pointer;
-                    padding: 10px 20px;
-                    margin-bottom: 0;
-                    border-radius: 8px;
-                    transition: background-color 0.3s ease;
-                    flex-grow: 1; /* Ensures each li stretches evenly across the width */
-                    text-align: center; /* Center the text */
-                    width: 100%; /* Ensure li takes full width */
-                }
-
-                .list-bar li.active {
-                    background-color: gray;
-                    color: white;
-                }
-
-                .list-bar li:hover {
-                    background-color: #e0e0e0;
-                }
-
-                .group-card-container {
-                    padding: 0px 0px;
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible grid */
-                    margin-top: 20px;
-                    gap: 20px; /* Space between grid items */
-                    border-radius: 20px;
-                    width: 100%; /* Full width */
-                    height: 100%; /* Full height */
-                    overflow-x: hidden;
-                }
-
-                .group-card {
-                    background: #fff;
-                    border-radius: 15px;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                    overflow: hidden;
-                    transition: transform 0.3s ease;
-                    width: 100%;
-                    min-width: 200px;
-                    position: relative;
-                    height: 410px;
-                    padding-bottom: 15px;
-                }
-
-                .group-card:hover {
-                    transform: translateY(-5px);
-                }
-
-                .group-image {
-                    width: 100%;
-                    height: 150px;
-                    object-fit: cover;
-                }
-
-                .group-details {
-                    padding: 15px;
-                    text-align: center;
-                }
-
-                .event-icons {
-                    position: absolute;
-                    top: 115px;
-                    display: flex;
-                    justify-content: center;
-                    gap: 10px;
-                    margin: 10px 0;
-                    margin-bottom: 10px;
-                }
-
-                .icon-check, .icon-heart, .icon-cross {
-                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
-
-                background-color: rgba(255, 255, 255,0.9);
-                border-radius: 50%;
-                padding: 10px;
-                    font-size: 20px;
-                    cursor: pointer;
-                    transition: transform 0.2s ease;
-                }
-
-                .icon-check:hover, .icon-heart:hover, .icon-cross:hover {
-                    transform: scale(1.2);
-                }
-
-                .group-date {
-                margin-top: 25px;
-                    font-size: 14px;
-                    color: #888;
-                    margin-bottom: 20px;
-                }
-
-                .group-location, .group-attendees, .group-friends {
-                    font-size: 14px;
-                    color: #555;
-                    margin-bottom: 10px;
-                }
-
-
-                .icon-calendar, .icon-friends {
-                    margin-right: 5px;
-                }
-
-               .group-friends {
-                    position: absolute;
-                    bottom: 10px;
-                    display: flex; /* Makes the content inline */
-                    align-items: center; /* Aligns text and images vertically */
-                    font-size: 14px; /* Adjust font size as needed */
-                    color: #888; /* Text color */
-                }
-
-                .friends-images {
-                    display: flex; /* Arrange images in a row */
-                    margin-right: 5px; /* Space between images and text */
-                }
-
-                .friend-image {
-                    width: 30px; /* Adjust as needed */
-                    height: 30px; /* Adjust as needed */
-                    border-radius: 50%; /* Makes the image circular */
-                    margin-top: -10px; /* Overlap images */
-                    margin-left: 5px; /* Space between images */
-                    position: relative; /* Required for absolute positioning */
-                }
-                
-                .eventTitle {
-                    font-size: auto;
-                }
-                .frindsText {
-                    float:left;
-                    margin-left: 5px;}
-
-
-                .members-section {
-                    padding: 20px 30px; /* Increased padding */
-                }
-
-                .member-list {
-                    list-style-type: none;
-                    padding: 0;
-                    margin: 0;
-                }
-
-                .member-item {
-                    display: flex;
-                    align-items: center;
-                    padding: 20px 0; /* Increased padding between items */
-                    border-bottom: 1px solid #e0e0e0;
-                }
-
-                .member-image {
-                    width: 70px; /* Increased image size */
-                    height: 70px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    margin-right: 20px; /* Increased spacing between image and text */
-                }
-
-                .member-details {
-                    display: flex;
-                    flex-direction: column;
-                }
-
-                .member-name {
-                    font-size: 20px; /* Increased font size for name */
-                    font-weight: 700; /* Bolder font for name */
-                    margin: 0;
-                    color: #333;
-                }
-
-                .member-username {
-                    font-size: 16px; /* Increased font size for username */
-                    color: #666; /* Slightly darker color */
-                    margin: 6px 0 0 0;
-                }
-
-                .popup {
-                border: 1px solid #ddd;
-                padding: 20px;
-                max-width: 1000px;
-                min-width: 500px;
-                width: 60%;
-                background-color: white;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-                border-radius: 20px;
-                height: 600px;
-                }
-
-                .popup-header {
+            .expandable-button {
                 display: flex;
-                justify-content: space-between;
                 align-items: center;
-                margin: 10px;
-                margin-bottom: 20px;
-                }
-
-                .close-button {
-                background: none;
-                border: none;
-                font-size: 1.2rem;
+                justify-content: center;
+                background-color: transparent;
+                border: 2px solid #f35366;
+                /* Default border */
+                border-radius: 50px;
+                padding: 0 15px;
+                height: 50px;
+                width: 50px;
                 cursor: pointer;
-                }
-
-                .search-bar {
-                margin-bottom: 25px;
-                }
-
-                .search-bar input {
-                width: 100%;
-                padding: 8px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                font-size: 1rem;
-                }
-
-                .member {
-                display: flex;
-                align-items: center;
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-                border-bottom: 1px solid #f1f1f1;
+                font-size: 16px;
+                font-weight: bold;
+                color: #f35366;
+                /* Default text color */
+                transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s ease, padding 0.4s ease;
+                /* Smoother transition for width */
+                white-space: nowrap;
+                overflow: hidden;
                 position: relative;
-                }
+            }
 
-                .member-avatar {
-                width: 60px;
-                height: 60px;
-                border-radius: 50%;
-                margin-right: 10px;
-                margin-left: 10px;
-                margin-top: 0px;
-                }
 
-                .member-info {
-                display: flex;
-                flex-direction: column;
-                margin-top: 20px;
-                margin-bottom: 5px;
-                margin-left: 10px;
-                line-height: 1;
-                }
+            /* Icon styles: initially centered */
 
-                /* Invite button positioned absolutely to the right */
-                .invite {
-                background-color: #2196f3;
-                color: white;
-                width: 90px;
-                height: 40px;
-                border: none;
-                padding: 8px 16px;
-                border-radius: 200px;
-                cursor: pointer;
-                transition: background-color 0.3s ease;
-                font-size: 1rem;
+            .expandable-button .icon {
                 position: absolute;
-                right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-                }
+                transform: translateX(-50%);
+                /* Center the icon in the circle */
+                transition: left 0.9s ease, transform 0.4s ease;
+            }
 
-                .invite:hover {
-                background-color: Grey;
-                }
 
+            /* Hover effect */
+
+            .expandable-button:hover {
+                width: auto;
+                /* Expand width on hover */
+                justify-content: flex-start;
+                /* Align items to the left when expanded */
+                transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+                /* Smoother width transition */
+            }
+
+
+            /* Move the icon to the left of the text on hover */
+
+            .expandable-button:hover .icon {
+                /* Move the icon to the left inside the expanded button */
+                transform: translateX(0);
+                /* No more centering */
+            }
+
+
+            /* Initially hide the text */
+
+            .expandable-button span {
+                margin-left: 5px;
+                /* Reduce space between icon and text */
+                display: none;
+            }
+
+
+            /* Show the text on hover */
+
+            .expandable-button:hover span {
+                display: inline;
+            }
+
+
+            /* Different colors for each button border and icon */
+
+            .button-1 {
+                border-color: #f35366;
+                /* Red for Add Post */
+            }
+
+            .button-2 {
+                border-color: #4caf50;
+                /* Green for Add Event */
+            }
+
+            .button-3 {
+                border-color: #2196f3;
+                /* Blue for Invite Member */
+            }
 
 
             `}</style>
         </div>
     );
 };
+
+
+
 
 export default GroupPage;
 

@@ -137,7 +137,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			notificationType = "followRequestReject"
 
 		} else {
-			models.UpdateFollower(structs.Follower{
+			models.UpdateFollowerStatues(structs.Follower{
 				FollowingID: user.ID,
 				FollowerID:  userRequestToFollow.UserID,
 				Status:      &status,
