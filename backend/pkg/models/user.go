@@ -259,13 +259,13 @@ func GetSession(token string) (*structs.Session, error) {
 
 func CreateFollower(f structs.Follower) error {
 	// Create a new record in the Follower table
-	columns := []string{"following_id", "follower_id"}
-	values := []interface{}{f.FollowingID, f.FollowerID}
+	columns := []string{"following_id", "follower_id", "Follower_status"}
+	values := []interface{}{f.FollowingID, f.FollowerID, f.Status}
 	return Create("Follower", columns, values)
 }
 
-func UpdateFollower(f structs.Follower)error {
-	return nil
+func UpdateFollowerStatues(f structs.Follower) error {
+	return Update("Follower", []string{"Follower_status"}, []interface{}{f.Status}, []string{"following_id", "follower_id"}, []interface{}{f.FollowingID, f.FollowerID})
 }
 
 func DeleteFollower(f structs.Follower) error {
@@ -283,21 +283,21 @@ func GetFollowings(userID int) ([]structs.Follower, error) {
 
 func CheckIfUserFollows(userID, followUserID int) (bool, error) {
 	query := "SELECT COUNT(*) FROM Follower WHERE FollowingID = ? AND FollowerID = ?"
-    
-    var count int
-    err := db.Database.QueryRow(query, userID, followUserID).Scan(&count)
-	
-    if err != nil {
-        return false, fmt.Errorf("error executing query: %v", err)
-    }
 
-    // If count is greater than 0, it means the user with userID follows the user with followUserID
-    if count > 0 {
-        return true, nil
-    }
-    
-    // If count is 0, it means the user with userID does not follow the user with followUserID
-    return false, nil
+	var count int
+	err := db.Database.QueryRow(query, userID, followUserID).Scan(&count)
+
+	if err != nil {
+		return false, fmt.Errorf("error executing query: %v", err)
+	}
+
+	// If count is greater than 0, it means the user with userID follows the user with followUserID
+	if count > 0 {
+		return true, nil
+	}
+
+	// If count is 0, it means the user with userID does not follow the user with followUserID
+	return false, nil
 }
 
 func GetFollows(userID int, followType string) ([]structs.Follower, error) {
@@ -454,6 +454,3 @@ func GetUserIdByUsername(username string) (int, error) {
 	}
 	return id, nil
 }
-
-
-
