@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarDays, faPlus, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const groupData = [
     {
@@ -115,6 +115,35 @@ const GroupPage = () => {
         }
     };
 
+    // State to track if the list is open or closed
+    const [isOpen, setIsOpen] = useState(false);
+
+    // State to handle search input
+    const [searchTerm, setSearchTerm] = useState('');
+
+    // Members data
+    const membersToInvite = [
+        { name: 'Frankie Sullivan', email: 'frankie@untitledui.com', role: 'Owner', status: 'You' },
+        { name: 'Amélie Laurent', email: 'amelie@untitledui.com', role: 'Editor' },
+        { name: 'Katie Moss', email: 'katie@untitledui.com', role: 'Editor', status: 'Invite pending' },
+    ];
+
+    // Function to toggle the list
+    const toggleList = () => {
+        setIsOpen(!isOpen);
+    };
+
+    // Function to close the list
+    const closeList = () => {
+        setIsOpen(false);
+    };
+
+    // Filtered members based on the search term
+    const filteredMembers = membersToInvite.filter(member =>
+        member.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+
     return (
         <div className="group-page-container">
             {/* Profile Header */}
@@ -146,7 +175,7 @@ const GroupPage = () => {
                         <span style={{ color: '#4CAF50' }}>Create Event</span>
                     </button>
 
-                    <button className="expandable-button button-3">
+                    <button className="expandable-button button-3" onClick={toggleList}>
                         <FontAwesomeIcon icon={faUser} className="icon" style={{ color: ' #2196F3' }} />
                         <span style={{ color: ' #2196F3' }}>Invite Member</span>
                     </button>
@@ -180,6 +209,8 @@ const GroupPage = () => {
                     </li>
                 </ul>
             </div>
+
+
 
             {/* Main Content Area */}
             <div className="content-area">
@@ -228,7 +259,7 @@ const GroupPage = () => {
                                 marginTop: "1.5%",
                                 width: "100%",
                                 display: "grid", // Use CSS Grid
-                                gridTemplateColumns: "repeat(2, minmax(450px, 1fr))", // Auto-adjust columns
+                                gridTemplateColumns: "repeat(2, minmax(380px, 1fr))", // Auto-adjust columns
                                 gap: "30px", // Space between posts
                                 justifyContent: "center",
                                 alignItems: "center",
@@ -262,7 +293,46 @@ const GroupPage = () => {
                         <p>Leave content goes here...</p>
                     </div>
                 )}
+
+
             </div>
+
+            {/* Expandable div */}
+            {isOpen && (
+                <div className="popup">
+                    <div className="popup-header">
+                        <h3>Members</h3>
+                        <button className="close-button" onClick={closeList}>
+                            <FontAwesomeIcon icon={faTimes} />
+                        </button>
+                    </div>
+
+                    {/* Search Bar */}
+                    <div className="search-bar">
+                        <input
+                            type="text"
+                            placeholder="Add members by name or email"
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Member List */}
+                    <div className="member-list">
+                        {filteredMembers.map((member, index) => (
+                            <div className="member" key={index}>
+                                <img src="https://picsum.photos/40/40?random=19" alt={member.name} className="member-avatar" />
+                                <div className="member-info">
+                                    <p className='memberName'>{member.name}</p>
+                                    <p>{member.email}</p>
+                                    <button className="invite">Invite</button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
 
 
 
@@ -272,17 +342,32 @@ const GroupPage = () => {
             {/* Embedded CSS */}
             <style jsx>{`
             /* App Styles */
+                
+            .invite {
+            float: right;
+            background-color: #f35366;
+            color: white;
+            }
+            .group-post {
+                min-width: 900px;
+                margin-left: 40px;
+                left:40px;
+                position: absolute;
+            }
+                .memberName { 
+                    font-size: 1.2rem;
+                    font-weight: bold;}
 
                 /* Container Styles */
                 .button-container {
-                position:absolute;
+                position: absolute; /* Position it absolutely within the profile-header */
                 z-index: 100;
                 float: right;
-                right: 80px;
+                right: 30px;
+                top: 30px;
                 display: flex;
+
                 gap: 15px; /* Space between buttons */
-                align-items: center;
-                top:120px;
                 height: 40px;
                 }
 
@@ -371,6 +456,8 @@ const GroupPage = () => {
                 }
 
                 .profile-header {
+                min-width: 800px; /* Ensure full width */
+                    position: relative; /* Ensure the button container is positioned relative to this */
                     height: 300px;
                     display: flex;
                     align-items: center;
@@ -416,6 +503,7 @@ const GroupPage = () => {
                 }
 
                 .list-bar {
+                min-width: 800px; /* Ensure full width */
                     margin-top: 20px;
                     background: #fff;
                     border-radius: 10px;
@@ -617,6 +705,99 @@ const GroupPage = () => {
                     color: #666; /* Slightly darker color */
                     margin: 6px 0 0 0;
                 }
+
+                .popup {
+                border: 1px solid #ddd;
+                padding: 20px;
+                max-width: 1000px;
+                min-width: 500px;
+                width: 60%;
+                background-color: white;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+                border-radius: 20px;
+                height: 600px;
+                }
+
+                .popup-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 10px;
+                margin-bottom: 20px;
+                }
+
+                .close-button {
+                background: none;
+                border: none;
+                font-size: 1.2rem;
+                cursor: pointer;
+                }
+
+                .search-bar {
+                margin-bottom: 25px;
+                }
+
+                .search-bar input {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 1rem;
+                }
+
+                .member {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #f1f1f1;
+                position: relative;
+                }
+
+                .member-avatar {
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                margin-right: 10px;
+                margin-left: 10px;
+                margin-top: 0px;
+                }
+
+                .member-info {
+                display: flex;
+                flex-direction: column;
+                margin-top: 20px;
+                margin-bottom: 5px;
+                margin-left: 10px;
+                line-height: 1;
+                }
+
+                /* Invite button positioned absolutely to the right */
+                .invite {
+                background-color: #2196f3;
+                color: white;
+                width: 90px;
+                height: 40px;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 200px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                font-size: 1rem;
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                }
+
+                .invite:hover {
+                background-color: Grey;
+                }
+
 
 
             `}</style>
