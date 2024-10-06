@@ -1,6 +1,8 @@
 'use client'; // Add this line at the very top to mark the component as a Client Component
 import React, { useState } from 'react';
 import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendarDays, faPlus, faUser } from '@fortawesome/free-solid-svg-icons';
 
 const groupData = [
     {
@@ -133,6 +135,22 @@ const GroupPage = () => {
                         </div>
                     </div>
                 </div>
+                <div className="button-container">
+                    <button className="expandable-button button-1">
+                        <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} />
+                        <span>Create Post</span>
+                    </button>
+
+                    <button className="expandable-button button-2">
+                        <FontAwesomeIcon icon={faCalendarDays} className="icon" style={{ color: '#4CAF50' }} />
+                        <span style={{ color: '#4CAF50' }}>Create Event</span>
+                    </button>
+
+                    <button className="expandable-button button-3">
+                        <FontAwesomeIcon icon={faUser} className="icon" style={{ color: ' #2196F3' }} />
+                        <span style={{ color: ' #2196F3' }}>Invite Member</span>
+                    </button>
+                </div>
             </div>
 
             {/* Navigation Bar */}
@@ -253,6 +271,93 @@ const GroupPage = () => {
 
             {/* Embedded CSS */}
             <style jsx>{`
+            /* App Styles */
+
+                /* Container Styles */
+                .button-container {
+                position:absolute;
+                z-index: 100;
+                float: right;
+                right: 80px;
+                display: flex;
+                gap: 15px; /* Space between buttons */
+                align-items: center;
+                top:120px;
+                height: 40px;
+                }
+
+                .expandable-button {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background-color: transparent;
+                    border: 2px solid #f35366; /* Default border */
+                    border-radius: 50px;
+                    padding: 0 15px;
+                    height: 50px;
+                    width: 50px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    font-weight: bold;
+                    color: #f35366; /* Default text color */
+                    transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.4s ease, padding 0.4s ease; /* Smoother transition for width */
+                    white-space: nowrap;
+                    overflow: hidden;
+                    position: relative;
+                }
+
+                /* Icon styles: initially centered */
+                .expandable-button .icon {
+                position: absolute;
+                transform: translateX(-50%); /* Center the icon in the circle */
+                transition: left 0.9s ease, transform 0.4s ease;
+                }
+
+                /* Hover effect */
+                .expandable-button:hover {
+                 width: auto; /* Expand width on hover */
+                justify-content: flex-start; /* Align items to the left when expanded */
+                transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother width transition */
+                
+                }
+
+                /* Move the icon to the left of the text on hover */
+                .expandable-button:hover .icon {
+                left: 10px; /* Move the icon to the left inside the expanded button */
+                transform: translateX(0); /* No more centering */
+                }
+
+                /* Initially hide the text */
+                .expandable-button span {
+                margin-left: 5px; /* Reduce space between icon and text */
+                display: none;
+                }
+
+                /* Show the text on hover */
+                .expandable-button:hover span {
+                display: inline;
+                }
+
+                /* Different colors for each button border and icon */
+                .button-1 {
+                border-color: #f35366; /* Red for Add Post */
+                }
+                .button-2 {
+                border-color: #4CAF50; /* Green for Add Event */
+                }
+
+                .button-2 .icon {
+                background-color: #4CAF50; /* Icon matches the border color */
+                }
+
+                .button-3 {
+                border-color: #2196F3; /* Blue for Invite Member */
+                }
+
+                .button-3 .icon {
+                    background-color:: #2196F3; /* Icon matches the border color */
+                }
+
                 .profile-info {
                     display: flex;
                     width: 100%;
@@ -357,10 +462,10 @@ const GroupPage = () => {
                 }
 
                 .group-card-container {
-                    padding: 25px;
+                    padding: 0px 0px;
                     display: grid;
                     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible grid */
-                    margin-top: 40px;
+                    margin-top: 20px;
                     gap: 20px; /* Space between grid items */
                     border-radius: 20px;
                     width: 100%; /* Full width */
