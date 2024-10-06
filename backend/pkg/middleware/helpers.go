@@ -374,23 +374,106 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 // TODO: Implement mapNotifications, which should return a slice of structs.NotificatoinResponse.
 // use case statment for teh Type , we should determine the type of the notification and map it to the correct struct
 // example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
-func MapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
+func MapNotifications(sessionUser structs.User, notifications []structs.Notification) ([]structs.NotificatoinResponse, error) {
 	var notificationRespose []structs.NotificatoinResponse
 
-	// for notification  := range notifications {
-	// 	switch notification.NotificationType {
-	// 	case "GroupInviteReject":
+	for _, notification := range notifications {
+		var notificate *structs.NotificatoinResponse
+		var err error
+		switch notification.NotificationType {
+		case "GroupRequestReject":
+			notificate, err = createGroupNotificationResponse(notification, "rejected")
+			if err != nil {
+				return nil, err
+			}
 
-	// 	}
+		case "GroupRequestAccept":
+			notificate, err = createGroupNotificationResponse(notification, "approved")
+			if err != nil {
+				return nil, err
+			}
 
-	// }
-	
-	
-	return notificationRespose
+		case "followRequestReject":
+			notificate, err = createFollowNotificationResponse(notification, 1)
+			if err != nil {
+				return nil, err
+			}
+
+		case "followRequestAccept":
+			notificate, err = createFollowNotificationResponse(notification, 2)
+			if err != nil {
+				return nil, err
+			}
+
+		case "startFollow":
+			notificate, err = createFollowNotificationResponse(notification, 3)
+			if err != nil {
+				return nil, err
+			}
+
+		case "followRequest":
+			notificate, err = createFollowNotificationResponse(notification, 4)
+			if err != nil {
+				return nil, err
+			}
+
+		}
+
+		notificationRespose = append(notificationRespose, *notificate)
+
+	}
+
+	return notificationRespose, nil
 }
 
 func IsDataImage(buff []byte) (bool, string) {
 	// the function that actually does the trick
 	t := http.DetectContentType(buff)
 	return strings.HasPrefix(t, "image"), t
+}
+
+func createGroupNotificationResponse(notification structs.Notification, msg string) (*structs.NotificatoinResponse, error) {
+	group, err := models.GetGroupByID(*notification.GroupID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &structs.NotificatoinResponse{
+		Id:           notification.ID,
+		Type:         notification.NotificationType,
+		SenderID:     *notification.SenderID,
+		GroupID:      group.ID,
+		IsRead:       notification.IsRead,
+		CreationDate: notification.CreationDate,
+		Message:      "Your request to join " + strings.Title(group.Title) + " group has been " + msg + ".",
+	}, nil
+}
+
+func createFollowNotificationResponse(notification structs.Notification, code int) (*structs.NotificatoinResponse, error) {
+	user, err := models.GetUserByID(*notification.SenderID)
+	if err != nil {
+		return nil, err
+	}
+
+	mssage := ""
+
+	if code == 1 {
+		mssage = user.Username + " has reject your follow request."
+	} else if code == 2 {
+		mssage = user.Username + " has accept your follow request."
+	} else if code == 3 {
+		mssage = user.Username + " started follow you."
+	} else if code == 4 {
+		mssage = user.Username + " wants to follow you."
+
+	}
+
+	return &structs.NotificatoinResponse{
+		Id:           notification.ID,
+		Type:         notification.NotificationType,
+		SenderID:     *notification.SenderID,
+		IsRead:       notification.IsRead,
+		CreationDate: notification.CreationDate,
+		Message:      mssage,
+	}, nil
 }

@@ -84,13 +84,14 @@ type GroupChatResponse struct {
 }
 
 type NotificatoinResponse struct {
-	Id           int                `json:"id"`
-	Type         string             `json:"type"`
-	Sender       UserResponse       `json:"sender"`
-	Group        GroupResponse      `json:"group"`
-	Event        GroupEventResponse `json:"event"`
-	IsRead       bool               `json:"is_read"`
-	CreationDate time.Time          `json:"created_at"`
+	Id           int       `json:"id"`
+	Type         string    `json:"type"`
+	SenderID     int       `json:"sender_id"`
+	GroupID      int       `json:"group_id"`
+	Event        int       `json:"event"`
+	IsRead       bool      `json:"is_read"`
+	Message      string    `json:"message"`
+	CreationDate time.Time `json:"created_at"`
 }
 
 type ChatResponse struct {

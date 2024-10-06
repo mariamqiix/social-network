@@ -27,7 +27,11 @@ func NotificationsHandler(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusInternalServerError)
 			return
 		}
-		notificationsRespone := MapNotifications(*user, notifications)
+		notificationsRespone, err := MapNotifications(*user, notifications)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return 
+		}
 		writeToJson(notificationsRespone, w)
 	default:
 		http.NotFound(w, r)
@@ -83,7 +87,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 	case "adminGroupRequestResponse":
 
-		notificationType := "GroupInviteReject"
+		notificationType := "GroupRequestReject"
 
 		// Unmarshal the JSON data into a GroupResponse struct
 		var GroupRequestResponse structs.GroupRequestResponse
@@ -101,7 +105,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 		if GroupRequestResponse.Response == "Accept" {
 			models.AddMember(user.ID, GroupRequestResponse.GroupID)
-			notificationType = "GroupInviteAccept"
+			notificationType = "GroupRequestAccept"
 		}
 
 		models.RemoveRequest(GroupRequestResponse.GroupID, GroupRequestResponse.UserID)
@@ -150,6 +154,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 	case "requestToFollow":
 		var userRequestToFollow *structs.UserInfoRequest
 		status := "Pending"
+		notificationType := "followRequest"
 
 		err := json.NewDecoder(r.Body).Decode(&userRequestToFollow)
 		if err != nil {
@@ -165,6 +170,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 		if userToFollow.ProfileType == "Public" {
 			status = "Accept"
+			notificationType = "startFollow"
 		}
 
 		models.CreateFollower(structs.Follower{
@@ -176,7 +182,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		models.CreateMessagesNotification(structs.Notification{
 			UserID:           user.ID,
 			SenderID:         &userRequestToFollow.UserID,
-			NotificationType: "followRequest",
+			NotificationType: notificationType,
 			IsRead:           false,
 		})
 
