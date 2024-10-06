@@ -50,6 +50,8 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 	switch path {
 	case "groupInviteResponse":
 
+		notificationType := "GroupInviteReject"
+
 		// Unmarshal the JSON data into a GroupResponse struct
 		var groupInviteResponse structs.GroupInviteResponse
 
@@ -58,12 +60,31 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 		}
 
-		models.RemoveInvite(user.ID, groupInviteResponse.GroupID)
-		if groupInviteResponse.Response == "Accept" {
-			models.AddMember(user.ID, groupInviteResponse.GroupID)
+		group, err := models.GetGroupByID(groupInviteResponse.GroupID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
 		}
 
+		models.RemoveInvite(group.ID, user.ID)
+
+		if groupInviteResponse.Response == "Accept" {
+			models.AddMember(user.ID, groupInviteResponse.GroupID)
+			notificationType = "GroupInviteAccept"
+		}
+
+		models.CreateGroupsNotification(structs.Notification{
+			UserID:           group.CreatorID,
+			SenderID:         &user.ID,
+			NotificationType: notificationType,
+			GroupID:          &group.ID,
+			IsRead:           false,
+		})
+
 	case "adminGroupRequestResponse":
+
+		notificationType := "GroupInviteReject"
+
 		// Unmarshal the JSON data into a GroupResponse struct
 		var GroupRequestResponse structs.GroupRequestResponse
 
@@ -72,14 +93,31 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 		}
 
+		group, err := models.GetGroupByID(GroupRequestResponse.GroupID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+
 		if GroupRequestResponse.Response == "Accept" {
 			models.AddMember(user.ID, GroupRequestResponse.GroupID)
+			notificationType = "GroupInviteAccept"
 		}
 
 		models.RemoveRequest(GroupRequestResponse.GroupID, GroupRequestResponse.UserID)
 
+		models.CreateMessagesNotification(structs.Notification{
+			UserID:           user.ID,
+			SenderID:         &group.CreatorID,
+			NotificationType: notificationType,
+			GroupID:          &GroupRequestResponse.GroupID,
+			IsRead:           false,
+		})
+
 	case "followResponse":
 		var userRequestToFollow *structs.UserInfoRequest
+		status := "Accept"
+		notificationType := "followRequestAccept"
 
 		err := json.NewDecoder(r.Body).Decode(&userRequestToFollow)
 		if err != nil {
@@ -87,13 +125,31 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		models.CreateFollower(structs.Follower{
-			FollowingID: user.ID,
-			FollowerID:  userRequestToFollow.UserID,
+		if userRequestToFollow.Response == "Reject" {
+			models.DeleteFollower(structs.Follower{
+				FollowingID: user.ID,
+				FollowerID:  userRequestToFollow.UserID,
+			})
+			notificationType = "followRequestReject"
+
+		} else {
+			models.UpdateFollower(structs.Follower{
+				FollowingID: user.ID,
+				FollowerID:  userRequestToFollow.UserID,
+				Status:      &status,
+			})
+		}
+
+		models.CreateMessagesNotification(structs.Notification{
+			UserID:           user.ID,
+			SenderID:         &userRequestToFollow.UserID,
+			NotificationType: notificationType,
+			IsRead:           false,
 		})
 
 	case "requestToFollow":
 		var userRequestToFollow *structs.UserInfoRequest
+		status := "Pending"
 
 		err := json.NewDecoder(r.Body).Decode(&userRequestToFollow)
 		if err != nil {
@@ -101,9 +157,27 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		userToFollow, err := models.GetUserByID(userRequestToFollow.UserID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+
+		if userToFollow.ProfileType == "Public" {
+			status = "Accept"
+		}
+
 		models.CreateFollower(structs.Follower{
 			FollowingID: user.ID,
 			FollowerID:  userRequestToFollow.UserID,
+			Status:      &status,
+		})
+
+		models.CreateMessagesNotification(structs.Notification{
+			UserID:           user.ID,
+			SenderID:         &userRequestToFollow.UserID,
+			NotificationType: "followRequest",
+			IsRead:           false,
 		})
 
 	default:

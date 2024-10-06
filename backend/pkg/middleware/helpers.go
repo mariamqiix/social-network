@@ -375,7 +375,18 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 // use case statment for teh Type , we should determine the type of the notification and map it to the correct struct
 // example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
 func MapNotifications(sessionUser structs.User, notifications []structs.Notification) []structs.NotificatoinResponse {
-	return nil
+	var notificationRespose []structs.NotificatoinResponse
+
+	// for notification  := range notifications {
+	// 	switch notification.NotificationType {
+	// 	case "GroupInviteReject":
+
+	// 	}
+
+	// }
+	
+	
+	return notificationRespose
 }
 
 func IsDataImage(buff []byte) (bool, string) {

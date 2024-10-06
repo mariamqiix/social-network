@@ -264,6 +264,10 @@ func CreateFollower(f structs.Follower) error {
 	return Create("Follower", columns, values)
 }
 
+func UpdateFollower(f structs.Follower)error {
+	return nil
+}
+
 func DeleteFollower(f structs.Follower) error {
 	// Execute a delete query to delete the follower
 	return Delete("Follower", []string{"following_id", "follower_id"}, []interface{}{f.FollowingID, f.FollowerID})
