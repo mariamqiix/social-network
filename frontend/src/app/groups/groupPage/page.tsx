@@ -4,6 +4,9 @@ import Post from '../../components/GroupPostContent'; // Adjust the path if nece
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
 import "./groupPage.css";
+
+import * as FaIcons from 'react-icons/fa'; // Import all FontAwesome icons
+import * as MdIcons from 'react-icons/md'; // Import all Material Design icons
 const groupData = [
     {
         id: 1,
@@ -148,6 +151,7 @@ const GroupPage = () => {
 
     // Function to close the popup
     const closePopup = () => {
+        setPopupOpen(false);
         setIsPostPopupOpen(false);
         setPostImage(null); // Reset image when closing
         setDescription('');  // Reset description when closing
@@ -171,7 +175,92 @@ const GroupPage = () => {
             alert("Please add a description or image before posting.");
         }
     };
+    const [isPopupOpen, setPopupOpen] = useState(false);
+    const [eventTitle, setEventTitle] = useState("");
+    const [eventDescription, setEventDescription] = useState("");
+    const [eventDateTime, setEventDateTime] = useState("");
+    const [options, setOptions] = useState([{ name: "", icon: <FaIcons.FaQuestionCircle /> }]); // Default icon
+    const [isIconPickerOpen, setIconPickerOpen] = useState([false]);
 
+    const openPopup = () => {
+        setPopupOpen(true);
+    };
+
+    const handleCreateEvent = () => {
+        if (eventTitle && eventDescription && eventDateTime) {
+            alert(`Event Created: \nTitle: ${eventTitle}\nDescription: ${eventDescription}\nDate and Time: ${eventDateTime}\nOptions: ${JSON.stringify(options)}`);
+            // Reset the fields after creating the event
+            setEventTitle("");
+            setEventDescription("");
+            setEventDateTime("");
+            setOptions([{ name: "", icon: <FaIcons.FaQuestionCircle /> }]); // Reset options
+            closePopup();
+        } else {
+            alert("Please fill in all fields.");
+        }
+    };
+
+    const addOption = () => {
+        if (options.length < 3) {
+            setOptions([...options, { name: "", icon: <FaIcons.FaQuestionCircle /> }]);
+            setIconPickerOpen([...isIconPickerOpen, false]);
+        } else {
+            alert("You can only add up to 3 options.");
+        }
+    };
+
+    const removeOption = (index) => {
+        setOptions(options.filter((_, i) => i !== index));
+        setIconPickerOpen(isIconPickerOpen.filter((_, i) => i !== index));
+    };
+
+    const updateOptionName = (index, newName) => {
+        const updatedOptions = [...options];
+        updatedOptions[index].name = newName;
+        setOptions(updatedOptions);
+    };
+
+    const updateOptionIcon = (index, newIcon) => {
+        const updatedOptions = [...options];
+        updatedOptions[index].icon = newIcon;
+        setOptions(updatedOptions);
+        toggleIconPicker(index, false); // Close the picker after selection
+    };
+
+    const toggleIconPicker = (index, open) => {
+        const updatedIconPicker = [...isIconPickerOpen];
+        updatedIconPicker[index] = open;
+        setIconPickerOpen(updatedIconPicker);
+    };
+
+    const renderIconPicker = (index) => (
+        <div className="icon-picker-scroll">
+            {Object.keys(FaIcons).map((iconKey, i) => {
+                const IconComponent = FaIcons[iconKey];
+                return (
+                    <span
+                        key={i}
+                        className="icon-picker-item"
+                        onClick={() => updateOptionIcon(index, <IconComponent />)}
+                    >
+                        <IconComponent />
+                    </span>
+                );
+            })}
+            {Object.keys(MdIcons).map((iconKey, i) => {
+                const IconComponent = MdIcons[iconKey];
+                return (
+                    <span
+                        key={i}
+                        className="icon-picker-item"
+                        onClick={() => updateOptionIcon(index, <IconComponent />)}
+                    >
+                        <IconComponent />
+                    </span>
+                );
+            })}
+        </div>
+    );
 
     return (
         <div className="group-page-container">
@@ -194,12 +283,12 @@ const GroupPage = () => {
                     </div>
                 </div>
                 <div className="button-container">
-                    <button className="expandable-button button-1" onClick={() => setIsPostPopupOpen(true) }>
+                    <button className="expandable-button button-1" onClick={() => setIsPostPopupOpen(true)}>
                         <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} />
                         <span>Create Post</span>
                     </button>
 
-                    <button className="expandable-button button-2">
+                    <button className="expandable-button button-2" onClick={openPopup} >
                         <FontAwesomeIcon icon={faCalendarDays} className="icon" style={{ color: '#4CAF50' }} />
                         <span style={{ color: '#4CAF50' }}>Create Event</span>
                     </button>
@@ -407,6 +496,84 @@ const GroupPage = () => {
                 </div>
             )}
 
+            {isPopupOpen && (
+                <>
+                    <div className="overlay" onClick={closePopup}></div>
+                    <div className="popup">
+                        <div className="popup-header">
+                            <h3>Create Event</h3>
+                            <button className="close-button" onClick={closePopup}>×</button>
+                        </div>
+                        <div className="form-field">
+                            <label htmlFor="event-title">Event Title</label>
+                            <input
+                                type="text"
+                                id="event-title"
+                                value={eventTitle}
+                                onChange={(e) => setEventTitle(e.target.value)}
+                                placeholder="Enter event title"
+                            />
+                        </div>
+                        <div className="form-field">
+                            <label htmlFor="event-description">Event Description</label>
+                            <textarea
+                                id="event-description"
+                                value={eventDescription}
+                                onChange={(e) => setEventDescription(e.target.value)}
+                                placeholder="Enter event description"
+                            />
+                        </div>
+                        <div className="form-field">
+                            <label htmlFor="event-datetime">Event Date and Time</label>
+                            <input
+                                type="datetime-local"
+                                id="event-datetime"
+                                value={eventDateTime}
+                                onChange={(e) => setEventDateTime(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-field">
+                            <label>Options </label>
+                            <button className="add-option-button" onClick={addOption} disabled={options.length >= 3}>
+                                <span className="add-option-icon">+</span> New Option
+                            </button>
+                            {options.map((option, index) => (
+                                <div key={index} className="option-field">
+                                    <input
+                                        type="text"
+                                        placeholder="Option Name"
+                                        value={option.name}
+                                        onChange={(e) => updateOptionName(index, e.target.value)}
+                                    />
+                                    <div className="icon-input" onClick={() => toggleIconPicker(index, !isIconPickerOpen[index])}>
+                                        {option.icon}
+                                    </div>
+
+                                    {isIconPickerOpen[index] && (
+                                        <div className="icon-picker-wrapper">
+                                            {renderIconPicker(index)}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        className="remove-button"
+                                        onClick={() => removeOption(index)}
+                                        disabled={options.length < 2}
+                                    >
+                                        ×
+                                    </button>
+                                                                    </div>
+                            ))}
+                        </div>
+
+                        <button className="create-post-button" onClick={handleCreateEvent}>
+                            Create Event
+                        </button>
+                    </div>
+                </>
+            )}
+
 
             {/* Embedded CSS */}
             <style jsx>{`
@@ -515,7 +682,7 @@ const GroupPage = () => {
 
 
             `}</style>
-        </div>
+        </div >
     );
 };
 
