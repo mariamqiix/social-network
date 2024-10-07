@@ -186,9 +186,41 @@ const GroupPage = () => {
         setPopupOpen(true);
     };
 
+
+
+    const getIconComponent = (iconDisplayName) => {
+        if (!iconDisplayName || typeof iconDisplayName !== 'string') {
+            console.error('Icon display name is not provided or is invalid');
+            return null; // Return null if iconDisplayName is not valid
+        }
+
+        // Capitalize the first letter and ensure "Fa" prefix
+        const iconKey = `${iconDisplayName.charAt(0).toUpperCase() + iconDisplayName.slice(1)}`;
+        const IconComponent = FaIcons[iconKey];
+
+        if (!IconComponent) {
+            console.error(`Icon "${iconDisplayName}" not found in react-icons/fa. Constructed Key: ${iconKey}`);
+            return null; // Return null if the icon doesn't exist
+        }
+
+        return <IconComponent />;
+    };
+
     const handleCreateEvent = () => {
         if (eventTitle && eventDescription && eventDateTime) {
-            alert(`Event Created: \nTitle: ${eventTitle}\nDescription: ${eventDescription}\nDate and Time: ${eventDateTime}\nOptions: ${JSON.stringify(options)}`);
+            const eventOptions = options.map(option => ({
+                name: option.name,
+                icon: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
+
+            }));
+
+            console.log("Event Created: ");
+            console.log("Title: ", eventTitle);
+            console.log("Description: ", eventDescription);
+            console.log("Date and Time: ", eventDateTime);
+            console.log("Options: ", eventOptions);
+            console.log(getIconComponent(eventOptions[0].icon));
+
             // Reset the fields after creating the event
             setEventTitle("");
             setEventDescription("");
@@ -199,7 +231,6 @@ const GroupPage = () => {
             alert("Please fill in all fields.");
         }
     };
-
     const addOption = () => {
         if (options.length < 3) {
             setOptions([...options, { name: "", icon: <FaIcons.FaQuestionCircle /> }]);
@@ -563,7 +594,7 @@ const GroupPage = () => {
                                     >
                                         ×
                                     </button>
-                                                                    </div>
+                                </div>
                             ))}
                         </div>
 
