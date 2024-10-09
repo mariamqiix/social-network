@@ -13,6 +13,7 @@ const Post = ({ index, post }) => (
             width: "100%", // Make width 100% to allow grid to control the size
             padding: "20px",
             marginBottom: "20px",
+            minHeight: "800px",
         }}
     >
         {/* Group and User Info */}
@@ -24,7 +25,9 @@ const Post = ({ index, post }) => (
             }}
         >
             <img
-                src={post.groupImage}
+                // src={post.group.image_url}
+                src={"https://picsum.photos/200/300?random=" + RandomNumber()}
+
                 alt="Group"
                 style={{
                     borderRadius: "20px",
@@ -33,9 +36,10 @@ const Post = ({ index, post }) => (
                     height: "70px",
                 }}
             />
-            <div style={{ flexGrow: 1,
+            <div style={{
+                flexGrow: 1,
                 marginLeft: "10px",
-             }}>
+            }}>
                 <h3
                     style={{
                         margin: 0,
@@ -44,7 +48,7 @@ const Post = ({ index, post }) => (
                         color: "#333",
                     }}
                 >
-                    {post.groupName}
+                    {post.group.title}
                 </h3>
                 <div
                     style={{
@@ -56,7 +60,7 @@ const Post = ({ index, post }) => (
                     }}
                 >
                     <img
-                        src={post.userImage}
+                        src={post.author.nickname}
                         alt="User"
                         style={{
                             borderRadius: "50%",
@@ -65,8 +69,8 @@ const Post = ({ index, post }) => (
                             height: "30px",
                         }}
                     />
-                    <span style={{ color: "#0073e6", marginRight: "5px" }}>{post.username}</span>
-                    <span style={{ fontSize: "0.8rem", color: "#aaa" }}>{post.time}</span>
+                    <span style={{ color: "#0073e6", marginRight: "5px" }}>{post.author.username}</span>
+                    <span style={{ fontSize: "0.8rem", color: "#aaa" }}>{post.created_at}</span>
                 </div>
             </div>
         </div>
@@ -78,16 +82,25 @@ const Post = ({ index, post }) => (
             }}
         >
             <p style={{ margin: "0 0 10px 0" }}>{post.content}</p>
-            <img
-                src={post.postImage}
-                alt="Post Content"
-                style={{
-                    width: "100%",
-                    borderRadius: "8px",
-                }}
-            />
+            {post.image_url &&
+                <img
+                    src={`data:image/png;base64,${post.image_url}`}
+                    alt="Post Content"
+                    style={{
+                        width: "100%",
+                        borderRadius: "8px",
+                    }}
+                />
+            }
         </div>
+
     </div>
 );
 
 export default Post;
+
+
+
+function RandomNumber(min = 0, max = 100) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

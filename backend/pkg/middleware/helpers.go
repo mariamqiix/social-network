@@ -22,6 +22,7 @@ func IsValidEmail(email string) bool {
 
 func GetUser(r *http.Request) *structs.User {
 	sessionCookie, err := r.Cookie("session")
+	fmt.Println(sessionCookie)
 	if err == http.ErrNoCookie {
 		return nil
 	}
@@ -256,7 +257,6 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 			continue
 		}
 		var users []structs.BasicUserResponse
-		fmt.Println(responses)
 		for _, response := range responses {
 			users = append(users, *ReturnBasicUser(response.UserID))
 		}
@@ -269,7 +269,6 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 				log.Printf("error checking if user is member of group: %s\n", err.Error())
 				continue
 			}
-			fmt.Println(didRespone)
 		}
 		optionResponses = append(optionResponses, structs.EventOptionsResponse{
 			Option:         option.OptionName,

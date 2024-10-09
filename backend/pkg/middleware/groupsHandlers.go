@@ -14,13 +14,16 @@ func GroupHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract the endpoint from the request path
 	path := strings.TrimPrefix(r.URL.Path, "/group/")
 
+	if strings.Contains(path, "event/list") {
+		ListEventHandler(w, r)
+		return
+	} else if strings.Contains(path, "list/") {
+		GroupsHandler(w, r)
+		return
+	}
 	switch path {
 	case "messages":
 		GroupChatsHandler(w, r)
-		return
-
-	case "list/":
-		GroupsHandler(w, r)
 		return
 
 	case "createGroup":
@@ -43,10 +46,6 @@ func GroupHandler(w http.ResponseWriter, r *http.Request) {
 		InviteUserHandler(w, r)
 		return
 
-	case "event/list":
-		ListEventHandler(w, r)
-		return
-
 	case "event/create":
 		CreateEventHandler(w, r)
 		return
@@ -54,13 +53,16 @@ func GroupHandler(w http.ResponseWriter, r *http.Request) {
 	case "event/userResponse":
 		CreateEventResponseHandler(w, r)
 		return
-
+	case "UsersToInvite":
+		fmt.Print("hellooooooo\n")
+		UsersToInviteHandler(w, r)
+		return
 	default:
 		http.Error(w, "Invalid endpoint", http.StatusNotFound)
 	}
 }
 
-func GroupsHandler(w http.ResponseWriter, r *http.Request) {
+func UsersToInviteHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
 	if sessionUser != nil {
@@ -70,7 +72,41 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
-	splitPath := strings.TrimPrefix(r.URL.Path, "/user/groups/")
+	if sessionUser == nil {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+	groupId, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+	users, err := models.GetUsersToInvite(sessionUser.ID, groupId)
+	if err != nil {
+		fmt.Println(err)
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+	var view []structs.UserResponse
+	for _, user := range users {
+		view = append(view, *ReturnUserResponse(&user))
+	}
+
+	writeToJson(view, w)
+}
+
+func GroupsHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+
+	limiterUsername := "[GUESTS]"
+	if sessionUser != nil {
+		limiterUsername = sessionUser.Username
+	}
+	if !userLimiter.Allow(limiterUsername) {
+		errorServer(w, http.StatusTooManyRequests)
+		return
+	}
+	splitPath := strings.TrimPrefix(r.URL.Path, "/group/list/")
 	AllGroups, err := models.GetAllGroups()
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
@@ -84,10 +120,7 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 		writeToJson(view, w)
 		return
 	}
-	fmt.Print("hi")
-	fmt.Print(len(splitPath))
 	if splitPath != "" {
-		fmt.Print("ss")
 
 		Posts, err := models.GetGroupPostsForUser(sessionUser.ID)
 		if err != nil {
@@ -95,7 +128,6 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		var groups []structs.Group
-		fmt.Print("hello")
 		switch splitPath {
 		case "joind":
 			groups, err = models.GetUserGroups(sessionUser.ID)
@@ -120,6 +152,7 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 				errorServer(w, http.StatusInternalServerError)
 			}
 		default:
+			fmt.Print("hello youuu ")
 			groups = AllGroups
 		}
 		view := GroupsHomePageView{
@@ -209,6 +242,7 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 // // leave group function
 func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
+	fmt.Print("hello")
 	if sessionUser == nil {
 		errorServer(w, http.StatusBadRequest)
 		return
@@ -304,6 +338,7 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // //invite user function
 func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Print("hello\n\n\n\n\n\nheeeey\n")
 	sessionUser := GetUser(r)
 	if sessionUser == nil {
 		errorServer(w, http.StatusBadRequest)
@@ -315,7 +350,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
-
+	fmt.Print(Invite)
 	err = models.AddInviteToGroup(Invite.GroupID, Invite.UserID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
@@ -420,7 +455,9 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	var eventRequest structs.EventRequest
 	err := json.NewDecoder(r.Body).Decode(&eventRequest)
+	fmt.Print(eventRequest)
 	if err != nil {
+		fmt.Println(err)
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
@@ -435,7 +472,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	eventID, err := models.CreateEvent(Event)
 	for _, option := range eventRequest.Options {
-		err := models.AddEventOption(eventID, option)
+		err := models.AddEventOption(eventID, option.Option)
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
 			return

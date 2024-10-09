@@ -3,7 +3,9 @@ package middleware
 import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -13,6 +15,11 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract the endpoint from the request path
 	path := strings.TrimPrefix(r.URL.Path, "/post/")
 
+	if strings.Contains(path, "createPost/") {
+		fmt.Println("jhfkslcd;")
+		CreatePostHandler(w, r)
+		return
+	}
 	switch path {
 	case "addReaction":
 		AddReactionHandler(w, r)
@@ -24,10 +31,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "addComment":
 		AddCommentHandler(w, r)
-		return
-
-	case "createPost":
-		CreatePostHandler(w, r)
 		return
 
 	default:
@@ -264,6 +267,9 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 
 func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With")
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Println(sessionUser)
 	limiterUsername := "[GUESTS]"
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
@@ -275,6 +281,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if sessionUser == nil {
+		fmt.Print("ghjfdksld;' hello")
 		errorServer(w, http.StatusUnauthorized)
 		return
 	}
@@ -285,15 +292,22 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		var post structs.GroupPostRequest
 		err := json.NewDecoder(r.Body).Decode(&post)
 		if err != nil {
+			fmt.Printf("Error decoding JSON: %v\n", err)
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
 
 		imageID := -1
 		if post.Image != nil {
-			isImage, _ := IsDataImage(post.Image)
+			imageBytes, err := base64.StdEncoding.DecodeString(*post.Image)
+			if err != nil {
+				fmt.Println("Error decoding base64 image:", err)
+				errorServer(w, http.StatusBadRequest)
+				return
+			}
+			isImage, _ := IsDataImage(imageBytes)
 			if isImage {
-				imageID, err = models.UploadImage(post.Image)
+				imageID, err = models.UploadImage(imageBytes)
 				if err != nil {
 					errorServer(w, http.StatusInternalServerError)
 					return

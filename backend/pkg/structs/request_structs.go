@@ -27,9 +27,9 @@ type PostRequest struct {
 // // used for http.HandleFunc("/post/addComment", AddCommentHandler)
 // // http.HandleFunc("/post/createPost", CreatePostHandler)
 type GroupPostRequest struct {
-	GroupID     int    `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
-	Description string `json:"description"`
-	Image       []byte `json:"image"`
+	GroupID     int     `json:"group_id"` /// since there is more than one group with teh exat nam eor title , we need to return the groupId from teh frount
+	Description string  `json:"description"`
+	Image       *string `json:"image"`
 }
 
 type CommentGroupRequest struct {
@@ -53,10 +53,14 @@ type EventRequest struct {
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	GroupID     int       `json:"group_id"`
-	Options     []string  `json:"options"`
+	Options     []Option  `json:"options"`
 	Time        time.Time `json:"time"`
 }
 
+type Option struct {
+	Option   string `json:"option"`
+	IconName string `json:"icon_name"`
+}
 type GroupInviteRequest struct {
 	GroupID int `json:"group_id"`
 	UserID  int `json:"user_id"`

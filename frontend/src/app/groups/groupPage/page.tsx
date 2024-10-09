@@ -1,5 +1,5 @@
 'use client'; // Add this line at the very top to mark the component as a Client Component
-import React, { useState, ReactElement } from 'react';
+import React, { useState, ReactElement, useEffect } from 'react';
 import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -7,95 +7,176 @@ import "./groupPage.css";
 
 import * as FaIcons from 'react-icons/fa'; // Import all FontAwesome icons
 import * as MdIcons from 'react-icons/md'; // Import all Material Design icons
-const groupData = [
-    {
-        id: 1,
-        image: 'https://picsum.photos/200/300?random=5',
-        name: 'Eat Corn on the Cob',
-        description: 'Join us for a fun event filled with delicious corn and great company!',
-        date: 'Tue, Jan 9, 5:00 PM',
-        location: 'Austin, TX',
-        attendees: 256,
-        friends: [
-            'https://picsum.photos/40/40?random=1', // Friend 1
-            'https://picsum.photos/40/40?random=2', // Friend 2
-            'https://picsum.photos/40/40?random=3', // Friend 3
-            'https://picsum.photos/40/40?random=4', // Friend 4
-        ],
-    },
-    {
-        id: 2,
-        image: 'https://picsum.photos/200/300?random=5',
-        name: 'Wine Tasting Experience',
-        description: 'Explore a variety of wines in a beautiful vineyard setting.',
-        date: 'Sun, Feb 15, 3:00 PM',
-        location: 'Napa Valley, CA',
-        attendees: 150,
-        friends: [
-            'https://picsum.photos/40/40?random=5', // Friend 1
-            'https://picsum.photos/40/40?random=6', // Friend 2
-        ],
-    },
-    {
-        id: 3,
-        image: 'https://picsum.photos/200/300?random=5',
-        name: 'Live Music Night',
-        description: 'Enjoy live performances from local bands at the park.',
-        date: 'Sat, Mar 21, 6:00 PM',
-        location: 'Central Park, NY',
-        attendees: 300,
-        friends: [
-            'https://picsum.photos/40/40?random=7', // Friend 1
-            'https://picsum.photos/40/40?random=8', // Friend 2
-            'https://picsum.photos/40/40?random=9', // Friend 3
-        ],
-    },
-    {
-        id: 4,
-        image: 'https://picsum.photos/200/300?random=5',
-        name: 'Cooking Class',
-        description: 'Learn to cook delicious dishes from around the world!',
-        date: 'Wed, Apr 12, 2:00 PM',
-        location: 'Chicago, IL',
-        attendees: 85,
-        friends: [
-            'https://picsum.photos/40/40?random=10', // Friend 1
-            'https://picsum.photos/40/40?random=11', // Friend 2
-            'https://picsum.photos/40/40?random=12', // Friend 3
-            'https://picsum.photos/40/40?random=13', // Friend 4
-        ],
-    },
-    {
-        id: 5,
-        image: 'https://picsum.photos/200/300?random=5',
-        name: 'Yoga Retreat',
-        description: 'Relax and rejuvenate at a peaceful yoga retreat.',
-        date: 'Sat, May 25, 10:00 AM',
-        location: 'Sedona, AZ',
-        attendees: 120,
-        friends: [
-            'https://picsum.photos/40/40?random=14', // Friend 1
-            'https://picsum.photos/40/40?random=15', // Friend 2
-            'https://picsum.photos/40/40?random=16', // Friend 3
-            'https://picsum.photos/40/40?random=17', // Friend 4
-        ],
-    },
-    {
-        id: 6,
-        image: 'https://picsum.photos/200/300?random=5',
-        name: 'Photography Workshop',
-        description: 'Join us for a hands-on photography workshop in nature.',
-        date: 'Sun, Jun 30, 1:00 PM',
-        location: 'Yosemite, CA',
-        attendees: 75,
-        friends: [
-            'https://picsum.photos/40/40?random=18', // Friend 1
-            'https://picsum.photos/40/40?random=19', // Friend 2
-            'https://picsum.photos/40/40?random=20', // Friend 3
-        ],
-    },
-];
 
+async function fetchGroupData() {
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
+    const url = `http://localhost:8080/group/page?id=${id}`; // Append the id to the URL
+
+    try {
+        const response = await fetch(url, {
+            credentials: 'include', // This is the key to include cookies
+        });
+        if (!response.ok) {
+            throw new Error(`Error: status code ${response.status}`);
+        }
+
+        // Fetch the group data from the API
+        const groupData = await response.json();
+        return groupData;
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        // If there is an error fetching data, return an empty array
+        return [];
+    }
+}
+
+
+async function fetchMembers() {
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
+    const url = `http://localhost:8080/group/UsersToInvite?id=${id}`; // Append the id to the URL
+
+    try {
+        const response = await fetch(url, {
+            credentials: 'include', // This is the key to include cookies
+        });
+        if (!response.ok) {
+            throw new Error(`Error: status code ${response.status}`);
+        }
+
+        // Fetch the group data from the API
+        const groupData = await response.json();
+        console.log(groupData);
+        return groupData;
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        // If there is an error fetching data, return an empty array
+        return [];
+    }
+}
+
+async function fetchEventData() {
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
+    const url = `http://localhost:8080/group/event/list/group?id=${id}`;
+
+    try {
+        const response = await fetch(url, {
+            credentials: 'include', // This is the key to include cookies
+        });
+        if (!response.ok) {
+            throw new Error(`Error: status code ${response.status}`);
+        }
+
+        // Fetch the group data from the API
+        const groupData = await response.json();
+        return groupData;
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        // If there is an error fetching data, return an empty array
+        return [];
+    }
+}
+
+type GroupInviteRequest = {
+    group_id: number;
+    user_id: number;
+};
+
+function sendInvite(memberId: number) {
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
+
+    if (!id) {
+        console.error('Group ID not found in the query string');
+        return;
+    }
+
+    const invite: GroupInviteRequest = {
+        group_id: parseInt(id, 10),
+        user_id: memberId,
+    };
+
+    const url = `http://localhost:8080/group/inviteUser`;
+
+    fetch(url, {
+        method: 'POST',
+        credentials: 'include', // This is the key to include cookies
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(invite),
+    })
+        .then(response => {
+            if (response.ok) {
+                console.log('Invite sent successfully');
+            } else {
+                console.error('Failed to send invite');
+            }
+        })
+        .catch(error => {
+            console.error('Error sending invite:', error);
+        });
+}
+
+async function LeaveGroup() {
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
+
+    if (!id) {
+        console.error('Group ID not found in query string');
+        return;
+    }
+
+    const url = `http://localhost:8080/group/leaveGroup?id=${id}`;
+
+    try {
+        const response = await fetch(url, {
+            credentials: 'include', // This is the key to include cookies
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: status code ${response.status}`);
+        }
+        console.log('Successfully left the group');
+    } catch (error) {
+        console.error('Error leaving the group:', error);
+    }
+}
+
+
+
+async function RequestToJoin() {
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
+
+    if (!id) {
+        console.error('Group ID not found in query string');
+        return;
+    }
+
+    const url = `http://localhost:8080/group/requestToJoin?id=${id}`;
+
+    try {
+        const response = await fetch(url, {
+            credentials: 'include', // This is the key to include cookies
+            method: 'POST',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error: status code ${response.status}`);
+        }
+
+        console.log('Successfully request the group');
+    } catch (error) {
+        console.error('Error requesting the group:', error);
+    }
+}
 
 const GroupPage = () => {
     const [activeTab, setActiveTab] = useState('Posts');
@@ -107,10 +188,39 @@ const GroupPage = () => {
             case 'Leave':
                 setIsMember(false);  // Update the membership status
                 setActiveTab('Posts');
+                LeaveGroup();
+
+                useEffect(() => {
+                    const getData = async () => {
+                        const data = await fetchGroupData();
+                        console.log(data);
+                        if (data.Group.is_user_member) {
+                            setIsMember(true)
+                        }
+                        console.log(data.Group.is_user_member)
+                        setProfileData(data);
+                    };
+
+                    getData();
+                }, []);
+
+                const [groupEvent, setGroupEvent] = useState([]);
+
+                useEffect(() => {
+                    const getData = async () => {
+                        const data = await fetchEventData();
+                        console.log(data);
+                        setGroupEvent(data);
+                    };
+
+                    getData();
+                }, []);
+
                 // send a request to leave the group
                 break;
             case 'Join':
                 setActiveTab('Posts');
+                RequestToJoin();
                 // send a request to join the group
                 break;
             default:
@@ -124,13 +234,6 @@ const GroupPage = () => {
     // State to handle search input
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Members data
-    const membersToInvite = [
-        { name: 'Frankie Sullivan', email: 'frankie@untitledui.com', role: 'Owner', status: 'You' },
-        { name: 'Amélie Laurent', email: 'amelie@untitledui.com', role: 'Editor' },
-        { name: 'Katie Moss', email: 'katie@untitledui.com', role: 'Editor', status: 'Invite pending' },
-    ];
-
     // Function to toggle the list
     const toggleList = () => {
         setIsOpen(!isOpen);
@@ -141,10 +244,7 @@ const GroupPage = () => {
         setIsOpen(false);
     };
 
-    // Filtered members based on the search term
-    const filteredMembers = membersToInvite.filter(member =>
-        member.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+
     const [postImage, setPostImage] = useState<string | null>(null);
     const [description, setDescription] = useState<string>('');
     const [isPostPopupOpen, setIsPostPopupOpen] = useState<boolean>(false);
@@ -161,20 +261,51 @@ const GroupPage = () => {
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            setPostImage(URL.createObjectURL(file));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPostImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
         }
     };
 
+    const query = new URLSearchParams(window.location.search);
+    const id = query.get('id'); // Get the 'id' from the query string
     // Function to handle post creation
-    const handlePostCreation = () => {
+    // Function to handle post creation
+    const handlePostCreation = async () => {
         if (description || postImage) {
-            // Here you would typically send the postData to your backend or state management
-            console.log("Post created:", { description, image: postImage });
-            closePopup();
+            const postData = {
+                group_id: parseInt(id, 10), // Convert id to an integer
+                description: description,
+                image: postImage ? postImage.split(',')[1] : null, // Send only the base64 part
+            };
+            try {
+                console.log(postData)
+                const response = await fetch('http://localhost:8080/post/createPost/group', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include', // This is the key to include cookies
+                    body: JSON.stringify(postData),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: status code ${response.status}`);
+                }
+
+                console.log('Post created:');
+                closePopup();
+            } catch (error) {
+                console.error('Error creating post:', error);
+            }
         } else {
-            alert("Please add a description or image before posting.");
+            alert('Please add a description or image before posting.');
         }
     };
+
+
     const [isPopupOpen, setPopupOpen] = useState(false);
     const [eventTitle, setEventTitle] = useState("");
     const [eventDescription, setEventDescription] = useState("");
@@ -204,31 +335,56 @@ const GroupPage = () => {
 
         return <IconComponent />;
     };
-    const handleCreateEvent = () => {
+
+    const formatDateTime = (dateTimeStr: string): string => {
+        const date = new Date(dateTimeStr);
+        return date.toISOString(); // Converts to "2024-10-09T22:19:00.000Z"
+    };
+    const handleCreateEvent = async () => {
         if (eventTitle && eventDescription && eventDateTime) {
             const eventOptions = options.map(option => ({
-                name: option.name,
-                icon: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
-
+                option: option.name,
+                icon_name: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
             }));
 
-            console.log("Event Created: ");
-            console.log("Title: ", eventTitle);
-            console.log("Description: ", eventDescription);
-            console.log("Date and Time: ", eventDateTime);
-            console.log("Options: ", eventOptions);
-            console.log(getIconComponent(eventOptions[0].icon));
+            const eventData = {
+                title: eventTitle,
+                description: eventDescription,
+                group_id: parseInt(id, 10), // Convert id to an integer
+                options: eventOptions,
+                time: formatDateTime(eventDateTime) // Ensure this is in ISO 8601 format, e.g., "2023-10-15T14:30:00Z"
+            };
 
-            // Reset the fields after creating the event
-            setEventTitle("");
-            setEventDescription("");
-            setEventDateTime("");
-            setOptions([{ name: "", icon: <FaIcons.FaQuestionCircle /> }]); // Reset options
-            closePopup();
+            try {
+                const response = await fetch('http://localhost:8080/group/event/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include', // This is the key to include cookies
+                    body: JSON.stringify(eventData),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+
+                console.log("Event created successfully:");
+
+                // Reset the fields after creating the event
+                setEventTitle("");
+                setEventDescription("");
+                setEventDateTime("");
+                setOptions([{ name: "", icon: <FaIcons.FaQuestionCircle /> }]); // Reset options
+                closePopup();
+            } catch (error) {
+                console.error("Error creating event:", error);
+            }
         } else {
             alert("Please fill in all fields.");
         }
     };
+
     const addOption = () => {
         if (options.length < 3) {
             setOptions([...options, { name: "", icon: <FaIcons.FaQuestionCircle /> }]);
@@ -292,6 +448,55 @@ const GroupPage = () => {
         </div>
     );
 
+    const [profileData, setProfileData] = useState([]);
+
+    useEffect(() => {
+        const getData = async () => {
+            const data = await fetchGroupData();
+            console.log(data);
+            if (data.Group.is_user_member == true) {
+                setIsMember(true)
+            } else {
+                setIsMember(false)
+            }
+            console.log(data.Group.is_user_member)
+            setProfileData(data);
+        };
+
+        getData();
+    }, []);
+
+    const [groupEvent, setGroupEvent] = useState([]);
+    const [membersToInvite, setMembersToInvite] = useState([]);
+
+
+    useEffect(() => {
+        const getData = async () => {
+            const data = await fetchEventData();
+            console.log(data);
+            setGroupEvent(data);
+        };
+
+        getData();
+    }, []);
+
+
+    useEffect(() => {
+        const getData = async () => {
+            const data = await fetchMembers();
+            console.log(data);
+            setMembersToInvite(data);
+        };
+
+        getData();
+    }, []);
+
+    // Filtered members based on the search term
+    const filteredMembers = membersToInvite.filter(member =>
+        member.username && member.username.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+
     return (
         <div className="group-page-container">
             {/* Profile Header */}
@@ -302,33 +507,39 @@ const GroupPage = () => {
                         alt="Avatar"
                         className="profile-avatar"
                     />
-                    <div className="profile-details">
-                        <h1 className="profile-name">Fredy Mercury</h1>
-                        <p className="profile-desc">
-                            Alzea Arafat, an Indonesian-based senior UI/UX designer with more than 10 years of experience in various industries from early-stage startups to unicorns. His hobby is playing games.
-                        </p>
-                        <div className="profile-follow-info">
-                            <span>1.25k Member</span>
+                    {profileData.Group &&
+                        <div className="profile-details">
+                            <h1 className="profile-name">{profileData.Group.title}</h1>
+                            <p className="profile-desc">
+                                {profileData.Group.description}                        </p>
+                            <div className="profile-follow-info">
+                                {profileData.Members &&
+
+                                    <span>{profileData.Members ? profileData.Members.length : 0} Member</span>}
+                            </div>
                         </div>
-                    </div>
+                    }
                 </div>
-                <div className="button-container">
-                    <button className="expandable-button button-1" onClick={() => setIsPostPopupOpen(true)}>
-                        <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} />
-                        <span>Create Post</span>
-                    </button>
+                {profileData && isMember && (
+                    <div className="button-container">
+                        <button className="expandable-button button-1" onClick={() => setIsPostPopupOpen(true)}>
+                            <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} />
+                            <span>Create Post</span>
+                        </button>
 
-                    <button className="expandable-button button-2" onClick={openPopup} >
-                        <FontAwesomeIcon icon={faCalendarDays} className="icon" style={{ color: '#4CAF50' }} />
-                        <span style={{ color: '#4CAF50' }}>Create Event</span>
-                    </button>
+                        <button className="expandable-button button-2" onClick={openPopup} >
+                            <FontAwesomeIcon icon={faCalendarDays} className="icon" style={{ color: '#4CAF50' }} />
+                            <span style={{ color: '#4CAF50' }}>Create Event</span>
+                        </button>
 
-                    <button className="expandable-button button-3" onClick={toggleList}>
-                        <FontAwesomeIcon icon={faUser} className="icon" style={{ color: ' #2196F3' }} />
-                        <span style={{ color: ' #2196F3' }}>Invite Member</span>
-                    </button>
-                </div>
+                        <button className="expandable-button button-3" onClick={toggleList}>
+                            <FontAwesomeIcon icon={faUser} className="icon" style={{ color: ' #2196F3' }} />
+                            <span style={{ color: ' #2196F3' }}>Invite Member</span>
+                        </button>
+                    </div>)
+                }
             </div>
+
 
             {/* Navigation Bar */}
             <div className="list-bar">
@@ -362,12 +573,12 @@ const GroupPage = () => {
 
             {/* Main Content Area */}
             <div className="content-area">
-                {activeTab === 'Events' && (
+                {activeTab === 'Events' && profileData.Group && profileData.Group.is_user_member && groupEvent && (
                     <div className="events-section">
                         <div className="group-card-container">
-                            {groupData.map((group) => (
+                            {groupEvent.map((group) => (
                                 <div key={group.id} className="group-card">
-                                    <img src={group.image} alt={group.name} className="group-image" />
+                                    <img src={profileData.Group.image_url} alt={profileData.Group.image_url} className="group-image" />
 
                                     <div className="group-details">
                                         <div className="event-icons">
@@ -376,12 +587,13 @@ const GroupPage = () => {
                                             <span className="icon-cross">❌</span>
                                         </div>
 
-                                        <p className="group-date"><i className="icon-calendar"></i> {group.date}</p>
-                                        <h3 className="eventTitle">{group.name}</h3>
-                                        <p className="group-location">{group.location}</p>
+                                        <p className="group-date"><i className="icon-calendar"></i> {group.created_at}</p>
+                                        <h3 className="eventTitle">{group.title}</h3>
+                                        <p className="group-location">{group.description
+                                        }</p>
 
                                         {/* Display images of friends, showing only the first three and a + if there are more */}
-                                        <p className="group-friends">
+                                        {/* <p className="group-friends">
                                             <i className="icon-friends"></i>
                                             {group.friends.slice(0, 3).map((friend, index) => (
                                                 <img key={index} src={friend} alt={`Friend ${index + 1}`} className="friend-image" />
@@ -392,7 +604,7 @@ const GroupPage = () => {
                                             {group.friends.length <= 3 && (
                                                 <span className="frindsText">{group.friends.length} friends are going</span>
                                             )}
-                                        </p>
+                                        </p> */}
                                     </div>
                                 </div>
                             ))}
@@ -413,21 +625,21 @@ const GroupPage = () => {
                                 alignItems: "center",
                             }}
                         >
-                            {postsData.map((post, index) => (
+                            {profileData.Posts && profileData.Posts.map((post, index) => (
                                 <Post index={post.groupName} post={post} />
                             ))}
                         </div>
                     </div>
                 )}
-                {activeTab === 'Members' && (
+                {activeTab === 'Members' && profileData.Members && (
                     <div className="members-section">
                         <ul className="member-list">
-                            {members.map((member) => (
+                            {profileData.Members.map((member) => (
                                 <li key={member.id} className="member-item">
-                                    <img src={member.image} alt={member.name} className="member-image" />
+                                    <img src={member.image_url} alt={member.username} className="member-image" />
                                     <div className="member-details">
-                                        <h3 className="member-name">{member.name}</h3>
-                                        <p className="member-username">{member.username}</p> {/* Username added here */}
+                                        <h3 className="member-name">{member.username}</h3>
+                                        <p className="member-username">{member.nickname}</p> {/* Username added here */}
                                     </div>
                                 </li>
                             ))}
@@ -446,7 +658,7 @@ const GroupPage = () => {
             </div>
 
             {/* Expandable div */}
-            {isOpen && (
+            {isOpen && profileData.Group.is_user_member && (
                 <div className="popup">
                     <div className="popup-header">
                         <h3>Members</h3>
@@ -469,11 +681,11 @@ const GroupPage = () => {
                     <div className="member-list">
                         {filteredMembers.map((member, index) => (
                             <div className="member" key={index}>
-                                <img src="https://picsum.photos/40/40?random=19" alt={member.name} className="member-avatar" />
+                                <img src="https://picsum.photos/40/40?random=19" alt={member.nickname} className="member-avatar" />
                                 <div className="member-info">
-                                    <p className='memberName'>{member.name}</p>
-                                    <p>{member.email}</p>
-                                    <button className="invite">Invite</button>
+                                    <p className='memberName'>{member.nickname}</p>
+                                    <p>{member.username}</p>
+                                    <button className="invite" onClick={() => sendInvite(member.id)}>Invite</button>
                                 </div>
                             </div>
                         ))}
@@ -484,7 +696,7 @@ const GroupPage = () => {
 
 
             {/* Expandable div for Create Post Popup */}
-            {isPostPopupOpen && (
+            {isPostPopupOpen && profileData.Group.is_user_member && (
                 <div className="popup">
                     <div className="popup-header">
                         <h3>Create a Post</h3>
@@ -526,7 +738,7 @@ const GroupPage = () => {
                 </div>
             )}
 
-            {isPopupOpen && (
+            {isPopupOpen && profileData.Group.is_user_member && (
                 <>
                     <div className="overlay" onClick={closePopup}></div>
                     <div className="popup">
@@ -788,7 +1000,7 @@ const GroupPage = () => {
 
 .group-image {
     width: 100%;
-    height: 150px;
+    min-height: 150px;
     object-fit: cover;
 }
 
@@ -899,6 +1111,8 @@ const GroupPage = () => {
     list-style-type: none;
     padding: 0;
     margin: 0;
+    overflow-y: scroll;
+    max-height: 600px;
 }
 
 .member-item {
@@ -1471,6 +1685,12 @@ const postsData = [
     {
         groupName: "Dribbble Shots Community",
         groupImage: 'https://picsum.photos/200/300?random=5',
+        group: {
+            title: "hello",
+        },
+        author: {
+            nickname: "hello",
+        },
         username: "Jonathan",
         userImage: "https://picsum.photos/200/300?random=2",
         time: "Just Now",
@@ -1479,6 +1699,12 @@ const postsData = [
     },
     {
         groupName: "Code Newbie",
+        group: {
+            title: "hello",
+        },
+        author: {
+            nickname: "hello",
+        },
         groupImage: 'https://picsum.photos/200/300?random=5',
         username: "Alice",
         userImage: "https://picsum.photos/200/300?random=5",
@@ -1489,6 +1715,12 @@ const postsData = [
     // Extra posts
     {
         groupName: "Creative Designers",
+        group: {
+            title: "hello",
+        },
+        author: {
+            nickname: "hello",
+        },
         groupImage: 'https://picsum.photos/200/300?random=5',
         username: "Eve",
         userImage: "https://picsum.photos/200/300?random=8",

@@ -11,48 +11,50 @@ var userLimiter *UserRateLimiter
 
 func GoLive() {
 	userLimiter = NewUserRateLimiter()
+	mux := http.NewServeMux()
 
-	http.HandleFunc("/", HomePageHandler)
-	http.HandleFunc("/postPage", PostPageHandler) //  DONE >>>>>	return the group Page view || checked
-	http.HandleFunc("/login", LoginHandler)       //  DONE >>>>>	login function || checked
-	http.HandleFunc("/logout", LogoutHandler)
-	// http.HandleFunc("/signup", SignupHandler)
-	// http.HandleFunc("/socket", socketHanddler)
+	mux.HandleFunc("/", HomePageHandler)
+	mux.HandleFunc("/postPage", PostPageHandler) //  DONE >>>>>	return the group Page view || checked
+	mux.HandleFunc("/login", LoginHandler)       //  DONE >>>>>	login function || checked
+	mux.HandleFunc("/logout", LogoutHandler)
+	// mux.HandleFunc("/signup", SignupHandler)
+	// mux.HandleFunc("/socket", socketHanddler)
 
 	// ///// the /post api's
-	http.HandleFunc("/post/", PostHandler)
-	// http.HandleFunc("/post/addReaction", AddReactionHandler)       //  DONE >>>>>	to add a reaction to a post || checked
-	// http.HandleFunc("/post/removeReaction", RemoveReactionHandler) //  DONE >>>>>	to remove a reaction from a post || checked
-	// http.HandleFunc("/post/addComment/", AddCommentHandler)        //  Done >>>>>	to add a comment to a post || checked
-	// http.HandleFunc("/post/createPost/", CreatePostHandler)        //  DONE >>>>>	to create a post || checked
+	mux.HandleFunc("/post/", PostHandler)
+	// mux.HandleFunc("/post/addReaction", AddReactionHandler)       //  DONE >>>>>	to add a reaction to a post || checked
+	// mux.HandleFunc("/post/removeReaction", RemoveReactionHandler) //  DONE >>>>>	to remove a reaction from a post || checked
+	// mux.HandleFunc("/post/addComment/", AddCommentHandler)        //  Done >>>>>	to add a comment to a post || checked
+	// mux.HandleFunc("/post/createPost/", CreatePostHandler)        //  DONE >>>>>	to create a post || checked
 
 	///// the /group api's
-	http.HandleFunc("/group/", GroupHandler)
-	// http.HandleFunc("/group/messages", GroupChatsHandler)                    //  DONE >>>>>	to return the messages between two users  || checked
-	// http.HandleFunc("/group/list/", GroupsHandler)                           //  DONE >>>>>	list to all groups/requested/invited/joined groups || checked
-	// http.HandleFunc("/group/createGroup", CreateGroupHandler)                //  DONE >>>>>	to create a group || checked
-	// http.HandleFunc("/group/requestToJoin", JoinGroupHandler)                //  DONE >>>>>	to request joing a group || checked
-	// http.HandleFunc("/group/leaveGroup", LeaveGroupHandler)                  //  DONE >>>>>	to leave a group || checked
-	// http.HandleFunc("/group/page", GroupPageHandler)                         //  DONE >>>>>	to return the group page || checked
-	// http.HandleFunc("/group/inviteUser", InviteUserHandler)                  //  DONE >>>>>	to Add user Invite || checked
-	// http.HandleFunc("/group/event/list/", ListEventHandler)                  //  DONE >>>>>	to list the events , all the events for the user in the groups page , and the group event for the group page || checked
-	// http.HandleFunc("/group/event/create", CreateEventHandler)               //  DONE >>>>>	to create an event || checked
-	// http.HandleFunc("/group/event/userResponse", CreateEventResponseHandler)
+	mux.HandleFunc("/group/", GroupHandler)
+	// mux.HandleFunc("/group/messages", GroupChatsHandler)                    //  DONE >>>>>	to return the messages between two users  || checked
+	// mux.HandleFunc("/group/list/", GroupsHandler)                           //  DONE >>>>>	list to all groups/requested/invited/joined groups || checked
+	// mux.HandleFunc("/group/createGroup", CreateGroupHandler)                //  DONE >>>>>	to create a group || checked
+	// mux.HandleFunc("/group/requestToJoin", JoinGroupHandler)                //  DONE >>>>>	to request joing a group || checked
+	// mux.HandleFunc("/group/leaveGroup", LeaveGroupHandler)                  //  DONE >>>>>	to leave a group || checked
+	// mux.HandleFunc("/group/page", GroupPageHandler)                         //  DONE >>>>>	to return the group page || checked
+	// mux.HandleFunc("/group/inviteUser", InviteUserHandler)                  //  DONE >>>>>	to Add user Invite || checked
+	// mux.HandleFunc("/group/event/list/", ListEventHandler)                  //  DONE >>>>>	to list the events , all the events for the user in the groups page , and the group event for the group page || checked
+	// mux.HandleFunc("/group/event/create", CreateEventHandler)               //  DONE >>>>>	to create an event || checked
+	// mux.HandleFunc("/group/event/userResponse", CreateEventResponseHandler)
 
 	///// the /user api's
-	http.HandleFunc("/user/profile/", ProfilePageHandler)
-	http.HandleFunc("/user/notifications/", NotificationsHandler)
-	http.HandleFunc("/user/responds/", UserResponde)
+	mux.HandleFunc("/user/profile/", ProfilePageHandler)
+	mux.HandleFunc("/user/notifications/", NotificationsHandler)
+	mux.HandleFunc("/user/responds/", UserResponde)
 
-	http.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
-	http.HandleFunc("/user/Chats", UserChatsHandler)            // to return the chats of the user
+	mux.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
+	mux.HandleFunc("/user/Chats", UserChatsHandler)            // to return the chats of the user
 
-	//http.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //// to return the users that can be talked with
-	// http.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)        // to return the user information that will be showen in the front
-	// http.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler)       // to update the user information
+	//mux.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //// to return the users that can be talked with
+	// mux.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)        // to return the user information that will be showen in the front
+	// mux.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler)       // to update the user information
+	corsWrappedMux := Cors(mux)
 
 	fmt.Println("Server is running on http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", corsWrappedMux)
 }
 
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {
