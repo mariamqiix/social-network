@@ -22,7 +22,6 @@ func IsValidEmail(email string) bool {
 
 func GetUser(r *http.Request) *structs.User {
 	sessionCookie, err := r.Cookie("session")
-	fmt.Println(sessionCookie)
 	if err == http.ErrNoCookie {
 		return nil
 	}

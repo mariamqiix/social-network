@@ -38,6 +38,7 @@ export default function Page() {
                 justifyContent: "center",
                 alignItems: "center",
                 height: "auto",
+                minHeight: "980px",
                 overflowX: "hidden",
                 backgroundColor: "#f0f4f7", // Light background
             }}
@@ -171,6 +172,14 @@ export default function Page() {
                         </div>
                     </div>
                 ))}
+                {!(groupEvent) && (
+                        <span style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            height: '100%', // Adjust height as needed
+                        }}>no events</span>
+                )}
             </div>
             <div
                 id="group-post"
@@ -184,6 +193,7 @@ export default function Page() {
                     justifyContent: "center",
                     alignItems: "center",
                     backgroundColor: "#f0f4f7",
+                    minHeight: "400px",
                 }}
             >
                 {groupData.Posts && groupData.Posts.map((post, index) => (
@@ -191,10 +201,11 @@ export default function Page() {
                 ))}
             </div>
             <style jsx>{`
+
                 .group-card-container {
                         width: 95%; /* Set initial width to 95% */
                         margin-left: 2.5%;
-                        margin-top: 2.5%;
+                        margin-top: 20px;
                         display: flex;
                         overflow-x: scroll;
                         gap: 20px;
@@ -206,10 +217,11 @@ export default function Page() {
                     }
 
             .event-card-container {
+                            min-height: 250px;
                 display: flex;
                 width:95%;
                 margin-left: 2.5%;
-                margin-top: 1.5%;
+                margin-top: 15px;
                 overflow-x: scroll;
                 gap: 20px;
                 height:auto;

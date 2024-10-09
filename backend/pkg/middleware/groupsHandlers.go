@@ -54,7 +54,6 @@ func GroupHandler(w http.ResponseWriter, r *http.Request) {
 		CreateEventResponseHandler(w, r)
 		return
 	case "UsersToInvite":
-		fmt.Print("hellooooooo\n")
 		UsersToInviteHandler(w, r)
 		return
 	default:
@@ -83,7 +82,6 @@ func UsersToInviteHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	users, err := models.GetUsersToInvite(sessionUser.ID, groupId)
 	if err != nil {
-		fmt.Println(err)
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
@@ -152,7 +150,6 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 				errorServer(w, http.StatusInternalServerError)
 			}
 		default:
-			fmt.Print("hello youuu ")
 			groups = AllGroups
 		}
 		view := GroupsHomePageView{
@@ -214,7 +211,6 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 // // join group functoin
 func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
-	fmt.Print("request")
 	if sessionUser == nil {
 		errorServer(w, http.StatusBadRequest)
 		return
@@ -259,10 +255,11 @@ func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.RemoveMember(sessionUser.ID, groupID)
+	err = models.RemoveMember(groupID, sessionUser.ID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 	}
+	fmt.Print(sessionUser.ID, groupID)
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -338,7 +335,6 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 
 // //invite user function
 func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Print("hello\n\n\n\n\n\nheeeey\n")
 	sessionUser := GetUser(r)
 	if sessionUser == nil {
 		errorServer(w, http.StatusBadRequest)
@@ -350,7 +346,6 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
-	fmt.Print(Invite)
 	err = models.AddInviteToGroup(Invite.GroupID, Invite.UserID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
@@ -455,7 +450,6 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	var eventRequest structs.EventRequest
 	err := json.NewDecoder(r.Body).Decode(&eventRequest)
-	fmt.Print(eventRequest)
 	if err != nil {
 		fmt.Println(err)
 		errorServer(w, http.StatusBadRequest)
