@@ -1,12 +1,12 @@
 'use client'; // Add this line at the very top to mark the component as a Client Component
 import React, { useState, ReactElement } from 'react';
-import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
+import Post from '../components/GroupPostContent'; // Adjust the path if necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
-import "./groupPage.css";
 
 import * as FaIcons from 'react-icons/fa'; // Import all FontAwesome icons
 import * as MdIcons from 'react-icons/md'; // Import all Material Design icons
+import { Icon } from 'next/dist/lib/metadata/types/metadata-types';
 const groupData = [
     {
         id: 1,
@@ -97,7 +97,7 @@ const groupData = [
 ];
 
 
-const GroupPage = () => {
+export function GroupPage() {
     const [activeTab, setActiveTab] = useState('Posts');
 
     const [isMember, setIsMember] = useState(true); // Set this based on the group membership
@@ -204,6 +204,7 @@ const GroupPage = () => {
 
         return <IconComponent />;
     };
+
     const handleCreateEvent = () => {
         if (eventTitle && eventDescription && eventDateTime) {
             const eventOptions = options.map(option => ({
@@ -608,9 +609,7 @@ const GroupPage = () => {
             {/* Embedded CSS */}
             <style jsx>{`
             /* Container Styles */
-
-
-            .invite {
+.invite {
     float: right;
     background-color: #f35366;
     color: white;
@@ -1336,7 +1335,6 @@ const GroupPage = () => {
     color: #aaa;
     cursor: not-allowed;
 }
-    
             .button-container {
                 position: absolute;
                 /* Position it absolutely within the profile-header */
@@ -1444,10 +1442,6 @@ const GroupPage = () => {
     );
 };
 
-
-
-
-export default GroupPage;
 
 const members = [
     {

@@ -2,6 +2,7 @@
 import Post from "../components/GroupPostContent"; // Adjust the path if necessary
 import { randomColor } from "../components/colors";
 export default function Page() {
+
     return (
         <div
             id="groups"
@@ -10,29 +11,18 @@ export default function Page() {
                 justifyContent: "center",
                 alignItems: "center",
                 height: "auto",
-                overflowY: "hidden",
+                overflowX: "hidden",
                 backgroundColor: "#f0f4f7", // Light background
             }}
         >
-            <a href="/groups/groupPage"> <div
+        <div
                 className="group-card-container"
-                style={{
-                    marginLeft: "2.5%",
-                    marginTop: "2.5%",
-                    top: "0%",
-                    display: "flex",
-                    overflowX: "scroll",
-                    gap: "20px",
-                    minHeight: "190px",
-                    width: "95%",
-                    padding: "20px",
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                    backgroundColor: "white",
-                    borderRadius: "20px",
-                }}
+
             >
                 {groupData.map((group, index) => (
+                                            
                     <div
+                        onClick={() => window.location.href = './groups/groupPage'}
                         key={index}
                         style={{
                             minWidth: "450px",
@@ -116,9 +106,45 @@ export default function Page() {
                         {/* Full description div, initially hidden */}
                         <div className="full-description">{group.description}</div>
                     </div>
+                    
+
+                    
                 ))}
             </div>
-            </a>
+
+            <div className="event-card-container">
+                {groupEvent.map((group) => (
+                    <div key={group.id} className="event-card">
+                        <img src={group.image} alt={group.name} className="group-image" />
+
+                        <div className="group-details">
+                            <div className="event-icons">
+                                <span className="icon-check">✔️</span>
+                                <span className="icon-heart">❤️</span>
+                                <span className="icon-cross">❌</span>
+                            </div>
+
+                            <p className="group-date"><i className="icon-calendar"></i> {group.date}</p>
+                            <h3 className="eventTitle">{group.name}</h3>
+                            <p className="group-location">{group.location}</p>
+
+                            {/* Display images of friends, showing only the first three and a + if there are more */}
+                            <p className="group-friends">
+                                <i className="icon-friends"></i>
+                                {group.friends.slice(0, 3).map((friend, index) => (
+                                    <img key={index} src={friend} alt={`Friend ${index + 1}`} className="friend-image" />
+                                ))}
+                                {group.friends.length > 3 && (
+                                    <span className="frindsText"> + {group.friends.length - 3} friends are going</span>
+                                )}
+                                {group.friends.length <= 3 && (
+                                    <span className="frindsText">{group.friends.length} friends are going</span>
+                                )}
+                            </p>
+                        </div>
+                    </div>
+                ))}
+            </div>
             <div
                 id="group-post"
                 style={{
@@ -137,6 +163,156 @@ export default function Page() {
                     <Post index={post.groupName} post={post} />
                 ))}
             </div>
+            <style jsx>{`
+                .group-card-container {
+                        width: 95%; /* Set initial width to 95% */
+                        margin-left: 2.5%;
+                        margin-top: 2.5%;
+                        display: flex;
+                        overflow-x: scroll;
+                        gap: 20px;
+                        min-height: 190px;
+                        padding: 20px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                        background-color: white;
+                        border-radius: 20px;
+                    }
+
+            .event-card-container {
+                display: flex;
+                width:95%;
+                margin-left: 2.5%;
+                margin-top: 1.5%;
+                overflow-x: scroll;
+                gap: 20px;
+                height:auto;
+                padding: 20px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                background-color: white;
+                border-radius: 20px;
+            }
+
+            .event-card {
+                background: #fff;
+                border-radius: 20px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                transition: transform 0.3s ease;
+                min-width: 310px;
+                position: relative;
+                height: 410px;
+                padding-bottom: 15px;
+            }
+
+            .event-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .group-image {
+                width: 100%;
+                height: 150px;
+                position:relative;
+                object-fit: cover;
+            }
+
+            .group-details {
+                padding: 15px;
+                text-align: center;
+            }
+
+            .event-icons {
+                position: absolute;
+                top: 115px;
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+                margin: 10px 0;
+                margin-bottom: 10px;
+            }
+
+            .icon-check,
+            .icon-heart,
+            .icon-cross {
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                /* Shadow effect */
+                background-color: rgba(255, 255, 255, 0.9);
+                border-radius: 50%;
+                padding: 10px;
+                font-size: 20px;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            }
+
+            .icon-check:hover,
+            .icon-heart:hover,
+            .icon-cross:hover {
+                transform: scale(1.2);
+            }
+
+            .group-date {
+                margin-top: 25px;
+                font-size: 14px;
+                color: #888;
+                margin-bottom: 20px;
+            }
+
+            .group-location,
+            .group-attendees,
+            .group-friends {
+                font-size: 14px;
+                color: #555;
+                margin-bottom: 10px;
+            }
+
+            .icon-calendar,
+            .icon-friends {
+                margin-right: 5px;
+            }
+
+            .group-friends {
+                position: absolute;
+                bottom: 10px;
+                display: flex;
+                /* Makes the content inline */
+                align-items: center;
+                /* Aligns text and images vertically */
+                font-size: 14px;
+                /* Adjust font size as needed */
+                color: #888;
+                /* Text color */
+            }
+
+            .friends-images {
+                display: flex;
+                /* Arrange images in a row */
+                margin-right: 5px;
+                /* Space between images and text */
+            }
+
+            .friend-image {
+                width: 30px;
+                /* Adjust as needed */
+                height: 30px;
+                /* Adjust as needed */
+                border-radius: 50%;
+                /* Makes the image circular */
+                margin-top: -10px;
+                /* Overlap images */
+                margin-left: 5px;
+                /* Space between images */
+                position: relative;
+                /* Required for absolute positioning */
+            }
+
+            .eventTitle {
+                font-size: auto;
+            }
+
+            .frindsText {
+                float: left;
+                margin-left: 5px;
+            }
+
+            `}</style>
         </div>
     );
 }
@@ -235,4 +411,94 @@ const postsData = [
         postImage: "https://picsum.photos/200/300?random=12",
     },
     // Add more posts as needed
+];
+
+
+const groupEvent = [
+    {
+        id: 1,
+        image: 'https://picsum.photos/200/300?random=5',
+        name: 'Eat Corn on the Cob',
+        description: 'Join us for a fun event filled with delicious corn and great company!',
+        date: 'Tue, Jan 9, 5:00 PM',
+        location: 'Austin, TX',
+        attendees: 256,
+        friends: [
+            'https://picsum.photos/40/40?random=1', // Friend 1
+            'https://picsum.photos/40/40?random=2', // Friend 2
+            'https://picsum.photos/40/40?random=3', // Friend 3
+            'https://picsum.photos/40/40?random=4', // Friend 4
+        ],
+    },
+    {
+        id: 2,
+        image: 'https://picsum.photos/200/300?random=5',
+        name: 'Wine Tasting Experience',
+        description: 'Explore a variety of wines in a beautiful vineyard setting.',
+        date: 'Sun, Feb 15, 3:00 PM',
+        location: 'Napa Valley, CA',
+        attendees: 150,
+        friends: [
+            'https://picsum.photos/40/40?random=5', // Friend 1
+            'https://picsum.photos/40/40?random=6', // Friend 2
+        ],
+    },
+    {
+        id: 3,
+        image: 'https://picsum.photos/200/300?random=5',
+        name: 'Live Music Night',
+        description: 'Enjoy live performances from local bands at the park.',
+        date: 'Sat, Mar 21, 6:00 PM',
+        location: 'Central Park, NY',
+        attendees: 300,
+        friends: [
+            'https://picsum.photos/40/40?random=7', // Friend 1
+            'https://picsum.photos/40/40?random=8', // Friend 2
+            'https://picsum.photos/40/40?random=9', // Friend 3
+        ],
+    },
+    {
+        id: 4,
+        image: 'https://picsum.photos/200/300?random=5',
+        name: 'Cooking Class',
+        description: 'Learn to cook delicious dishes from around the world!',
+        date: 'Wed, Apr 12, 2:00 PM',
+        location: 'Chicago, IL',
+        attendees: 85,
+        friends: [
+            'https://picsum.photos/40/40?random=10', // Friend 1
+            'https://picsum.photos/40/40?random=11', // Friend 2
+            'https://picsum.photos/40/40?random=12', // Friend 3
+            'https://picsum.photos/40/40?random=13', // Friend 4
+        ],
+    },
+    {
+        id: 5,
+        image: 'https://picsum.photos/200/300?random=5',
+        name: 'Yoga Retreat',
+        description: 'Relax and rejuvenate at a peaceful yoga retreat.',
+        date: 'Sat, May 25, 10:00 AM',
+        location: 'Sedona, AZ',
+        attendees: 120,
+        friends: [
+            'https://picsum.photos/40/40?random=14', // Friend 1
+            'https://picsum.photos/40/40?random=15', // Friend 2
+            'https://picsum.photos/40/40?random=16', // Friend 3
+            'https://picsum.photos/40/40?random=17', // Friend 4
+        ],
+    },
+    {
+        id: 6,
+        image: 'https://picsum.photos/200/300?random=5',
+        name: 'Photography Workshop',
+        description: 'Join us for a hands-on photography workshop in nature.',
+        date: 'Sun, Jun 30, 1:00 PM',
+        location: 'Yosemite, CA',
+        attendees: 75,
+        friends: [
+            'https://picsum.photos/40/40?random=18', // Friend 1
+            'https://picsum.photos/40/40?random=19', // Friend 2
+            'https://picsum.photos/40/40?random=20', // Friend 3
+        ],
+    },
 ];
