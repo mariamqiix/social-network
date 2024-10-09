@@ -36,7 +36,7 @@ export default function Home() {
     fetch("http://localhost:8080").then(res => {
       res.json().then(data => {
         data.Posts.forEach((post: any) => {
-          dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [post.image_url], likes: post.likes.count }));
+          dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [], likes: post.likes.count }));
         });
       });
     });
@@ -86,7 +86,7 @@ export default function Home() {
             images={post.images}
             id={post.id.toString()}
           />
-          <PostActions likes={post.likes} />
+          <PostActions likes={post.likes} id={post.id} />
         </div>
       ))}
     </main>

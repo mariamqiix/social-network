@@ -7,43 +7,36 @@ import PostActions from '../../components/PostActions';
 import CommentList from '../../components/CommentList';
 import { useEffect, useState } from "react";
 import ProgressBar from "@/app/components/progress_bar";
+import { Post } from "@/app/types/Types";
 
 export default function Page() {
-  // const posts = useSelector(selectPosts);
   const id = usePathname().split("/")[2];
-  // const likes = 1;
-  // const comments = [
-  //   {
-  //     author: {
-  //       name: "Vitaliy Boyko",
-  //       avatar: "/placeholder.jpg",
-  //     },
-  //     content: "That's very nice! enjoy your time.",
-  //     time: "15 minutes ago",
-  //     likes: "4 likes"
-  //   },
-  //   {
-  //     author: {
-  //       name: "John Wick",
-  //       avatar: "/placeholder.jpg",
-  //     },
-  //     content: "Hello, what an adventure.",
-  //     time: "1 day ago",
-  //     likes: "126 likes"
-  //   }
-  // ];
-  const [post, setPost] = useState(null)
-  console.log("http://localhost:8080/postPage/" + id);
+  type Comment =
+    {
+      author: {
+        name: string,
+        avatar: string,
+      },
+      content: string,
+      time: string,
+      likes: number
+    };
+  const [comments, setComments] = useState<null | Comment[]>(null);
+  const [post, setPost] = useState<null | Post>(null)
   useEffect(() => {
-    fetch("http://localhost:8080/postPage/" + id, { credentials: 'include' }).then((res) => {
+    fetch("http://localhost:8080/postPage?id=" + id, { credentials: 'include' }).then((res) => {
       res.json().then((data) => {
         console.log(data);
-        // setPost(data);
+        let newPost: Post = { id: data.Posts.id, author: { name: data.Posts.author.username, avatar: "/placeholder.jpg" }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : [], likes: data.Posts.likes.count };
+        setPost(newPost);
+        if (data.Comments) {
+          setComments(data.Comments.map((comment: any) => ({ author: { name: comment.author.username, avatar: comment.author.image_url }, content: comment.content, time: comment.created_at, likes: comment.likes.count })));
+        }
       });
     });
   }, [fetch]);
   if (post == null) {
-    return <ProgressBar progress={1}/>;
+    return <ProgressBar progress={1} />;
   } else if (post != null) {
     return (
       <div className="container my-4">
@@ -60,11 +53,11 @@ export default function Page() {
             />
 
             {/* Post Actions */}
-            <PostActions likes={15} />
+            <PostActions likes={post.likes} id={post.id} />
 
             {/* Comments Section */}
             <div className="mt-4">
-              {/* <CommentList comments={comments} /> */}
+              <CommentList comments={comments} />
             </div>
           </div>
         </div>
