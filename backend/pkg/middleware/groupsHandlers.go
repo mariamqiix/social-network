@@ -227,7 +227,7 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.AddUserRequestJoinGroup(sessionUser.ID, groupID)
+	err = models.AddUserRequestJoinGroup(groupID, sessionUser.ID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
@@ -310,12 +310,13 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		writeToJson(view, w)
 		return
 	}
-
+	fmt.Print(groupId)
 	posts, err := models.GetGroupPosts(groupId)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
+	fmt.Print((posts))
 
 	groupMembers, err := models.GetGroupMembers(groupId)
 	if err != nil {

@@ -1,13 +1,23 @@
 'use client'; // Add this line at the very top to mark the component as a Client Component
+import { User } from "../../types/Types";
+import "../../../../public/groupPage.css";
+import * as FaIcons from 'react-icons/fa';
+import * as MdIcons from 'react-icons/md';
+import Post from '../../components/GroupPostContent';
 import React, { useState, ReactElement, useEffect } from 'react';
-import Post from '../../components/GroupPostContent'; // Adjust the path if necessary
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GroupPageView, GroupEventResponse } from "../../types/Types";
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
-import "./groupPage.css";
 import { RequestToJoin, sendInvite, fetchEventData, fetchMembers, fetchGroupData, LeaveGroup } from "./fetching";
-import * as FaIcons from 'react-icons/fa'; // Import all FontAwesome icons
-import * as MdIcons from 'react-icons/md'; // Import all Material Design icons
-import { GroupPageView } from "../../types/Types";
+
+
+
+
+
+const query = new URLSearchParams(window.location.search);
+const id = query.get('id') || ''; // Get the 'id' from the query string and ensure it's a string
+
+
 
 
 const GroupPage = () => {
@@ -33,7 +43,7 @@ const GroupPage = () => {
                 }, []);
 
 
-                const [groupEvent, setGroupEvent] = useState([]);
+                const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
 
                 useEffect(() => {
                     const getData = async () => {
@@ -76,9 +86,9 @@ const GroupPage = () => {
             },
             title: '',
             description: '',
-            imageUrl: '',
+            image_url: '',
             is_user_member: false,
-            creationDate: ''
+            created_at: ''
         },
         Members: []
     });
@@ -128,9 +138,6 @@ const GroupPage = () => {
     };
 
     const handlePostCreation = async () => {
-
-        const query = new URLSearchParams(window.location.search);
-        const id = query.get('id') || ''; // Get the 'id' from the query string and ensure it's a string
         if (description || postImage) {
             const postData = {
                 group_id: parseInt(id, 10), // Convert id to an integer
@@ -292,8 +299,8 @@ const GroupPage = () => {
         getData();
     }, []);
 
-    const [groupEvent, setGroupEvent] = useState([]);
-    const [membersToInvite, setMembersToInvite] = useState([]);
+    const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
+    const [membersToInvite, setMembersToInvite] = useState<User[]>([]);
 
 
     useEffect(() => {
@@ -452,8 +459,8 @@ const GroupPage = () => {
                                 alignItems: "center",
                             }}
                         >
-                            {profileData.Posts && profileData.Posts.map((post, index) => (
-                                <Post index={post.groupName} post={post} />
+                            {profileData.posts && profileData.posts.map((post, index) => (
+                                <Post index={post.group.title} post={post} />
                             ))}
                         </div>
                     </div>

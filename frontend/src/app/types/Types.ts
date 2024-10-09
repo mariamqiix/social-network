@@ -42,7 +42,7 @@ export type PostResponse = {
     content: string;
     author: User;
     group: GroupResponse;
-    creationDate: string; // ISO 8601 date string
+    created_at: string; // ISO 8601 date string
     image_url: string;
     likes: ReactionResponse;
     dislikes: ReactionResponse;
@@ -56,7 +56,7 @@ export type GroupResponse = {
     description: string;
     image_url: string;
     is_user_member: boolean;
-    creationDate: string; // ISO 8601 date string
+    created_at: string; // ISO 8601 date string
 };
 export type ReactionResponse = {
     didReact: boolean;
@@ -76,4 +76,29 @@ export type GroupPageView = {
     posts: PostResponse[];
     Group: GroupResponse;
     Members: BasicUserResponse[];
+};
+
+export type GroupEventResponse = {
+    id: number;
+    group: GroupResponse;
+    creator: User;
+    title: string;
+    description: string;
+    options: EventOptionsResponse[];
+    event_time: string; // ISO 8601 string format
+    created_at: string; // ISO 8601 string format
+};
+
+export type EventOptionsResponse = {
+    option: string;
+    iconName: string;
+    count: number;
+    userResponse: BasicUserResponse[];
+    didUserRespond: boolean;
+};
+
+export type GroupsHomePageView = {
+    user: User | null; // null if not logged in
+    Posts: PostResponse[] | null;
+    Groups: GroupResponse[];
 };

@@ -68,6 +68,7 @@ type GroupEventResponse struct {
 
 type EventOptionsResponse struct {
 	Option         string              `json:"option"`
+	IconNAme       string              `json:"icon"`
 	Count          int                 `json:"count"`
 	UserResponde   []BasicUserResponse `json:"users_response"`
 	DidUserRespone bool                `json:"did_user_respond"`

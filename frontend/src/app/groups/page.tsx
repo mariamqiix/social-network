@@ -1,12 +1,21 @@
 "use client";
+import "../../../public/groupsPage.css";
+import { GroupEventResponse, GroupsHomePageView } from '../types/Types';
+import Post from "../components/GroupPostContent";
 import React, { useState, useEffect } from 'react';
-
-import Post from "../components/GroupPostContent"; // Adjust the path if necessary
 import { randomColor } from "../components/colors";
-export default function Page() {
 
-    const [groupData, setGroupData] = useState([]);
-    const [groupEvent, setGroupEvent] = useState([]);
+
+
+export default function Page() {
+    const [groupData, setGroupData] = useState<GroupsHomePageView>(
+        {
+            user: null,
+            Posts: [],
+            Groups: []
+        }
+    );
+    const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
 
     useEffect(() => {
         const getData = async () => {
@@ -18,9 +27,11 @@ export default function Page() {
         getData();
     }, []);
 
+
+
     useEffect(() => {
         const getData = async () => {
-            const data = await fetchGroupData();
+            const data = await fetchGroupData('http://localhost:8080/group/list/all');
             console.log(data);
 
             setGroupData(data);
@@ -29,12 +40,20 @@ export default function Page() {
         getData();
     }, []);
 
-    console.log("\n\n\n", groupEvent);
+    const reloadGroups = async (url: string) => {
+        const data = await fetchGroupData(url);
+        setGroupData(prevState => ({
+            ...prevState,
+            Groups: data.Groups // Directly replacing the existing groups with the new ones
+        }));
+    };
+
     return (
         <div
             id="groups"
             style={{
                 display: "grid",
+                gridTemplateColumns: "1fr",
                 justifyContent: "center",
                 alignItems: "center",
                 height: "auto",
@@ -43,6 +62,20 @@ export default function Page() {
                 backgroundColor: "#f0f4f7", // Light background
             }}
         >
+            <div className="tabs">
+
+                <div className="tab-group-left">
+                    <button className="tab-button" autoFocus onClick={() => reloadGroups('http://localhost:8080/group/list/all')}>All</button>
+                    <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/joind')} >Joined</button>
+                    <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/created')}>created</button>
+                    <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/requested')}>Requested To Join</button>
+
+                </div>
+                <div className="tab-group-right">
+                    <button className="tab-button">Create New Group</button>
+                </div>
+            </div>
+
             <div
                 className="group-card-container"
 
@@ -76,7 +109,7 @@ export default function Page() {
                                 }}
                             >
                                 <img
-                                    src={group.image}
+                                    src={group.image_url}
                                     alt={group.title}
                                     style={{
                                         marginLeft: "20px",
@@ -114,7 +147,7 @@ export default function Page() {
                                             color: "#888",
                                         }}
                                     >
-                                        {group.date}
+                                        {group.created_at}
                                     </span>
                                 </div>
                             </div>
@@ -138,6 +171,21 @@ export default function Page() {
 
 
                 ))}
+                {!(groupData.Groups) && (
+                    <div style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%', // Full height of the container
+                        width: '100%',  // Full width of the container
+                    }}>
+                        <span style={{
+                            fontSize: '1.5rem',
+                            color: '#888',
+                        }}>No groups</span>
+                    </div>
+                )}
+
             </div>
 
             <div className="event-card-container">
@@ -173,12 +221,12 @@ export default function Page() {
                     </div>
                 ))}
                 {!(groupEvent) && (
-                        <span style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            height: '100%', // Adjust height as needed
-                        }}>no events</span>
+                    <span style={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%', // Adjust height as needed
+                    }}>no events</span>
                 )}
             </div>
             <div
@@ -197,171 +245,17 @@ export default function Page() {
                 }}
             >
                 {groupData.Posts && groupData.Posts.map((post, index) => (
-                    <Post index={post.groupName} post={post} />
+                    <Post index={post.group} post={post} />
                 ))}
             </div>
-            <style jsx>{`
-
-                .group-card-container {
-                        width: 95%; /* Set initial width to 95% */
-                        margin-left: 2.5%;
-                        margin-top: 20px;
-                        display: flex;
-                        overflow-x: scroll;
-                        gap: 20px;
-                        min-height: 190px;
-                        padding: 20px;
-                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                        background-color: white;
-                        border-radius: 20px;
-                    }
-
-            .event-card-container {
-                            min-height: 250px;
-                display: flex;
-                width:95%;
-                margin-left: 2.5%;
-                margin-top: 15px;
-                overflow-x: scroll;
-                gap: 20px;
-                height:auto;
-                padding: 20px;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-                background-color: white;
-                border-radius: 20px;
-            }
-
-            .event-card {
-                background: #fff;
-                border-radius: 20px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                transition: transform 0.3s ease;
-                min-width: 310px;
-                position: relative;
-                height: 410px;
-                padding-bottom: 15px;
-            }
-
-            .event-card:hover {
-                transform: translateY(-5px);
-            }
-
-            .group-image {
-                width: 100%;
-                min-height: 150px;
-                position:relative;
-                object-fit: cover;
-            }
-
-            .group-details {
-                padding: 15px;
-                text-align: center;
-            }
-
-            .event-icons {
-                position: absolute;
-                top: 115px;
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-                margin: 10px 0;
-                margin-bottom: 10px;
-            }
-
-            .icon-check,
-            .icon-heart,
-            .icon-cross {
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-                /* Shadow effect */
-                background-color: rgba(255, 255, 255, 0.9);
-                border-radius: 50%;
-                padding: 10px;
-                font-size: 20px;
-                cursor: pointer;
-                transition: transform 0.2s ease;
-            }
-
-            .icon-check:hover,
-            .icon-heart:hover,
-            .icon-cross:hover {
-                transform: scale(1.2);
-            }
-
-            .group-date {
-                margin-top: 25px;
-                font-size: 14px;
-                color: #888;
-                margin-bottom: 20px;
-            }
-
-            .group-location,
-            .group-attendees,
-            .group-friends {
-                font-size: 14px;
-                color: #555;
-                margin-bottom: 10px;
-            }
-
-            .icon-calendar,
-            .icon-friends {
-                margin-right: 5px;
-            }
-
-            .group-friends {
-                position: absolute;
-                bottom: 10px;
-                display: flex;
-                /* Makes the content inline */
-                align-items: center;
-                /* Aligns text and images vertically */
-                font-size: 14px;
-                /* Adjust font size as needed */
-                color: #888;
-                /* Text color */
-            }
-
-            .friends-images {
-                display: flex;
-                /* Arrange images in a row */
-                margin-right: 5px;
-                /* Space between images and text */
-            }
-
-            .friend-image {
-                width: 30px;
-                /* Adjust as needed */
-                height: 30px;
-                /* Adjust as needed */
-                border-radius: 50%;
-                /* Makes the image circular */
-                margin-top: -10px;
-                /* Overlap images */
-                margin-left: 5px;
-                /* Space between images */
-                position: relative;
-                /* Required for absolute positioning */
-            }
-
-            .eventTitle {
-                font-size: auto;
-            }
-
-            .frindsText {
-                float: left;
-                margin-left: 5px;
-            }
-
-            `}</style>
         </div>
     );
 }
 
 
-async function fetchGroupData() {
-    const url = 'http://localhost:8080/group/list/all';
-
+export async function fetchGroupData(url: string): Promise<GroupsHomePageView> {
     try {
-        console.log("hello\n\n")
+        console.log("hello\n\n");
         const response = await fetch(url, {
             credentials: 'include', // This is the key to include cookies
         });
@@ -370,18 +264,22 @@ async function fetchGroupData() {
         }
 
         // Fetch the group data from the API
-        const groupData = await response.json();
-        console.log(groupData)
+        const groupData: GroupsHomePageView = await response.json();
+        console.log(groupData);
         return groupData;
 
     } catch (error) {
         console.error('Error fetching data:', error);
-        // If there is an error fetching data, return an empty array
-        return [];
+        // If there is an error fetching data, return a default GroupsHomePageView object
+        return {
+            user: null,
+            Posts: [],
+            Groups: []
+        };
     }
 }
 
-async function fetchEventData() {
+export async function fetchEventData(): Promise<GroupEventResponse[]> {
     const url = 'http://localhost:8080/group/event/list/user';
 
     try {
@@ -393,7 +291,7 @@ async function fetchEventData() {
         }
 
         // Fetch the group data from the API
-        const groupData = await response.json();
+        const groupData: GroupEventResponse[] = await response.json();
         return groupData;
 
     } catch (error) {

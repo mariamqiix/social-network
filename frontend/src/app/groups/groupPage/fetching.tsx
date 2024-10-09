@@ -1,4 +1,4 @@
-import { GroupPageView } from '../../types/Types';
+import { GroupPageView, GroupEventResponse } from '../../types/Types';
 
 export async function fetchGroupData(): Promise<GroupPageView> {
     const query = new URLSearchParams(window.location.search);
@@ -40,7 +40,7 @@ export async function fetchGroupData(): Promise<GroupPageView> {
                 description: '',
                 image_url: '',
                 is_user_member: false,
-                creationDate: ''
+                created_at: ''
             },
             Members: []
         };
@@ -48,8 +48,9 @@ export async function fetchGroupData(): Promise<GroupPageView> {
 }
 
 
+import { User } from '../../types/Types';
 
-export async function fetchMembers() {
+export async function fetchMembers(): Promise<User[]> {
     const query = new URLSearchParams(window.location.search);
     const id = query.get('id'); // Get the 'id' from the query string
     const url = `http://localhost:8080/group/UsersToInvite?id=${id}`; // Append the id to the URL
@@ -63,7 +64,7 @@ export async function fetchMembers() {
         }
 
         // Fetch the group data from the API
-        const groupData = await response.json();
+        const groupData: User[] = await response.json();
         console.log(groupData);
         return groupData;
 
@@ -74,7 +75,8 @@ export async function fetchMembers() {
     }
 }
 
-export async function fetchEventData() {
+
+export async function fetchEventData(): Promise<GroupEventResponse[]> {
     const query = new URLSearchParams(window.location.search);
     const id = query.get('id'); // Get the 'id' from the query string
     const url = `http://localhost:8080/group/event/list/group?id=${id}`;
@@ -88,7 +90,7 @@ export async function fetchEventData() {
         }
 
         // Fetch the group data from the API
-        const groupData = await response.json();
+        const groupData: GroupEventResponse[] = await response.json();
         return groupData;
 
     } catch (error) {
