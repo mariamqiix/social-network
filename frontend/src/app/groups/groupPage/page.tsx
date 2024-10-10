@@ -70,7 +70,7 @@ const GroupPage = () => {
 
     const [profileData, setProfileData] = useState<GroupPageView>({
         user: null,
-        posts: [],
+        Posts: [],
         Group: {
             id: 0,
             creator: {
