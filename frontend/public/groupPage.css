@@ -9,6 +9,7 @@
     margin-left: 40px;
     left: 40px;
     position: absolute;
+    max-height: 400px;
 }
 
 .memberName {
@@ -177,6 +178,7 @@
 .group-image {
     width: 100%;
     min-height: 150px;
+    max-height: 150px;
     object-fit: cover;
 }
 

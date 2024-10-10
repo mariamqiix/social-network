@@ -83,7 +83,7 @@ const GroupPage = () => {
                 lastName: '',
                 dob: '',
                 bio: '',
-                image: ''
+                image_url: ''
             },
             title: '',
             description: '',
@@ -366,7 +366,7 @@ const GroupPage = () => {
             <div className="GroupProfilePageHeader">
                 <div className="profile-info">
                     <img
-                        src="https://picsum.photos/200/300?random=5"
+                        src={`data:image/jpeg;base64,${profileData.Group.image_url}`}
                         alt="Avatar"
                         className="profile-avatar"
                     />
@@ -441,7 +441,7 @@ const GroupPage = () => {
                         <div className="profileGroup-container">
                             {groupEvent.map((group) => (
                                 <div className="profileGroup">
-                                    <img src={profileData.Group.image_url} alt={profileData.Group.image_url} className="group-image" />
+                                    <img src={`data:image/jpeg;base64,${profileData.Group.image_url}`} alt={profileData.Group.image_url} className="group-image" />
 
                                     <div className="group-details">
                                         <div className="event-icons">
@@ -468,16 +468,21 @@ const GroupPage = () => {
 
                                         {/* Display images of friends, showing only the first three and a + if there are more */}
                                         <p className="group-friends">
-                                            {group.options && (
+                                            {group.options && group.options[0] && group.options[0].users_response && (
                                                 <>
                                                     <i className="icon-friends"></i>
                                                     {group.options[0].users_response.slice(0, 3).map((friend, index) => (
-                                                        <img key={index} src={friend.image_url} alt={`Friend ${index + 1}`} className="friend-image" />
+                                                        <img
+                                                            key={index}
+                                                            src={`data:image/jpeg;base64,${friend.image_url}`}
+                                                            alt={`Friend ${index + 1}`}
+                                                            className="friend-image"
+                                                        />
                                                     ))}
                                                     {group.options[0].users_response.length > 3 ? (
-                                                        <span className="friendsText">   + {group.options[0].users_response.length - 3} friends are going</span>
+                                                        <span className="friendsText">+ {group.options[0].users_response.length - 3} friends are going</span>
                                                     ) : (
-                                                        <span className="friendsText">  {group.options[0].users_response.length} friends are going</span>
+                                                        <span className="friendsText">{group.options[0].users_response.length} friends are going</span>
                                                     )}
                                                 </>
                                             )}
@@ -503,7 +508,7 @@ const GroupPage = () => {
                             }}
                         >
                             {profileData.Posts && profileData.Posts.map((post, index) => (
-                                <Post index={post.group.title} post={post} />
+                                <Post post={post} />
                             ))}
                         </div>
                     </div>
@@ -513,7 +518,7 @@ const GroupPage = () => {
                         <ul className="member-list">
                             {profileData.Members.map((member) => (
                                 <li key={member.id} className="member-item">
-                                    <img src={member.image_url} alt={member.username} className="member-image" />
+                                    <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
                                     <div className="member-details">
                                         <h3 className="member-name">{member.username}</h3>
                                         <p className="member-username">{member.nickname}</p> {/* Username added here */}
@@ -558,7 +563,7 @@ const GroupPage = () => {
                     <div className="member-list">
                         {filteredMembers.map((member, index) => (
                             <div className="member" key={index}>
-                                <img src="https://picsum.photos/40/40?random=19" alt={member.nickname} className="member-avatar" />
+                                <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.nickname} className="member-avatar" />
                                 <div className="member-info">
                                     <p className='memberName'>{member.nickname}</p>
                                     <p>{member.username}</p>

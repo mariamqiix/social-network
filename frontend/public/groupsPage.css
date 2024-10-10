@@ -57,8 +57,13 @@
 .group-image {
     width: 100%;
     min-height: 150px;
+    max-height: 150px;
     position: relative;
     object-fit: cover;
+    border-top-left-radius: 15px;
+    /* Adjust the value as needed */
+    border-top-right-radius: 15px;
+    /* Adjust the value as needed */
 }
 
 .group-details {

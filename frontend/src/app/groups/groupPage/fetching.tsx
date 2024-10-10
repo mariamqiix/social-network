@@ -34,7 +34,7 @@ export async function fetchGroupData(): Promise<GroupPageView> {
                     lastName: '',
                     dob: '',
                     bio: '',
-                    image: ''
+                    image_url: ''
                 },
                 title: '',
                 description: '',

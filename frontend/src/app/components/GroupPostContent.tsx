@@ -1,9 +1,12 @@
 import React from "react";
+import { PostResponse } from "../types/Types";
+import { height } from "@fortawesome/free-solid-svg-icons/faExclamation";
+import { relative } from "path";
 
 // Define your Client Component here
-const Post = ({ index, post }) => (
+const Post = ({ post }: { post: PostResponse }) => (
     <div
-        key={index}
+        key={`postId${post.id}`}
         style={{
             flex: "1 1 calc(90% - 30px)",
             position: "relative",
@@ -14,6 +17,7 @@ const Post = ({ index, post }) => (
             padding: "20px",
             marginBottom: "20px",
             minHeight: "800px",
+            maxHeight:"800px",
         }}
     >
         {/* Group and User Info */}
@@ -25,9 +29,7 @@ const Post = ({ index, post }) => (
             }}
         >
             <img
-                // src={post.group.image_url}
-                src={"https://picsum.photos/200/300?random=" + RandomNumber()}
-
+                src={`data:image/jpeg;base64,${post.group.image_url}`}
                 alt="Group"
                 style={{
                     borderRadius: "20px",
@@ -36,10 +38,7 @@ const Post = ({ index, post }) => (
                     height: "70px",
                 }}
             />
-            <div style={{
-                flexGrow: 1,
-                marginLeft: "10px",
-            }}>
+            <div style={{ flexGrow: 1, marginLeft: "10px" }}>
                 <h3
                     style={{
                         margin: 0,
@@ -60,7 +59,7 @@ const Post = ({ index, post }) => (
                     }}
                 >
                     <img
-                        src={post.author.nickname}
+                        src={`data:image/jpeg;base64,${post.author.image_url}`}
                         alt="User"
                         style={{
                             borderRadius: "50%",
@@ -76,30 +75,28 @@ const Post = ({ index, post }) => (
         </div>
 
         {/* Post Content */}
-        <div
-            style={{
-                marginBottom: "15px",
-            }}
-        >
+        <div style={{ marginBottom: "15px" }}>
             <p style={{ margin: "0 0 10px 0" }}>{post.content}</p>
-            {post.image_url &&
+            {post.image_url && (
                 <img
                     src={`data:image/png;base64,${post.image_url}`}
                     alt="Post Content"
                     style={{
                         width: "100%",
+                        maxHeight: "600px",
+                        minHeight:"600px",
                         borderRadius: "8px",
+                        margin: "auto",
+                        objectFit: "cover", // Ensures the image covers the container
+                        display: "block", // Centers the image
                     }}
                 />
-            }
+            )}
         </div>
-
     </div>
 );
 
 export default Post;
-
-
 
 function RandomNumber(min = 0, max = 100) {
     return Math.floor(Math.random() * (max - min + 1)) + min;

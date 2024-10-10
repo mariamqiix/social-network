@@ -31,7 +31,7 @@ export type User = {
     firstName: string;
     lastName: string;
     email: string;
-    image: string | null;
+    image_url: string | null;
     bio: string;
     dob: string;
 };
@@ -100,7 +100,7 @@ export type EventOptionsResponse = {
 };
 
 export type GroupsHomePageView = {
-    user: User | null; // null if not logged in
+    User: User | null; // null if not logged in
     Posts: PostResponse[] | null;
     Groups: GroupResponse[];
 };
