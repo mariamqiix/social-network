@@ -174,10 +174,6 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
-	if r.ContentLength > 1024 {
-		http.Error(w, "Request too large", http.StatusRequestEntityTooLarge)
-		return
-	}
 	var createGroupRequest structs.CreateGroupRequest
 	err := json.NewDecoder(r.Body).Decode(&createGroupRequest)
 	if err != nil {
@@ -186,10 +182,12 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	imageID := 0
 	if createGroupRequest.Image != nil {
+
 		isImage, _ := IsDataImage(createGroupRequest.Image)
 		if isImage {
 			imageID, err = models.UploadImage(createGroupRequest.Image)
 			if err != nil {
+				fmt.Print(err)
 				errorServer(w, http.StatusInternalServerError)
 			}
 		}
@@ -200,7 +198,14 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		CreatorID:   sessionUser.ID,
 		ImageID:     &imageID,
 	}
-	err = models.CreateGroup(group)
+	id, err := models.CreateGroup(group)
+	if err != nil {
+		fmt.Print(err)
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	err = models.AddMember(id, sessionUser.ID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return

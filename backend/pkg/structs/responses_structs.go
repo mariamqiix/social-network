@@ -47,6 +47,7 @@ type GroupResponse struct {
 	Image        string       `json:"image_url"`
 	IsUserMember bool         `json:"is_user_member"`
 	CreationDate time.Time    `json:"created_at"`
+	GroupMember  int          `json:"group_member"`
 }
 
 type GroupMemberResponse struct {

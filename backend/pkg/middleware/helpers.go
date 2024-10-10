@@ -109,6 +109,11 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 			} else {
 				IsUserMember = false
 			}
+			members, err := models.GetGroupMembers(group.ID)
+			if err != nil {
+				log.Printf("error getting group members by group id: %s\n", err.Error())
+				continue
+			}
 			GroupCreator := ReturnUserResponse(user)
 			Group = structs.GroupResponse{
 				Id:           group.ID,
@@ -118,6 +123,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 				IsUserMember: IsUserMember,
 				Image:        GetImageData(group.ImageID),
 				CreationDate: group.CreationDate,
+				GroupMember:  len(members),
 			}
 		}
 		auther := ReturnUserResponse(user)
@@ -189,6 +195,11 @@ func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.Grou
 		} else {
 			IsUserMember = false
 		}
+		members, err := models.GetGroupMembers(group.ID)
+		if err != nil {
+			log.Printf("error getting group members by group id: %s\n", err.Error())
+			continue
+		}
 
 		GroupCreator := ReturnUserResponse(user)
 		groupResponses = append(groupResponses, structs.GroupResponse{
@@ -199,6 +210,7 @@ func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.Grou
 			IsUserMember: IsUserMember,
 			Image:        GetImageData(group.ImageID),
 			CreationDate: group.CreationDate,
+			GroupMember:  len(members),
 		})
 	}
 	return groupResponses

@@ -2,12 +2,88 @@
 import "../../../public/groupsPage.css";
 import { GroupEventResponse, GroupsHomePageView } from '../types/Types';
 import Post from "../components/GroupPostContent";
-import React, { useState, useEffect } from 'react';
+import React, { useRef,useState, useEffect } from 'react';
 import { randomColor } from "../components/colors";
 
 
 
 export default function Page() {
+
+    // State for the Create Group popup
+    const [isCreateGroupPopupOpen, setIsCreateGroupPopupOpen] = useState(false);
+    const [groupTitle, setGroupTitle] = useState('');
+    const [groupDescription, setGroupDescription] = useState('');
+    const [groupImage, setGroupImage] = useState<string | null>(null);
+    const buttonRef = useRef<HTMLButtonElement>(null);
+
+    // Function to handle image upload for group creation
+    const handleGroupImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setGroupImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+
+    // Function to handle group creation
+    const handleGroupCreation = async () => {
+        // Ensure both title and description are provided
+        if (groupTitle && groupDescription) {
+            const groupData = {
+                title: groupTitle,
+                description: groupDescription,
+                image: groupImage ? groupImage.split(',')[1] : null, // Only the base64 part of the image
+            };
+
+            try {
+                const response = await fetch('http://localhost:8080/group/createGroup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include', // Include cookies for session management
+                    body: JSON.stringify(groupData),
+                });
+
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error(`Error: status code ${response.status}`);
+                }
+                console.log('Group created successfully:');
+
+                // Close the popup after successful creation
+                closeCreateGroupPopup();
+                // Optionally reset fields
+                setGroupTitle('');
+                setGroupDescription('');
+                setGroupImage(null);
+                // Focus the button
+                if (buttonRef.current) {
+                    buttonRef.current.focus();
+                }
+            } catch (error) {
+                console.error('Error creating group:', error);
+                alert('Failed to create group. Please try again.');
+            }
+        } else {
+            alert('Please provide both a title and a description for the group.');
+        }
+    };
+
+    // Function to close the Create Group popup
+    const closeCreateGroupPopup = () => {
+        setIsCreateGroupPopupOpen(false);
+        // Reset state variables if needed
+        setGroupTitle('');
+        setGroupDescription('');
+        setGroupImage(null);
+    };
+
+
     const [groupData, setGroupData] = useState<GroupsHomePageView>(
         {
             user: null,
@@ -65,14 +141,14 @@ export default function Page() {
             <div className="tabs">
 
                 <div className="tab-group-left">
-                    <button className="tab-button" autoFocus onClick={() => reloadGroups('http://localhost:8080/group/list/all')}>All</button>
+                    <button className="tab-button" autoFocus onClick={() => reloadGroups('http://localhost:8080/group/list/all')} ref={buttonRef}>All</button>
                     <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/joind')} >Joined</button>
                     <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/created')}>created</button>
                     <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/requested')}>Requested To Join</button>
 
                 </div>
                 <div className="tab-group-right">
-                    <button className="tab-button">Create New Group</button>
+                    <button className="tab-button" onClick={() => setIsCreateGroupPopupOpen(true)}>Create New Group</button>
                 </div>
             </div>
 
@@ -108,9 +184,7 @@ export default function Page() {
                                     alignItems: "center",
                                 }}
                             >
-                                <img
-                                    src={group.image_url}
-                                    alt={group.title}
+                                <img src={`data:image/jpeg;base64,${group.image_url}`} alt={group.title}
                                     style={{
                                         marginLeft: "20px",
                                         width: "60px",
@@ -160,7 +234,7 @@ export default function Page() {
                                     fontSize: "0.9rem",
                                 }}
                             >
-                                {group.id} contacts
+                                {group.group_member} contacts
                             </div>
                         </div>
 
@@ -248,6 +322,62 @@ export default function Page() {
                     <Post index={post.group} post={post} />
                 ))}
             </div>
+
+            {/* Expandable div for Create Group Popup */}
+            {isCreateGroupPopupOpen && (
+                <div className="popup">
+                    <div className="popup-header">
+                        <h3>Create a Group</h3>
+                        <button className="close-button" onClick={closeCreateGroupPopup}>
+                            X
+                        </button>
+                    </div>
+
+
+                    {/* Image Upload */}
+                    <label htmlFor="groupImageUpload" className="image-upload-label">
+                        {groupImage ? (
+                            <img src={groupImage} alt="Uploaded Group Image Preview" className="uploaded-image" />
+                        ) : (
+                            <div className="upload-placeholder">
+                                <p>Upload Group Image</p>
+                            </div>
+                        )}
+                    </label>
+
+
+                    {/* Group Title Input */}
+                    <input
+                        type="text"
+                        placeholder="Enter group title"
+                        value={groupTitle}
+                        onChange={(e) => setGroupTitle(e.target.value)}
+                        className="title-input"
+                    />
+                    <input
+                        type="file"
+                        id="groupImageUpload"
+                        accept="image/*"
+                        onChange={handleGroupImageUpload}
+                        style={{ display: 'none' }}
+                    />
+
+                    {/* Group Description Input */}
+                    <textarea
+                        placeholder="Write a group description..."
+                        value={groupDescription}
+                        onChange={(e) => setGroupDescription(e.target.value)}
+                        className="description-input"
+                    />
+
+                    {/* Create Group Button */}
+                    <button className="create-group-button" onClick={handleGroupCreation}>
+                        Create Group
+                    </button>
+                </div>
+            )}
+
+
         </div>
     );
 }

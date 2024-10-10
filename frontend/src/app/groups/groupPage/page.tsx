@@ -88,7 +88,8 @@ const GroupPage = () => {
             description: '',
             image_url: '',
             is_user_member: false,
-            created_at: ''
+            created_at: '',
+            group_member: 0
         },
         Members: []
     });

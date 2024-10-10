@@ -202,3 +202,100 @@
     margin-left: 2.5%;
     margin-top: 20px;
 }
+
+.popup {
+    border: 1px solid #ddd;
+    padding: 20px;
+    max-width: 1000px;
+    min-width: 500px;
+    width: 60%;
+    background-color: white;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    min-height: 600px;
+    z-index: 100;
+    height: auto;
+    max-height: 900px;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+    margin-bottom: 20px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.image-upload-label {
+    display: block;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.upload-placeholder {
+    border: 1px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.uploaded-image {
+    max-width: 6000px;
+    width: 100%;
+    min-width: 350px;
+    margin-bottom: 15px;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.title-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    height: 40px;
+    /* Adjust height for title input */
+}
+
+.description-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    height: 100px;
+    resize: none;
+}
+
+.create-group-button {
+    background-color: #2196f3;
+    color: white;
+    width: 150px;
+    height: 40px;
+    border: none;
+    border-radius: 200px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    position: relative;
+    left: 42.5%;
+    top: 90%;
+    max-width: 1200px;
+    margin-top: 50px;
+}
+
+.create-group-button:hover {
+    background-color: #989898;
+}

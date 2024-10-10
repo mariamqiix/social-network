@@ -5,13 +5,23 @@ import (
 	"backend/pkg/structs"
 )
 
-func CreateGroup(g structs.Group) error {
+func CreateGroup(g structs.Group) (int, error) {
 	// Create a new record in the Group table
-	columns := []string{"creator_id", "title", "description", "image_id"}
 	values := []interface{}{g.CreatorID, g.Title, g.Description, g.ImageID}
-	return Create("GroupTable", columns, values)
-}
 
+	query := "INSERT INTO GroupTable (creator_id, title, group_description, image_id) VALUES (?, ?, ?, ?)"
+	result, err := db.Database.Exec(query, values...)
+	if err != nil {
+		return 0, err
+	}
+
+	groupID, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(groupID), nil
+}
 func RemoveGroup(id int) error {
 	// Execute a delete query to delete the group
 	return Delete("GroupTable", []string{"id"}, []interface{}{id})
@@ -51,7 +61,7 @@ func GetGroupByID(id int) (*structs.Group, error) {
 
 func UpdateGroup(g structs.Group) error {
 	// Update the group with the specified ID
-	return Update("GroupTable", []string{"title", "description"}, []interface{}{g.Title, g.Description}, []string{"id"}, []interface{}{g.ID})
+	return Update("GroupTable", []string{"title", "group_description"}, []interface{}{g.Title, g.Description}, []string{"id"}, []interface{}{g.ID})
 }
 
 func AddMember(groupID, userID int) error {
