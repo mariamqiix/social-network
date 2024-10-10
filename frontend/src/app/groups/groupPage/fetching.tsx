@@ -22,7 +22,7 @@ export async function fetchGroupData(): Promise<GroupPageView> {
         // If there is an error fetching data, return a default GroupPageView object
         return {
             user: null,
-            posts: [],
+            Posts: [],
             Group: {
                 id: 0,
                 creator: {

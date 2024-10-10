@@ -460,7 +460,7 @@ const GroupPage = () => {
                                 alignItems: "center",
                             }}
                         >
-                            {profileData.posts && profileData.posts.map((post, index) => (
+                            {profileData.Posts && profileData.Posts.map((post, index) => (
                                 <Post index={post.group.title} post={post} />
                             ))}
                         </div>
