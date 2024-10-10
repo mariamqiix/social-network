@@ -355,9 +355,9 @@ func GetUserEvents(userID int) ([]structs.Event, error) {
 	return events, nil
 }
 
-func AddEventOption(eventID int, optionID string) error {
-	columns := []string{"event_id", "option_name"}
-	values := []interface{}{eventID, optionID}
+func AddEventOption(eventID int, optionID,IconName string) error {
+	columns := []string{"event_id", "option_name","Icon_name"}
+	values := []interface{}{eventID, optionID,IconName}
 	return Create("EventOptions", columns, values)
 }
 
@@ -375,6 +375,7 @@ func GetEventOptions(eventID int) ([]structs.EventOptions, error) {
 			&option.ID,
 			&option.EventID,
 			&option.OptionName,
+			&option.IconName,
 		)
 		if err != nil {
 			return nil, err

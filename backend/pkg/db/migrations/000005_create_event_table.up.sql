@@ -22,5 +22,6 @@ CREATE TABLE EventResponse (
 CREATE TABLE EventOptions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     event_id INTEGER REFERENCES EventTable(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    option_name VARCHAR(100)
+    option_name VARCHAR(100),
+    Icon_name VARCHAR(100)
 );

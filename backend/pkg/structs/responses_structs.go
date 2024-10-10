@@ -68,6 +68,7 @@ type GroupEventResponse struct {
 }
 
 type EventOptionsResponse struct {
+	Id             int                 `json:"id"`
 	Option         string              `json:"option"`
 	IconNAme       string              `json:"icon"`
 	Count          int                 `json:"count"`

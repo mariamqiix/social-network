@@ -57,7 +57,7 @@ export type GroupResponse = {
     image_url: string;
     is_user_member: boolean;
     created_at: string; // ISO 8601 date string
-    group_member:number;
+    group_member: number;
 };
 export type ReactionResponse = {
     didReact: boolean;
@@ -88,15 +88,15 @@ export type GroupEventResponse = {
     options: EventOptionsResponse[];
     event_time: string; // ISO 8601 string format
     created_at: string; // ISO 8601 string format
-
 };
 
 export type EventOptionsResponse = {
+    id: number;
     option: string;
-    iconName: string;
+    icon: string;
     count: number;
-    userResponse: BasicUserResponse[];
-    didUserRespond: boolean;
+    users_response: BasicUserResponse[];
+    did_user_respond: boolean;
 };
 
 export type GroupsHomePageView = {

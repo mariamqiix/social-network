@@ -76,22 +76,19 @@
     margin-bottom: 10px;
 }
 
-.icon-check,
-.icon-heart,
-.icon-cross {
+.iconEvent {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     /* Shadow effect */
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     padding: 10px;
     font-size: 20px;
+    width: 50px;
     cursor: pointer;
     transition: transform 0.2s ease;
 }
 
-.icon-check:hover,
-.icon-heart:hover,
-.icon-cross:hover {
+.iconEvent:hover {
     transform: scale(1.2);
 }
 

@@ -282,7 +282,9 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 			}
 		}
 		optionResponses = append(optionResponses, structs.EventOptionsResponse{
+			Id:             option.ID,
 			Option:         option.OptionName,
+			IconNAme:       option.IconName,
 			Count:          len(responses),
 			UserResponde:   users,
 			DidUserRespone: didRespone,

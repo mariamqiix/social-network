@@ -472,7 +472,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 
 	eventID, err := models.CreateEvent(Event)
 	for _, option := range eventRequest.Options {
-		err := models.AddEventOption(eventID, option.Option)
+		err := models.AddEventOption(eventID, option.Option, option.IconName)
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
 			return

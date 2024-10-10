@@ -2,11 +2,29 @@
 import "../../../public/groupsPage.css";
 import { GroupEventResponse, GroupsHomePageView } from '../types/Types';
 import Post from "../components/GroupPostContent";
-import React, { useRef,useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { randomColor } from "../components/colors";
+import * as FaIcons from "react-icons/fa"; // Import all FontAwesome icons
+import { IconType } from 'react-icons'; // Import IconType from react-icons
+import internal from "stream";
 
+export const getIconComponent = (iconDisplayName: string): JSX.Element | null => {
+    if (!iconDisplayName || typeof iconDisplayName !== 'string') {
+        console.error('Icon display name is not provided or is invalid');
+        return null; // Return null if iconDisplayName is not valid
+    }
 
+    // Ensure the icon name starts with "Fa" and capitalize the first letter
+    const iconKey = `${iconDisplayName.charAt(0).toUpperCase() + iconDisplayName.slice(1)}` as keyof typeof FaIcons;
+    const IconComponent: IconType | undefined = FaIcons[iconKey];
 
+    if (!IconComponent) {
+        console.error(`Icon "${iconDisplayName}" not found in react-icons/fa. Constructed Key: ${iconKey}`);
+        return null; // Return null if the icon doesn't exist
+    }
+
+    return <IconComponent />;
+};
 export default function Page() {
 
     // State for the Create Group popup
@@ -122,6 +140,33 @@ export default function Page() {
             ...prevState,
             Groups: data.Groups // Directly replacing the existing groups with the new ones
         }));
+    };
+
+    const getIconStyle = (didUserRespond: boolean) => {
+        return didUserRespond ? { backgroundColor: randomColor() } : {}; // Random color if user responded
+    };
+
+
+    const handleReact = async (option_id: number, event_id: number) => {
+        try {
+            const response = await fetch('http://localhost:8080/group/event/userResponse', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ event_id, option_id }), // Send the ID of the option being reacted to
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: status code ${response.status}`);
+            }
+
+            // Optionally, update the UI state here to reflect the user's reaction
+            console.log('User reacted to option:', option_id);
+        } catch (error) {
+            console.error('Error sending reaction:', error);
+        }
     };
 
     return (
@@ -269,9 +314,20 @@ export default function Page() {
 
                         <div className="group-details">
                             <div className="event-icons">
-                                <span className="icon-check">✔️</span>
-                                <span className="icon-heart">❤️</span>
-                                <span className="icon-cross">❌</span>
+                                {group.options && group.options.map((option, index) => (
+                                    <span
+                                        key={index}
+                                        className={`iconEvent`} // Optionally add unique class based on ID
+                                        style={getIconStyle(option.did_user_respond)} // Apply styles based on response
+                                        onClick={() => {
+                                            const hasResponded = group.options.some(option => option.did_user_respond);
+                                            if (!hasResponded) {
+                                                handleReact(option.id, group.id);
+                                            }
+                                        }}                                     >
+                                        {getIconComponent(option.icon)} {/* Render icon */}
+                                    </span>
+                                ))}
                             </div>
 
                             <p className="group-date"><i className="icon-calendar"></i> {group.event_time}</p>
@@ -279,18 +335,21 @@ export default function Page() {
                             <p className="group-location">{group.description}</p>
 
                             {/* Display images of friends, showing only the first three and a + if there are more */}
-                            {/* <p className="group-friends">
-                                <i className="icon-friends"></i>
-                                {group.friends.slice(0, 3).map((friend, index) => (
-                                    <img key={index} src={friend} alt={`Friend ${index + 1}`} className="friend-image" />
-                                ))}
-                                {group.friends.length > 3 && (
-                                    <span className="frindsText"> + {group.friends.length - 3} friends are going</span>
+                            <p className="group-friends">
+                                {group.options && (
+                                    <>
+                                        <i className="icon-friends"></i>
+                                        {group.options[0].users_response.slice(0, 3).map((friend, index) => (
+                                            <img key={index} src={friend.image_url} alt={`Friend ${index + 1}`} className="friend-image" />
+                                        ))}
+                                        {group.options[0].users_response.length > 3 ? (
+                                            <span className="friendsText">   + {group.options[0].users_response.length - 3} friends are going</span>
+                                        ) : (
+                                            <span className="friendsText">  {group.options[0].users_response.length} friends are going</span>
+                                        )}
+                                    </>
                                 )}
-                                {group.friends.length <= 3 && (
-                                    <span className="frindsText">{group.friends.length} friends are going</span>
-                                )}
-                            </p> */}
+                            </p>
                         </div>
                     </div>
                 ))}
@@ -422,6 +481,7 @@ export async function fetchEventData(): Promise<GroupEventResponse[]> {
 
         // Fetch the group data from the API
         const groupData: GroupEventResponse[] = await response.json();
+        console.log(groupData);
         return groupData;
 
     } catch (error) {

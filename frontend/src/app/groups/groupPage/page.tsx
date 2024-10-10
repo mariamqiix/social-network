@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GroupPageView, GroupEventResponse } from "../../types/Types";
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RequestToJoin, sendInvite, fetchEventData, fetchMembers, fetchGroupData, LeaveGroup } from "./fetching";
+import { randomColor } from "@/app/components/colors";
 
 
 
@@ -332,6 +333,33 @@ const GroupPage = () => {
     const [activeTab, setActiveTab] = useState('Posts');
 
 
+    const getIconStyle = (didUserRespond: boolean) => {
+        return didUserRespond ? { backgroundColor: randomColor() } : {}; // Random color if user responded
+    };
+
+
+    const handleReact = async (option_id: number, event_id: number) => {
+        try {
+            const response = await fetch('http://localhost:8080/group/event/userResponse', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify({ event_id, option_id }), // Send the ID of the option being reacted to
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error: status code ${response.status}`);
+            }
+
+            // Optionally, update the UI state here to reflect the user's reaction
+            console.log('User reacted to option:', option_id);
+        } catch (error) {
+            console.error('Error sending reaction:', error);
+        }
+    };
+
     return (
         <div className="GroupPageContainer">
             {/* Profile Header */}
@@ -417,9 +445,20 @@ const GroupPage = () => {
 
                                     <div className="group-details">
                                         <div className="event-icons">
-                                            <span className="icon-check">✔️</span>
-                                            <span className="icon-heart">❤️</span>
-                                            <span className="icon-cross">❌</span>
+                                            {group.options && group.options.map((option, index) => (
+                                                <span
+                                                    key={index}
+                                                    className={`iconEvent`} // Optionally add unique class based on ID
+                                                    style={getIconStyle(option.did_user_respond)} // Apply styles based on response
+                                                    onClick={() => {
+                                                        const hasResponded = group.options.some(option => option.did_user_respond);
+                                                        if (!hasResponded) {
+                                                            handleReact(option.id, group.id);
+                                                        }
+                                                    }}                                     >
+                                                    {getIconComponent(option.icon)} {/* Render icon */}
+                                                </span>
+                                            ))}
                                         </div>
 
                                         <p className="group-date"><i className="icon-calendar"></i> {group.created_at}</p>
@@ -428,18 +467,21 @@ const GroupPage = () => {
                                         }</p>
 
                                         {/* Display images of friends, showing only the first three and a + if there are more */}
-                                        {/* <p className="group-friends">
-                                            <i className="icon-friends"></i>
-                                            {group.friends.slice(0, 3).map((friend, index) => (
-                                                <img key={index} src={friend} alt={`Friend ${index + 1}`} className="friend-image" />
-                                            ))}
-                                            {group.friends.length > 3 && (
-                                                <span className="frindsText"> + {group.friends.length - 3} friends are going</span>
+                                        <p className="group-friends">
+                                            {group.options && (
+                                                <>
+                                                    <i className="icon-friends"></i>
+                                                    {group.options[0].users_response.slice(0, 3).map((friend, index) => (
+                                                        <img key={index} src={friend.image_url} alt={`Friend ${index + 1}`} className="friend-image" />
+                                                    ))}
+                                                    {group.options[0].users_response.length > 3 ? (
+                                                        <span className="friendsText">   + {group.options[0].users_response.length - 3} friends are going</span>
+                                                    ) : (
+                                                        <span className="friendsText">  {group.options[0].users_response.length} friends are going</span>
+                                                    )}
+                                                </>
                                             )}
-                                            {group.friends.length <= 3 && (
-                                                <span className="frindsText">{group.friends.length} friends are going</span>
-                                            )}
-                                        </p> */}
+                                        </p>
                                     </div>
                                 </div>
                             ))}
@@ -765,7 +807,7 @@ export default GroupPage;
 
 
 
-const getIconComponent = (iconDisplayName: string) => {
+export const getIconComponent = (iconDisplayName: string) => {
     if (!iconDisplayName || typeof iconDisplayName !== 'string') {
         console.error('Icon display name is not provided or is invalid');
         return null; // Return null if iconDisplayName is not valid
