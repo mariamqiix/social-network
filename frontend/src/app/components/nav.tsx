@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { selectNotifications, selectUser } from "../redux/selectors";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../redux/actions";
+import { login, logout } from "../redux/actions";
 
 const links = ["/", "/chat", "/groups", "/profile", "/notifications", "/login"];
 
@@ -46,6 +46,16 @@ export default function Nav() {
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotifications);
     const dispatch = useDispatch();
+
+    fetch("http://localhost:8080/login",
+        { method: "POST", credentials: 'include' }).then(res => {
+            if (res.ok) {
+                res.json().then(data => {
+                    console.log(data);
+                    dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
+                });
+            }
+        });
 
     const router = useRouter()
     function logoutButton() {

@@ -8,6 +8,11 @@ import (
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+	if sessionUser != nil {
+		writeToJson(sessionUser, w)
+		return
+	}
 	if r.ContentLength > 1024 {
 		http.Error(w, "Request too large", http.StatusRequestEntityTooLarge)
 		return
