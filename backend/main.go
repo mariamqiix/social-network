@@ -8,7 +8,8 @@ import (
 )
 
 func main() {
-	
+
 	db.Init() // Ensure this is called to initialize the database connection
 	middleware.GoLive()
+
 }

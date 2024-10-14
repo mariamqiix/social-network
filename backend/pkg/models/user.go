@@ -280,6 +280,36 @@ func GetFollowers(userID int) ([]structs.Follower, error) {
 func GetFollowings(userID int) ([]structs.Follower, error) {
 	return GetFollows(userID, "follower_id")
 }
+func GetUsersToInvite(userID int, groupId int) ([]structs.User, error) {
+	query := `
+        SELECT * 
+        FROM User 
+        WHERE id NOT IN (
+            SELECT user_id FROM GroupMember WHERE group_id = ? 
+        ) 
+        AND id != ? 
+        AND id NOT IN (
+            SELECT user_id FROM GroupRequest WHERE group_id = ? AND request_status = 'pending'
+        ) 
+    `
+	// Correctly pass all parameters for the query
+	rows, err := db.Database.Query(query, groupId, userID, groupId, groupId)
+	if err != nil {
+		return nil, fmt.Errorf("error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	var users []structs.User
+	for rows.Next() {
+		var user structs.User
+		err := rows.Scan(&user.ID, &user.Username, &user.UserType, &user.Email, &user.HashedPassword, &user.FirstName, &user.LastName, &user.DateOfBirth, &user.ImageID, &user.Bio, &user.ProfileType, &user.Nickname)
+		if err != nil {
+			return nil, fmt.Errorf("error scanning row: %v", err)
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
 
 func CheckIfUserFollows(userID, followUserID int) (bool, error) {
 	query := "SELECT COUNT(*) FROM Follower WHERE FollowingID = ? AND FollowerID = ?"

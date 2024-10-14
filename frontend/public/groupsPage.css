@@ -1,0 +1,303 @@
+.group-card-container {
+    width: 95%;
+    /* Set initial width to 95% */
+    margin-left: 2.5%;
+    margin-top: 20px;
+    display: flex;
+    overflow-x: scroll;
+    gap: 20px;
+    min-height: 190px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: 20px;
+    min-width: 95%;
+}
+
+.groups {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    margin-top: 10px;
+}
+
+.event-card-container {
+    min-height: 250px;
+    display: flex;
+    width: 95%;
+    margin-left: 2.5%;
+    margin-top: 15px;
+    overflow-x: scroll;
+    gap: 20px;
+    height: auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    border-radius: 20px;
+}
+
+.event-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    min-width: 310px;
+    position: relative;
+    height: 410px;
+    padding-bottom: 15px;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+}
+
+.group-image {
+    width: 100%;
+    min-height: 150px;
+    max-height: 150px;
+    position: relative;
+    object-fit: cover;
+    border-top-left-radius: 15px;
+    /* Adjust the value as needed */
+    border-top-right-radius: 15px;
+    /* Adjust the value as needed */
+}
+
+.group-details {
+    padding: 15px;
+    text-align: center;
+}
+
+.event-icons {
+    position: absolute;
+    top: 115px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+    margin-bottom: 10px;
+}
+
+.iconEvent {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Shadow effect */
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    padding: 10px;
+    font-size: 20px;
+    width: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.iconEvent:hover {
+    transform: scale(1.2);
+}
+
+.group-date {
+    margin-top: 25px;
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.group-location,
+.group-attendees,
+.group-friends {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.icon-calendar,
+.icon-friends {
+    margin-right: 5px;
+}
+
+.group-friends {
+    position: absolute;
+    bottom: 10px;
+    display: flex;
+    /* Makes the content inline */
+    align-items: center;
+    /* Aligns text and images vertically */
+    font-size: 14px;
+    /* Adjust font size as needed */
+    color: #888;
+    /* Text color */
+}
+
+.friends-images {
+    display: flex;
+    /* Arrange images in a row */
+    margin-right: 5px;
+    /* Space between images and text */
+}
+
+.friend-image {
+    width: 30px;
+    /* Adjust as needed */
+    height: 30px;
+    /* Adjust as needed */
+    border-radius: 50%;
+    /* Makes the image circular */
+    margin-top: -10px;
+    /* Overlap images */
+    margin-left: 5px;
+    /* Space between images */
+    position: relative;
+    /* Required for absolute positioning */
+}
+
+.eventTitle {
+    font-size: auto;
+}
+
+.frindsText {
+    float: left;
+    margin-left: 5px;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tab-button {
+    padding: 10px 20px;
+    background-color: #fdfdfd;
+    border: none;
+    cursor: pointer;
+    margin: 5px;
+    border-radius: 30px;
+}
+
+.tab-button:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-group-left {
+    margin-right: auto;
+    /* This will push the group of buttons to the right */
+}
+
+.tab-group-right {
+    color: #888;
+    display: flex;
+    gap: 10px;
+}
+
+
+/* Optional styles for button states */
+
+.tab-button:focus {
+    outline: none;
+    background-color: #dcdbdb;
+}
+
+.tabs {
+    width: 95%;
+    margin-left: 2.5%;
+    margin-top: 20px;
+}
+
+.popup {
+    border: 1px solid #ddd;
+    padding: 20px;
+    max-width: 1000px;
+    min-width: 500px;
+    width: 60%;
+    background-color: white;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    min-height: 600px;
+    z-index: 100;
+    height: auto;
+    max-height: 900px;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+    margin-bottom: 20px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.image-upload-label {
+    display: block;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.upload-placeholder {
+    border: 1px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.uploaded-image {
+    max-width: 6000px;
+    width: 100%;
+    min-width: 350px;
+    margin-bottom: 15px;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.title-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    height: 40px;
+    /* Adjust height for title input */
+}
+
+.description-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    height: 100px;
+    resize: none;
+}
+
+.create-group-button {
+    background-color: #2196f3;
+    color: white;
+    width: 150px;
+    height: 40px;
+    border: none;
+    border-radius: 200px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    position: relative;
+    left: 42.5%;
+    top: 90%;
+    max-width: 1200px;
+    margin-top: 50px;
+}
+
+.create-group-button:hover {
+    background-color: #989898;
+}

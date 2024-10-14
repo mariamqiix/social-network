@@ -109,6 +109,11 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 			} else {
 				IsUserMember = false
 			}
+			members, err := models.GetGroupMembers(group.ID)
+			if err != nil {
+				log.Printf("error getting group members by group id: %s\n", err.Error())
+				continue
+			}
 			GroupCreator := ReturnUserResponse(user)
 			Group = structs.GroupResponse{
 				Id:           group.ID,
@@ -118,6 +123,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 				IsUserMember: IsUserMember,
 				Image:        GetImageData(group.ImageID),
 				CreationDate: group.CreationDate,
+				GroupMember:  len(members),
 			}
 		}
 		auther := ReturnUserResponse(user)
@@ -189,6 +195,11 @@ func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.Grou
 		} else {
 			IsUserMember = false
 		}
+		members, err := models.GetGroupMembers(group.ID)
+		if err != nil {
+			log.Printf("error getting group members by group id: %s\n", err.Error())
+			continue
+		}
 
 		GroupCreator := ReturnUserResponse(user)
 		groupResponses = append(groupResponses, structs.GroupResponse{
@@ -199,6 +210,7 @@ func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.Grou
 			IsUserMember: IsUserMember,
 			Image:        GetImageData(group.ImageID),
 			CreationDate: group.CreationDate,
+			GroupMember:  len(members),
 		})
 	}
 	return groupResponses
@@ -256,7 +268,6 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 			continue
 		}
 		var users []structs.BasicUserResponse
-		fmt.Println(responses)
 		for _, response := range responses {
 			users = append(users, *ReturnBasicUser(response.UserID))
 		}
@@ -269,10 +280,11 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 				log.Printf("error checking if user is member of group: %s\n", err.Error())
 				continue
 			}
-			fmt.Println(didRespone)
 		}
 		optionResponses = append(optionResponses, structs.EventOptionsResponse{
+			Id:             option.ID,
 			Option:         option.OptionName,
+			IconNAme:       option.IconName,
 			Count:          len(responses),
 			UserResponde:   users,
 			DidUserRespone: didRespone,

@@ -462,7 +462,7 @@ func TestCreateGroup(t *testing.T) {
 		Description:  "Test Description",
 		CreationDate: time.Now(),
 	}
-	err := CreateGroup(group)
+	_,err := CreateGroup(group)
 	if err != nil {
 		t.Fatalf("CreateGroup() error = %v", err)
 	}

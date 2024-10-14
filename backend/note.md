@@ -62,10 +62,12 @@ VALUES
 (3, 6, 'Art Workshop', 'Workshop on creating digital illustrations.', '2024-10-20 15:00:00');
 
 -- Insert Event Options
-INSERT INTO EventOptions (event_id, option_name)
+INSERT INTO EventOptions (event_id, option_name, icon_name)
 VALUES
-(1, 'Attend in Person'), (1, 'Attend Virtually'),
-(2, 'Join Live Stream'), (3, 'Join Workshop in Zoom');
+(1, 'Attend in Person', 'FaUsers'),
+(1, 'Attend Virtually', 'FaVideo'),
+(2, 'Join Live Stream', 'FaBroadcastTower'),
+(3, 'Join Workshop in Zoom', 'FaChalkboardTeacher');
 
 -- Insert Event Responses
 INSERT INTO EventResponse (event_id, user_id, response_id)
@@ -137,8 +139,6 @@ VALUES
 (9, 10, 'Did you finish the assignment?', NULL), -- User 9 to User 10
 (10, 9, 'Almost done! I’ll send it to you once I finish.', NULL);
 
-
-
 -- Insert Events for Group 1
 INSERT INTO EventTable (group_id, creator_id, title, event_description, event_time)
 VALUES
@@ -150,50 +150,3 @@ VALUES
 (1, 6, 'Feedback Gathering Session', 'A meeting to gather feedback on team processes and suggestions for improvement.', '2024-12-01 11:00:00'),
 (1, 7, 'Holiday Planning Meeting', 'Discussion on plans for the upcoming holidays and team activities.', '2024-11-25 15:00:00'),
 (1, 8, 'Brainstorming Session', 'A creative session to generate ideas for the next project.', '2024-10-30 16:00:00');
-
-
--- Insert Event Options for each event in Group 1
-INSERT INTO EventOptions (event_id, option_name)
-VALUES
--- Options for Weekly Team Meeting
-(1, 'Attending'),
-(1, 'Not Attending'),
-(1, 'Maybe'),
-
--- Options for Coding Workshop
-(2, 'Attending'),
-(2, 'Not Attending'),
-(2, 'Maybe'),
-
--- Options for Team Building Activity
-(3, 'Attending'),
-(3, 'Not Attending'),
-(3, 'Maybe'),
-
--- Options for Project Review Session
-(4, 'Attending'),
-(4, 'Not Attending'),
-(4, 'Maybe'),
-
--- Options for End-of-Year Party
-(5, 'Attending'),
-(5, 'Not Attending'),
-(5, 'Maybe'),
-
--- Options for Feedback Gathering Session
-(6, 'Attending'),
-(6, 'Not Attending'),
-(6, 'Maybe'),
-
--- Options for Holiday Planning Meeting
-(7, 'Attending'),
-(7, 'Not Attending'),
-(7, 'Maybe'),
-
--- Options for Brainstorming Session
-(8, 'Attending'),
-(8, 'Not Attending'),
-(8, 'Maybe');
-
-
-

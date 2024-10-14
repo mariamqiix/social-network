@@ -47,6 +47,7 @@ type GroupResponse struct {
 	Image        string       `json:"image_url"`
 	IsUserMember bool         `json:"is_user_member"`
 	CreationDate time.Time    `json:"created_at"`
+	GroupMember  int          `json:"group_member"`
 }
 
 type GroupMemberResponse struct {
@@ -67,7 +68,9 @@ type GroupEventResponse struct {
 }
 
 type EventOptionsResponse struct {
+	Id             int                 `json:"id"`
 	Option         string              `json:"option"`
+	IconNAme       string              `json:"icon"`
 	Count          int                 `json:"count"`
 	UserResponde   []BasicUserResponse `json:"users_response"`
 	DidUserRespone bool                `json:"did_user_respond"`

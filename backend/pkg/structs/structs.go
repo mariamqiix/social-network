@@ -106,6 +106,7 @@ type EventOptions struct {
 	ID         int
 	EventID    int
 	OptionName string
+	IconName   string
 }
 
 type Notification struct {

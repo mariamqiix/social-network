@@ -3,7 +3,6 @@ package models
 import (
 	"backend/pkg/db"
 	"backend/pkg/structs"
-	"fmt"
 	"log"
 	"time"
 )
@@ -195,7 +194,6 @@ func GetEventResponsesByEventId(eventID int) ([]structs.EventResponse, error) {
 }
 
 func GetEventResponsesByEventIdAndEventOptionId(eventID, option int) ([]structs.EventResponse, error) {
-	fmt.Print("eventID: ", eventID, "option: ", option)
 	rows, err := Read("EventResponse", []string{"*"}, []string{"event_id", "response_id"}, []interface{}{eventID, option})
 	if err != nil {
 		return nil, err
@@ -357,9 +355,9 @@ func GetUserEvents(userID int) ([]structs.Event, error) {
 	return events, nil
 }
 
-func AddEventOption(eventID int, optionID string) error {
-	columns := []string{"event_id", "option_name"}
-	values := []interface{}{eventID, optionID}
+func AddEventOption(eventID int, optionID,IconName string) error {
+	columns := []string{"event_id", "option_name","Icon_name"}
+	values := []interface{}{eventID, optionID,IconName}
 	return Create("EventOptions", columns, values)
 }
 
@@ -377,6 +375,7 @@ func GetEventOptions(eventID int) ([]structs.EventOptions, error) {
 			&option.ID,
 			&option.EventID,
 			&option.OptionName,
+			&option.IconName,
 		)
 		if err != nil {
 			return nil, err
