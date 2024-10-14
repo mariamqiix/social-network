@@ -23,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className + " d-flex flex-row h-100"}>
+      <body className={inter.className + " d-flex flex-sm-row h-100 flex-column-reverse"}>
         <Provider store={store}>
           <Nav />
           <div className="flex-fill h-100 p-2">

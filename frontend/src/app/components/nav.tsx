@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { selectNotifications, selectUser } from "../redux/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../redux/actions";
+import { useEffect } from "react";
 
 const links = ["/", "/chat", "/groups", "/profile", "/notifications", "/login"];
 
@@ -47,15 +48,16 @@ export default function Nav() {
     const notifications = useSelector(selectNotifications);
     const dispatch = useDispatch();
 
-    fetch("http://localhost:8080/login",
-        { method: "POST", credentials: 'include' }).then(res => {
-            if (res.ok) {
-                res.json().then(data => {
-                    console.log(data);
-                    dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
-                });
-            }
-        });
+    useEffect(() => {
+        fetch("http://localhost:8080/login",
+            { method: "POST", credentials: 'include' }).then(res => {
+                if (res.ok) {
+                    res.json().then(data => {
+                        dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
+                    });
+                }
+            });
+    }, [dispatch]);
 
     const router = useRouter()
     function logoutButton() {
@@ -76,23 +78,25 @@ export default function Nav() {
 
     const pathName = usePathname();
     return (
-        <nav className="h-100">
-            <ul className="nav flex-column p-5">
+        <nav className="h-sm-100 w-auto">
+            <ul className="nav d-flex flex-sm-column flex-row p-sm-5 justify-content-center position-sm-sticky bottom-0 p-2">
                 {user != null ?
                     <div className="container-fluid d-flex flex-column align-items-center">
                         <a className="navbar-brand m-0 p-0" href="#">
                             <Image
                                 className="rounded-circle"
-                                src={user.image ?? "/placeholder.jpg"}
+                                src={user.image_url ?? "/placeholder.jpg"}
                                 width={80}
                                 height={80}
                                 alt="Avatar"
                             />
                         </a>
-                        <br />
-                        {user.firstName} {user.lastName}
-                        <br />
-                        <span className="text-body-tertiary">{user.username}</span>
+                        <span className="d-none d-sm-block">
+                            <br />
+                            {user.firstName} {user.lastName}
+                            <br />
+                            <span className="text-body-tertiary">{user.username}</span>
+                        </span>
                     </div> : <p>Not logged in</p>}
                 {links.map((link, i) => link != "/login" || user == null ? (
                     <Link
@@ -116,7 +120,7 @@ export default function Nav() {
                         <span
                             className={
                                 (pathName == link || (pathName == "" && link == "/") ? "text-white" : "text-black") +
-                                " text-start nav-link"
+                                " text-start nav-link d-none d-sm-block"
                             }
                         >
                             {link == "/" ? "Posts" : link[1].toLocaleUpperCase() + link.slice(2)}
@@ -141,11 +145,11 @@ export default function Nav() {
                             // stroke="currentColor"
                             className="icon"
                         >
-                            {icons[5]}
+                            <path d="M18 1.5c2.9 0 5.25 2.35 5.25 5.25v3.75a.75.75 0 0 1-1.5 0V6.75a3.75 3.75 0 1 0-7.5 0v3a3 3 0 0 1 3 3v6.75a3 3 0 0 1-3 3H3.75a3 3 0 0 1-3-3v-6.75a3 3 0 0 1 3-3h9v-3c0-2.9 2.35-5.25 5.25-5.25Z" />
                         </svg>
                         <span
                             className={
-                                "text-black text-start nav-link"
+                                "text-black text-start nav-link d-none d-sm-block"
                             }
                         >
                             Logout

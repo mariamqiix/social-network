@@ -1,5 +1,6 @@
 export type State = {
     posts: Post[];
+    chats: Chat[];
     notifications: Notifi[];
     user: null | User;
 };
@@ -22,6 +23,23 @@ export type Post = {
     content: string;
     images: string[];
     likes: number;
+};
+
+export type Chat = {
+    id: number;
+    sender: {
+        name: string;
+        avatar: string;
+    };
+    receiver: {
+        name: string;
+        avatar: string;
+    };
+    
+    created_at: string;
+    content: string;
+    image_url: string;
+    color: string;
 };
 
 export type User = {
