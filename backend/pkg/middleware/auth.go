@@ -74,9 +74,13 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	sessionToken := cookie.Value
+
 	TokenInfo, err1 := models.GetSession(sessionToken)
 	if err1 != nil {
 		http.Error(w, "Something went wrong, contact server administrator", http.StatusInternalServerError)
+		return
+	} else if TokenInfo == nil {
+		http.Error(w, "Something went wrong, user not logged in", http.StatusInternalServerError)
 		return
 	}
 	err2 := models.DeleteUserSession(TokenInfo.ID)
