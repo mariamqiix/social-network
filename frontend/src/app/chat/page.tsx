@@ -8,8 +8,8 @@ export default function page() {
     const chats = useSelector(selectChats);
     const dispatch = useDispatch();
     useEffect(() => {
-        fetch("http://localhost:8080/user/userMessages?Username=john_doe", { credentials: 'include' }).then((res) => {
-            res.json().then((data) => {
+        fetch("http://localhost:8080/user/Chats", { credentials: 'include' }).then((res) => {
+            res.text().then((data) => {
                 console.log(data);
                 // dispatch(addChat({}))
             });

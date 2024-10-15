@@ -4,15 +4,7 @@ import { Notifi, Post, State, Chat } from "../types/Types";
 const initialState: State = {
     posts: [],
     chats: [],
-    notifications: [
-        {
-            id: 1,
-            message: "Testing notifications",
-            title: "Test",
-            type: "error",
-            link: null,
-        }
-    ],
+    notifications: [],
     user: null,
 };
 
