@@ -1,0 +1,8 @@
+.btn-outline-purple {
+    color: #a370f7;
+}
+
+.btn-outline-purple:hover {
+    color: white;
+    background-color: #a370f7;
+}

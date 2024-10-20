@@ -4,12 +4,10 @@ import Link from 'next/link';
 
 const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
   return (
-    <Link href={id == "" ? "" : "/posts/" + id} className='text-decoration-none'>
-      <div className="card mb-4 shadow-sm">
+    <Link href={id == "" ? "" : "/posts/" + id} className='text-decoration-none text-black'>
+      <div>
         {/* Author Info */}
-        <div className="card-header d-flex align-items-center" style={{
-          backgroundColor: randomColor(), // Set the background color to a random color
-        }}>
+        <div className="d-flex align-items-center" >
           <Image
             src={"/placeholder.jpg"}
             alt="Author's Avatar"
@@ -18,8 +16,8 @@ const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
             className="rounded-circle me-3"
           />
           <div>
-            <h5 className="mb-0">{name}</h5>
-            <small className="text-muted">{time}</small>
+            <h5>{name}</h5>
+            <small className="text-secondary">{time.replace("T", " ").replace("Z", "")}</small>
           </div>
         </div>
 

@@ -30,7 +30,7 @@ func NotificationsHandler(w http.ResponseWriter, r *http.Request) {
 		notificationsRespone, err := MapNotifications(*user, notifications)
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
-			return 
+			return
 		}
 		writeToJson(notificationsRespone, w)
 	default:

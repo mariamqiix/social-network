@@ -388,7 +388,6 @@ func mapUsers(followers []structs.Follower) []structs.UserResponse {
 // example : if the type is "FriendRequest" we should map it to have Sender Struct , if the type Is "GroupInvitation" we should map it to have Group Struct
 func MapNotifications(sessionUser structs.User, notifications []structs.Notification) ([]structs.NotificatoinResponse, error) {
 	var notificationRespose []structs.NotificatoinResponse
-
 	for _, notification := range notifications {
 		var notificate *structs.NotificatoinResponse
 		var err error
@@ -430,8 +429,9 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 			}
 
 		}
-
-		notificationRespose = append(notificationRespose, *notificate)
+		if notificate != nil {
+			notificationRespose = append(notificationRespose, *notificate)
+		}
 
 	}
 

@@ -1,6 +1,4 @@
 'use client';
-import { useDispatch, useSelector } from "react-redux";
-import { selectPosts } from "../../redux/selectors";
 import { usePathname } from 'next/navigation'
 import PostContent from '../../components/PostContent';
 import PostActions from '../../components/PostActions';
@@ -8,6 +6,7 @@ import CommentList from '../../components/CommentList';
 import { useEffect, useState } from "react";
 import ProgressBar from "@/app/components/progress_bar";
 import { Post } from "@/app/types/Types";
+import { randomColor } from '@/app/components/colors';
 
 export default function Page() {
   const id = usePathname().split("/")[2];
@@ -37,21 +36,22 @@ export default function Page() {
   }, [fetch]);
   if (post == null) {
     return <ProgressBar progress={1} />;
-  } else if (post != null) {
+  } else {
     return (
-      <div className="container my-4">
+      <div className="card my-4 p-3 shadow-sm border-0" style={{
+        backgroundColor: randomColor(),
+      }}>
         <div className="row justify-content-center">
           {/* Use a wider column */}
           <div className="col-lg-10">
             {/* Post Content */}
             <PostContent
               avatar="/placeholder.jpg"
-              name={post.author.username}
-              time={post.created_at}
+              name={post.author.name}
+              time={post.time}
               content={post.content}
-              images={post.image_url == "" ? [] : [post.image_url]}
+              images={post.images}
             />
-
             {/* Post Actions */}
             <PostActions likes={post.likes} id={post.id} />
 
