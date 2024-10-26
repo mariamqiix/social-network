@@ -77,13 +77,13 @@ type EventOptionsResponse struct {
 }
 
 type GroupChatResponse struct {
-	Id           int          `json:"id"`
-	Sender       UserResponse `json:"Sender"`
-	Sended       bool         `json:"sended"` /// if the user is the one who sent the message or not
-	Content      string       `json:"content"`
-	Image        string       `json:"image_url"`
-	Color        string       `json:"color"`
-	CreationDate time.Time    `json:"created_at"`
+	Id           int               `json:"id"`
+	Sender       BasicUserResponse `json:"Sender"`
+	Sended       bool              `json:"sended"` /// if the user is the one who sent the message or not
+	Content      string            `json:"content"`
+	Image        string            `json:"image_url"`
+	Color        string            `json:"color"`
+	CreationDate time.Time         `json:"created_at"`
 }
 
 type NotificatoinResponse struct {
@@ -98,13 +98,12 @@ type NotificatoinResponse struct {
 }
 
 type ChatResponse struct {
-	Id           int          `json:"id"`
-	Sender       UserResponse `json:"Sender"`
-	Receiver     UserResponse `json:"receiver"`
-	Content      string       `json:"content"`
-	Image        string       `json:"image_url"`
-	Color        string       `json:"color"`
-	CreationDate time.Time    `json:"created_at"`
+	Id           int               `json:"id"`
+	Sender       BasicUserResponse `json:"Sender"`
+	Receiver     BasicUserResponse `json:"receiver"`
+	Content      string            `json:"content"`
+	Image        string            `json:"image_url"`
+	CreationDate time.Time         `json:"created_at"`
 }
 
 type ProfileResponse struct {
@@ -120,4 +119,11 @@ type ProfileResponse struct {
 	UserPosts        []Post    `json:"user_posts"`
 	UserLikedPost    []Post    `json:"user_Liked_posts"`
 	UserDislikedPost []Post    `json:"user_Disliked_posts"`
+}
+
+type WebsocketResponse struct {
+	MessageType  string            `json:"message_type"`
+	UserChat     ChatResponse      `json:"user_chat"`
+	GroupChat    GroupChatResponse `json:"group_chat"`
+	Notification string            `json:"notification"`
 }
