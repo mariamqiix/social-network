@@ -372,6 +372,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
+	
 	w.WriteHeader(http.StatusCreated)
 
 	models.CreateGroupsNotification(structs.Notification{

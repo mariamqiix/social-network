@@ -76,19 +76,6 @@ type EventResponseRequest struct {
 	OptionID int `json:"option_id"`
 }
 
-type MessageRequest struct {
-	Sender    string `json:"sender"`
-	Recipient string `json:"recipient"`
-	Message   string `json:"message"`
-	Image     []byte `json:"image"`
-}
-
-type GroupMessageRequest struct {
-	Sender  string `json:"sender"`
-	GroupID int    `json:"group_id"`
-	Message string `json:"message"`
-	Image   []byte `json:"image"`
-}
 
 type ReactoinRequest struct {
 	PostID   int    `json:"post_id"`
@@ -109,4 +96,13 @@ type GroupRequestResponse struct {
 type UserInfoRequest struct {
 	UserID   int    `json:"user_id"`
 	Response string `json:"response"`
+}
+
+type MessageRequest struct {
+	Type       string `json:"type"`
+	SenderId   string `json:"sender_id"`
+	ReceiverId string `json:"receiver_id"`
+	GroupID    int    `json:"group_id"`
+	Message    string `json:"message"`
+	Image      []byte `json:"image"`
 }
