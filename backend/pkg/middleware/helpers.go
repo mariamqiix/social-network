@@ -323,7 +323,7 @@ func mapChats(sessionuser structs.User, chats []structs.GroupChat) []structs.Gro
 		IsItTheUserMessage := chat.SenderID == sessionuser.ID
 		chatResponses = append(chatResponses, structs.GroupChatResponse{
 			Id:           chat.ID,
-			Sender:       *ReturnUserResponse(user),
+			Sender:       *ReturnBasicUser(user.ID),
 			Content:      chat.Message,
 			CreationDate: chat.CreationDate,
 			Sended:       IsItTheUserMessage, /// if the user is the one who sent the message or not
@@ -358,12 +358,11 @@ func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
 		}
 		chatResponses = append(chatResponses, structs.ChatResponse{
 			Id:           chat.ID,
-			Sender:       *ReturnUserResponse(Sender),
-			Receiver:     *ReturnUserResponse(Receiver),
+			Sender:       *ReturnBasicUser(Sender.ID),
+			Receiver:     *ReturnBasicUser(Receiver.ID),
 			Content:      chat.Message,
 			CreationDate: chat.CreationDate,
 			Image:        GetImageData(&chat.ImageID),
-			Color:        randomLightColor(),
 		})
 	}
 	return chatResponses
@@ -446,7 +445,7 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 				EventID:      *notification.EventID,
 				IsRead:       notification.IsRead,
 				CreationDate: notification.CreationDate,
-				Message:      event.Title+" event has been created in "+group.Title,
+				Message:      event.Title + " event has been created in " + group.Title,
 			}
 
 		case "GroupInvite":
@@ -461,7 +460,7 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 				GroupID:      *notification.GroupID,
 				IsRead:       notification.IsRead,
 				CreationDate: notification.CreationDate,
-				Message:      "You've been invited to join "+group.Title+ " group.",
+				Message:      "You've been invited to join " + group.Title + " group.",
 			}
 
 		case "GroupRequestToJoin":
@@ -481,7 +480,7 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 				GroupID:      *notification.GroupID,
 				IsRead:       notification.IsRead,
 				CreationDate: notification.CreationDate,
-				Message:      userRequeted.Username + " has has rquested to join your "+group.Title+ " group.",
+				Message:      userRequeted.Username + " has has rquested to join your " + group.Title + " group.",
 			}
 		}
 
