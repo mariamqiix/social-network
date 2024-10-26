@@ -1,0 +1,91 @@
+.container {
+    height: 100%;
+    width: 100%;
+}
+
+.userBar table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-left: 10%;
+    border-bottom: 2px solid rgb(253, 247, 247);
+    color: rgb(215, 150, 150);
+    justify-items: center;
+}
+
+.userBarDiv {
+    float: left;
+    clear: left;
+    width: 80%;
+    justify-items: center;
+}
+
+.userBar th,
+.userBar td {
+    padding: 8px;
+    text-align: center;
+    color: black;
+    width: 150px;
+    height: 40px;
+    border: none;
+    border-radius: 200px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 1rem;
+    position: relative;
+    max-width: 1200px;
+    margin-top: 50px;
+}
+
+.userBar th:hover,
+.userBar td:hover{
+    cursor: pointer;
+    background-color: #989898;
+    border-radius: 15px;
+}
+
+.profile th:hover {
+    color: #fbd998;
+    cursor: pointer;
+}
+
+#profileContent {
+    margin-top: 20px;
+    padding: 10px;
+    width: 80%;
+    margin-left: 10%;
+    float: left;
+    clear: both;
+}
+
+.userPic {
+    background: linear-gradient(180deg, #935b5b 0%, rgba(45, 28, 28, 1) 100%);
+    border-radius: 100%;
+    background-size: 100% 100%;
+    border-radius: 100%;
+    flex: none;
+    height: 123px;
+    width: 123px;
+    float: left;
+    clear: left;
+    margin-top: 5%;
+    margin-left: 10%;
+}
+
+.profileUsername {
+    float: left;
+    margin-top: 7.5%;
+    margin-left: 2%;
+    font-size: 28px;
+    color: #ccc;
+}
+
+.userInfo {
+    float: left;
+    clear: left;
+    font-size: 16px;
+    color: #706767;
+    margin-top: 2%;
+    margin-bottom: 4%;
+    margin-left: 7%;
+    width: 70%;
+}
