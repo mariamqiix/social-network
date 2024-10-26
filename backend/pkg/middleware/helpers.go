@@ -369,7 +369,7 @@ func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
 	return chatResponses
 }
 
-func mapUsers(followers []structs.Follower) []structs.UserResponse {
+func MapUsers(followers []structs.Follower) []structs.UserResponse {
 	var NewFollowers []structs.UserResponse
 	for _, follower := range followers {
 		user, err := models.GetUserByID(follower.FollowerID)
@@ -428,7 +428,63 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 				return nil, err
 			}
 
+		case "GroupNewEvent":
+			group, err := models.GetGroupByID(*notification.GroupID)
+			if err != nil {
+				return nil, err
+			}
+
+			event, err := models.GetEventByID(*notification.EventID)
+			if err != nil {
+				return nil, err
+			}
+
+			notificate = &structs.NotificatoinResponse{
+				Id:           notification.ID,
+				Type:         notification.NotificationType,
+				GroupID:      *notification.GroupID,
+				EventID:      *notification.EventID,
+				IsRead:       notification.IsRead,
+				CreationDate: notification.CreationDate,
+				Message:      event.Title+" event has been created in "+group.Title,
+			}
+
+		case "GroupInvite":
+			group, err := models.GetGroupByID(*notification.GroupID)
+			if err != nil {
+				return nil, err
+			}
+
+			notificate = &structs.NotificatoinResponse{
+				Id:           notification.ID,
+				Type:         notification.NotificationType,
+				GroupID:      *notification.GroupID,
+				IsRead:       notification.IsRead,
+				CreationDate: notification.CreationDate,
+				Message:      "You've been invited to join "+group.Title+ " group.",
+			}
+
+		case "GroupRequestToJoin":
+			group, err := models.GetGroupByID(*notification.GroupID)
+			if err != nil {
+				return nil, err
+			}
+
+			userRequeted, err := models.GetUserByID(notificate.SenderID)
+			if err != nil {
+				return nil, err
+			}
+
+			notificate = &structs.NotificatoinResponse{
+				Id:           notification.ID,
+				Type:         notification.NotificationType,
+				GroupID:      *notification.GroupID,
+				IsRead:       notification.IsRead,
+				CreationDate: notification.CreationDate,
+				Message:      userRequeted.Username + " has has rquested to join your "+group.Title+ " group.",
+			}
 		}
+
 		if notificate != nil {
 			notificationRespose = append(notificationRespose, *notificate)
 		}

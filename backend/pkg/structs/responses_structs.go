@@ -91,7 +91,7 @@ type NotificatoinResponse struct {
 	Type         string    `json:"type"`
 	SenderID     int       `json:"sender_id"`
 	GroupID      int       `json:"group_id"`
-	Event        int       `json:"event"`
+	EventID        int       `json:"event"`
 	IsRead       bool      `json:"is_read"`
 	Message      string    `json:"message"`
 	CreationDate time.Time `json:"created_at"`
