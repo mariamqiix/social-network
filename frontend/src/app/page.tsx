@@ -38,6 +38,15 @@ export default function Home() {
       reader.onload = function (e) {
         imageContent = e.target?.result as string;
         dispatch(addPost({ id: 0, author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [imageContent], likes: 0, }));
+
+        // fetch("http://localhost:8080/post/createPost/user", { credentials: 'include', method: "POST", body: JSON.stringify({
+        //   description: "",
+
+        // }) }).then(res => {
+        //   res.text().then(data => {
+        //     console.log(data);
+        //   });
+        // });
       }
       reader.readAsDataURL(form.children[1].files[0]);
     } else {

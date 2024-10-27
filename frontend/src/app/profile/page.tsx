@@ -29,7 +29,7 @@ export default function page() {
                 console.log(data);
             });
         });
-    }, []);
+    }, [fetch]);
     if (user) {
 
         const changeProfileContent = (type: String) => {

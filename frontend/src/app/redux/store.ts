@@ -68,6 +68,7 @@ const reducer = (state = initialState, action: any) => {
 const store = createStore(reducer);
 
 const socket = new WebSocket('ws://localhost:8080/socket');
+console.log("socket created: ", socket);
 socket.onmessage = (event) => {
     // setMessages((prevMessages) => [...prevMessages, event.data]);
     console.log("socket received: ", event.data);
