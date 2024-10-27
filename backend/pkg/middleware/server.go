@@ -18,7 +18,7 @@ func GoLive() {
 	mux.HandleFunc("/login", LoginHandler)       //  DONE >>>>>	login function || checked
 	mux.HandleFunc("/logout", LogoutHandler)
 	// mux.HandleFunc("/signup", SignupHandler)
-	// mux.HandleFunc("/socket", socketHanddler)
+	mux.HandleFunc("/socket", websocketHandler)
 
 	// ///// the /post api's
 	mux.HandleFunc("/post/", PostHandler)

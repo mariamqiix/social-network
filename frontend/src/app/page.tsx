@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 
+
 export default function Home() {
   const posts = useSelector(selectPosts);
   let [imageData, setImageData] = useState("");
