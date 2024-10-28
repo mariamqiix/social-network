@@ -239,17 +239,34 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	group, err := models.GetGroupByID(groupID)
-
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	models.CreateGroupsNotification(structs.Notification{
+
+	user, err := models.GetUserByID(sessionUser.ID) 
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	notification := structs.Notification{
 		UserID:           group.CreatorID,
 		NotificationType: "GroupRequestToJoin",
 		SenderID:         &sessionUser.ID,
 		GroupID:          &groupID,
 		IsRead:           false,
+	}
+
+	models.CreateGroupsNotification(notification)
+
+	SendNotification(notification.UserID, structs.NotificatoinResponse{
+		Id:           notification.ID,
+		Type:         notification.NotificationType,
+		GroupID:      *notification.GroupID,
+		IsRead:       notification.IsRead,
+		CreationDate: notification.CreationDate,
+		Message:      user.Username + " has has rquested to join your " + group.Title + " group.",
 	})
 
 	w.WriteHeader(http.StatusCreated)
@@ -372,14 +389,31 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	
+
 	w.WriteHeader(http.StatusCreated)
 
-	models.CreateGroupsNotification(structs.Notification{
+	notification := structs.Notification{
 		UserID:           Invite.UserID,
 		NotificationType: "GroupInvite",
 		GroupID:          &Invite.GroupID,
 		IsRead:           false,
+	}
+
+	models.CreateGroupsNotification(notification)
+
+	group, err := models.GetGroupByID(Invite.GroupID)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	SendNotification(Invite.UserID, structs.NotificatoinResponse{
+		Id:           notification.ID,
+		Type:         notification.NotificationType,
+		GroupID:      Invite.GroupID,
+		IsRead:       notification.IsRead,
+		CreationDate: notification.CreationDate,
+		Message:      "You've been invited to join " + group.Title + " group.",
 	})
 }
 
@@ -494,6 +528,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	eventID, err := models.CreateEvent(Event)
+
 	for _, option := range eventRequest.Options {
 		err := models.AddEventOption(eventID, option.Option, option.IconName)
 		if err != nil {
@@ -514,12 +549,31 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	group, err := models.GetGroupByID(eventRequest.GroupID)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
 	for _, member := range groupMembers {
-		models.CreateEventsNotification(structs.Notification{
+		notification := structs.Notification{
 			UserID:           member.UserID,
 			NotificationType: "GroupNewEvent",
 			GroupID:          &eventRequest.GroupID,
+			EventID:          &eventID,
 			IsRead:           false,
+		}
+
+		models.CreateEventsNotification(notification)
+
+		SendNotification(member.ID, structs.NotificatoinResponse{
+			Id:           notification.ID,
+			Type:         notification.NotificationType,
+			GroupID:      eventRequest.GroupID,
+			EventID:      *notification.EventID,
+			IsRead:       notification.IsRead,
+			CreationDate: notification.CreationDate,
+			Message:      eventRequest.Title + " event has been created in " + group.Title,
 		})
 	}
 

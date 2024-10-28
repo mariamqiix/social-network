@@ -391,14 +391,26 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 		var notificate *structs.NotificatoinResponse
 		var err error
 		switch notification.NotificationType {
-		case "GroupRequestReject":
+		case "GroupInviteReject":
 			notificate, err = createGroupNotificationResponse(notification, "rejected")
 			if err != nil {
 				return nil, err
 			}
 
+		case "GroupInviteAccept":
+			notificate, err = createGroupNotificationResponse(notification, "accepted")
+			if err != nil {
+				return nil, err
+			}
+
+		case "GroupRequestReject":
+			notificate, err = createGroupNotificationRequestResponse(notification, "rejected")
+			if err != nil {
+				return nil, err
+			}
+
 		case "GroupRequestAccept":
-			notificate, err = createGroupNotificationResponse(notification, "approved")
+			notificate, err = createGroupNotificationRequestResponse(notification, "accepted")
 			if err != nil {
 				return nil, err
 			}
@@ -427,7 +439,7 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 				return nil, err
 			}
 
-		case "GroupNewEvent":
+		case "GroupNewEvent": 
 			group, err := models.GetGroupByID(*notification.GroupID)
 			if err != nil {
 				return nil, err
@@ -499,7 +511,7 @@ func IsDataImage(buff []byte) (bool, string) {
 	return strings.HasPrefix(t, "image"), t
 }
 
-func createGroupNotificationResponse(notification structs.Notification, msg string) (*structs.NotificatoinResponse, error) {
+func createGroupNotificationRequestResponse(notification structs.Notification, msg string) (*structs.NotificatoinResponse, error) {
 	group, err := models.GetGroupByID(*notification.GroupID)
 	if err != nil {
 		return nil, err
@@ -513,6 +525,28 @@ func createGroupNotificationResponse(notification structs.Notification, msg stri
 		IsRead:       notification.IsRead,
 		CreationDate: notification.CreationDate,
 		Message:      "Your request to join " + strings.Title(group.Title) + " group has been " + msg + ".",
+	}, nil
+}
+
+func createGroupNotificationResponse(notification structs.Notification, msg string) (*structs.NotificatoinResponse, error) {
+	group, err := models.GetGroupByID(*notification.GroupID)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := models.GetUserByID(*notification.SenderID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &structs.NotificatoinResponse{
+		Id:           notification.ID,
+		Type:         notification.NotificationType,
+		SenderID:     *notification.SenderID,
+		GroupID:      group.ID,
+		IsRead:       notification.IsRead,
+		CreationDate: notification.CreationDate,
+		Message:      user.Username+ " has "+msg+" your invitation to join " + strings.Title(group.Title) + ".",
 	}, nil
 }
 

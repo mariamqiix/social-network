@@ -91,7 +91,7 @@ type NotificatoinResponse struct {
 	Type         string    `json:"type"`
 	SenderID     int       `json:"sender_id"`
 	GroupID      int       `json:"group_id"`
-	EventID        int       `json:"event"`
+	EventID      int       `json:"event"`
 	IsRead       bool      `json:"is_read"`
 	Message      string    `json:"message"`
 	CreationDate time.Time `json:"created_at"`
@@ -122,8 +122,8 @@ type ProfileResponse struct {
 }
 
 type WebsocketResponse struct {
-	MessageType  string            `json:"message_type"`
-	UserChat     ChatResponse      `json:"user_chat"`
-	GroupChat    GroupChatResponse `json:"group_chat"`
-	Notification string            `json:"notification"`
+	MessageType  string               `json:"message_type"`
+	UserChat     ChatResponse         `json:"user_chat"`
+	GroupChat    GroupChatResponse    `json:"group_chat"`
+	Notification NotificatoinResponse `json:"notification"`
 }

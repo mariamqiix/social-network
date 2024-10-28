@@ -189,6 +189,7 @@ func SendMessage(conn Connection, message *structs.WebsocketResponse) {
 		RemoveConnection(conn.ID)
 	}
 }
+
 func BodyToMessage(body []byte) *structs.MessageRequest {
 	if len(body) == 0 {
 		return nil
@@ -226,7 +227,7 @@ func IsUserOnline(userID int) bool {
 	return ok
 }
 
-func SendNotification(id int, notification string) {
+func SendNotification(id int, notification structs.NotificatoinResponse) {
 	conn, ok := GetConnectionByID(id)
 	if !ok {
 		return
@@ -236,7 +237,6 @@ func SendNotification(id int, notification string) {
 		Notification: notification,
 	}
 	SendMessage(*conn, &newNotification)
-
 }
 
 func checkUserOnlineHandler(w http.ResponseWriter, r *http.Request) {
