@@ -130,7 +130,7 @@ type UserChat struct {
 	SenderID     int
 	ReceiverID   int
 	Message      string
-	ImageID      int
+	ImageID      *int
 	IsRead       bool
 	CreationDate time.Time
 }

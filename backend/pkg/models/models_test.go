@@ -462,7 +462,7 @@ func TestCreateGroup(t *testing.T) {
 		Description:  "Test Description",
 		CreationDate: time.Now(),
 	}
-	_,err := CreateGroup(group)
+	_, err := CreateGroup(group)
 	if err != nil {
 		t.Fatalf("CreateGroup() error = %v", err)
 	}
@@ -845,11 +845,12 @@ func TestUpdateNotificationToRead(t *testing.T) {
 }
 
 func TestCreateUserMessage(t *testing.T) {
+	ImageID := 0
 	message := structs.UserChat{
 		SenderID:   1,
 		ReceiverID: 2,
 		Message:    "Hello",
-		ImageID:    0,
+		ImageID:    &ImageID,
 		IsRead:     false,
 	}
 
@@ -880,12 +881,13 @@ func TestUpdatePrivateMessageToRead(t *testing.T) {
 }
 
 func TestUpdatePrivateMessage(t *testing.T) {
+	ImageID := 0
 	message := structs.UserChat{
 		ID:         1,
 		SenderID:   1,
 		ReceiverID: 2,
 		Message:    "Updated Message",
-		ImageID:    0,
+		ImageID:    &ImageID,
 		IsRead:     true,
 	}
 

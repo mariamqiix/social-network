@@ -72,13 +72,17 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 		if MessageRequest.Type == "GroupMessage" {
 			isExist, err := models.CheckExistance("GroupTable", []string{"id"}, []interface{}{MessageRequest.GroupID})
 			if err != nil || !isExist {
-				// errorServer(w, r, http.StatusInternalServerError)
+				errorServer(w, http.StatusInternalServerError)
 				continue
 			}
 			groupMembers, err := models.GetGroupMembers(MessageRequest.GroupID)
+			if err != nil {
+				errorServer(w, http.StatusInternalServerError)
+				continue
+			}
 			for _, member := range groupMembers {
 				reciver := ReturnBasicUser(member.UserID)
-				err := SendMessageToGroupOrUser(SenderId.ID, MessageRequest.GroupID, MessageRequest.Message, reciver.Username, "GroupMessage")
+				err := SendMessageToGroupOrUser(SenderId.ID, MessageRequest.GroupID, MessageRequest.Message, reciver.Username, "GroupMessage", (MessageRequest.Image))
 				if err != nil {
 					fmt.Print(err)
 					continue
@@ -86,7 +90,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 		} else {
-			err := SendMessageToGroupOrUser(SenderId.ID, 0, MessageRequest.Message, MessageRequest.ReceiverId, "UserMessage")
+			err := SendMessageToGroupOrUser(SenderId.ID, 0, MessageRequest.Message, MessageRequest.ReceiverId, "UserMessage", (MessageRequest.Image))
 			if err != nil {
 				fmt.Print(err)
 				continue
@@ -96,16 +100,23 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, MessageType string) error {
+func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, MessageType string, image []byte) error {
 	ReceiverId, err := models.GetUserByUsername(ReceiverUsername)
 	if err != nil {
 		return err
 	}
 	if ReceiverId == nil {
-		return fmt.Errorf("User with username %s not found", ReceiverUsername)
+		return fmt.Errorf("user with username %s not found", ReceiverUsername)
 	}
 	if MessageType == "GroupMessage" {
 		imageId := 0
+		if image != nil {
+			id, err := models.UploadImage(image)
+			if err != nil {
+				return err
+			}
+			imageId = id
+		}
 		message := structs.GroupChat{
 			SenderID:     SenderId,
 			GroupID:      GroupID,
@@ -120,7 +131,7 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 		reciverConnections, ok := GetConnectionByID(ReceiverId.ID)
 		if !ok {
 			fmt.Println("No connection found for the user with id:", ReceiverId.ID)
-			return fmt.Errorf("No connection found for the user with id: %d", ReceiverId.ID)
+			return fmt.Errorf("no connection found for the user with id: %d", ReceiverId.ID)
 		}
 		image, err := models.GetImageByID(*message.ImageID)
 		if err != nil {
@@ -138,12 +149,20 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 		}
 		SendMessage(*reciverConnections, &newMessageStruct)
 	} else {
+		imageId := 0
+		if image != nil {
+			id, err := models.UploadImage(image)
+			if err != nil {
+				return err
+			}
+			imageId = id
+		}
 		message := structs.UserChat{
 			SenderID:     SenderId,
 			ReceiverID:   ReceiverId.ID,
 			Message:      Messag,
 			IsRead:       false,
-			ImageID:      0,
+			ImageID:      &imageId,
 			CreationDate: time.Now(),
 		}
 		err = models.CreateUserMessage(message)
@@ -153,9 +172,9 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 		reciverConnections, ok := GetConnectionByID(message.ReceiverID)
 		if !ok {
 			fmt.Println("No connection found for the user with id:", message.ReceiverID)
-			return fmt.Errorf("No connection found for the user with id: %d", message.ReceiverID)
+			return fmt.Errorf("no connection found for the user with id: %d", message.ReceiverID)
 		}
-		image, err := models.GetImageByID(message.ImageID)
+		image, err := models.GetImageByID(*message.ImageID)
 		if err != nil {
 			return err
 		}
@@ -239,7 +258,7 @@ func SendNotification(id int, notification structs.NotificatoinResponse) {
 	SendMessage(*conn, &newNotification)
 }
 
-func checkUserOnlineHandler(w http.ResponseWriter, r *http.Request) {
+func CheckUserOnlineHandler(w http.ResponseWriter, r *http.Request) {
 	userIDStr := r.URL.Query().Get("userID")
 	userID, err := strconv.Atoi(userIDStr)
 	if err != nil {

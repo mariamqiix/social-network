@@ -362,7 +362,7 @@ func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
 			Receiver:     *ReturnBasicUser(Receiver.ID),
 			Content:      chat.Message,
 			CreationDate: chat.CreationDate,
-			Image:        GetImageData(&chat.ImageID),
+			Image:        GetImageData(chat.ImageID),
 		})
 	}
 	return chatResponses
