@@ -6,137 +6,101 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAt, faCalendarDay, faEnvelope, faSignature } from "@fortawesome/free-solid-svg-icons";
 import { ProfilePageView } from "../types/Types";
-import { useEffect } from "react";
-import { fetchProfileData} from "./fetch";
-
-
-// import React, { useRef, useState, useEffect } from 'react';
-
-import { useState } from "react";
-
+import { fetchProfileData } from "./fetch";
+import Post from '../components/GroupPostContent';
+import React, { useRef, useState, useEffect } from 'react';
 
 export default function page() {
-    const user = useSelector(selectUser);
+    const [profileData, setProfileData] = useState<ProfilePageView>({
+        user: {
+            id: 0,
+            username: '',
+            nickname: '',
+            firstName: '',
+            lastName: '',
+            email: '',
+            image_url: '',
+            bio: '',
+            dob: '',
+        },
+        UserPosts: [],
+        UserLikedPost: [],
+        UserDislikedPost: [],
+    });
+
     useEffect(() => {
-        fetch("http://localhost:8080/user/profile/", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ user_id: -1 })
-        }).then((res) => {
-            res.text().then((data) => {
-                // console.log(data);
-            });
-        });
-    }, [fetch]);
-    
-    if (user) {
+        const fetchData = async () => {
+            try {
+                const data = await fetchProfileData();
+                setProfileData(data);
+                console.log(data)
+                console.log(profileData)
 
-        const changeProfileContent = (type: String) => {
-            // Function to be executed on button click
-            const profileContent = document.getElementById("profileContent");
-
-            // const url = new URL("http://localhost:8080/user/profile/");
-            // fetch(url, {
-            //     method: "GET",
-            // })
-            //     .then((response) => {
-            //         if (!response.ok) {
-            //             //i should handle bad response
-            //         }
-            //         return response.json();
-            //     })
-            //     .then((data) => {
-            //         if (data && data.Posts) {
-            //             displayPostOnProfile(data.Posts, type);
-            //         } else {
-            //             console.error("Invalid data format. Expected profileView with Posts.");
-            //         }
-            //     })
-            //     .catch((error) => {
-            //         console.error("Error fetching profile:", error);
-            //     });
-        };
-
-        const age = calculateAge(user.dob);
-
-        const [isMember, setIsMember] = useState(true);
-        const [activeTab, setActiveTab] = useState('Posts');
-
-        const [profileData, setProfileData] = useState<ProfilePageView>({
-            user: null,
-            Posts: [],
-            LikedPosts: [],
-            DislikedPosts: [],
-            Followers: []
-        });
-
-        const handleTabClick = (tabName: string) => {
-            switch (tabName) {
-                case 'Posts':
-                    setIsMember(false);  // Update the membership status
-                    setActiveTab('Posts');
-    
-                    useEffect(() => {
-                        const getData = async () => {
-                            const data = await fetchProfileData();
-                            console.log(data);
-                            // if (data.Group.is_user_member) {
-                            //     setIsMember(true)
-                            // }
-                            setProfileData(data);
-                        };
-    
-                        getData();
-                    }, []);
-        
-    
-                    // send a request to leave the group
-                    break;
-                case 'LikedPosts':
-                    setActiveTab('Posts');
-                    // RequestToJoin();
-                    // send a request to join the group
-                    break;
-                case 'DisLikedPosts':
-                        setActiveTab('Posts');
-                        // RequestToJoin();
-                        // send a request to join the group
-                        break;
-                default:
-                    setActiveTab(tabName);
+            } catch (error) {
+                console.error('Error fetching data:', error);
             }
         };
 
-        return (
-            <div className="Container">
+        fetchData();
+    }, []);
+
+    const handleTabClick = (tabName: string) => {
+        switch (tabName) {
+            case 'Posts':
+                setIsMember(false);  // Update the membership status
+                setActiveTab(tabName);
+                // send a request to leave the group
+                break;
+            case 'LikedPosts':
+                setActiveTab(tabName);
+                // RequestToJoin();
+                // send a request to join the group
+                break;
+            case 'DisLikedPosts':
+                setActiveTab(tabName);
+                // RequestToJoin();
+                // send a request to join the group
+                break;
+            default:
+                setActiveTab(tabName);
+
+        }
+    };
+
+    const [isMember, setIsMember] = useState(true);
+    const [activeTab, setActiveTab] = useState('Posts');
+
+    return (
+        <div className="Container">
 
             {/* Profile Header */}
             <div className="ProfilePageHeader">
                 <div className="profile-info">
                     <img
-                        src={`data:image/jpeg;base64,${user.image_url}`}
+                        // src={`data:image/jpeg;base64,${profileData.Image}`}
                         alt="Avatar"
                         className="profile-avatar"
                     />
 
-                        <div className="profile-details">
-                            <h1 className="profile-name">{user.firstName} {user.lastName} ({user.username})</h1>
-                            <p className="profile-desc">{user.bio}</p>
-                            <div className="profile-follow-info">
-                                {profileData.Followers &&
-                                    <span>{profileData.Followers ? profileData.Followers.length : 0} Member</span>
-                                }
-                            </div>
+                    <div className="profile-details">
+                        <h1 className="profile-name">{profileData.user.firstName} {profileData.user.lastName} ({profileData.user.username})</h1>
+                        <p className="profile-desc">{profileData.user.bio}</p>
+                        {/* <p className="profile-desc">{calculateAge(profileData.user.DateOfBirth)}</p> */}
+                        <p className="profile-desc">{profileData.user.email}</p>
+
+                        <div className="profile-follow-info">
+                            {/* {profileData.Followers &&
+                                // <span>{profileData.Followers ? profileData.Followers.length : 0} Member</span>
+                            } */}
                         </div>
+                    </div>
                 </div>
 
-                {profileData && isMember && (
+                {profileData && ( //--isMember
                     <div className="button-container">
-                        <button className="expandable-button button-1" onClick={() => setIsPostPopupOpen(true)}>
-                            <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} />
+                        <button className="expandable-button button-1" >
+                            {/* onClick={() => setIsPostPopupOpen(true)}> */}
+                            {/* <FontAwesomeIcon icon={faPlus} className="icon" style={{ color: '#f35366' }} /> */}
                             <span>UnFollow</span>
                         </button>
 
@@ -155,128 +119,48 @@ export default function page() {
                         Posts
                     </li>
                     <li
-                        className={activeTab === 'Events' ? 'active' : ''}
+                        className={activeTab === 'LikedPosts' ? 'active' : ''}
                         onClick={() => handleTabClick('LikedPosts')}
                     >
-                        LikedPosts
+                        Likes
                     </li>
 
                     <li
-                        className={activeTab === 'Members' ? 'active' : ''}
+                        className={activeTab === 'DisLikedPosts' ? 'active' : ''}
                         onClick={() => handleTabClick('DisLikedPosts')}
                     >
-                        DisLikedPosts
-                    </li>
-                    <li onClick={() => handleTabClick(isMember ? 'Leave' : 'Join')}>
-                        {isMember ? 'Leave' : 'Join'}
+                        Dislikes
                     </li>
                 </ul>
             </div>
 
-
-
             {/* Main Content Area */}
             <div className="content-area">
-                {activeTab === 'Events' && profileData.Group && profileData.Group.is_user_member && groupEvent && (
-                    <div className="events-section">
-                        <div className="profileGroup-container">
-                            {groupEvent.map((group) => (
-                                <div className="profileGroup">
-                                    <img src={`data:image/jpeg;base64,${profileData.Group.image_url}`} alt={profileData.Group.image_url} className="group-image" />
-
-                                    <div className="group-details">
-                                        <div className="event-icons">
-                                            {group.options && group.options.map((option, index) => (
-                                                <span
-                                                    key={index}
-                                                    className={`iconEvent`} // Optionally add unique class based on ID
-                                                    style={getIconStyle(option.did_user_respond)} // Apply styles based on response
-                                                    onClick={() => {
-                                                        const hasResponded = group.options.some(option => option.did_user_respond);
-                                                        if (!hasResponded) {
-                                                            handleReact(option.id, group.id);
-                                                        }
-                                                    }}                                     >
-                                                    {getIconComponent(option.icon)} {/* Render icon */}
-                                                </span>
-                                            ))}
-                                        </div>
-
-                                        <p className="group-date"><i className="icon-calendar"></i> {group.created_at}</p>
-                                        <h3 className="eventTitle">{group.title}</h3>
-                                        <p className="group-location">{group.description
-                                        }</p>
-
-                                        {/* Display images of friends, showing only the first three and a + if there are more */}
-                                        <p className="group-friends">
-                                            {group.options && group.options[0] && group.options[0].users_response && (
-                                                <>
-                                                    <i className="icon-friends"></i>
-                                                    {group.options[0].users_response.slice(0, 3).map((friend, index) => (
-                                                        <img
-                                                            key={index}
-                                                            src={`data:image/jpeg;base64,${friend.image_url}`}
-                                                            alt={`Friend ${index + 1}`}
-                                                            className="friend-image"
-                                                        />
-                                                    ))}
-                                                    {group.options[0].users_response.length > 3 ? (
-                                                        <span className="friendsText">+ {group.options[0].users_response.length - 3} friends are going</span>
-                                                    ) : (
-                                                        <span className="friendsText">{group.options[0].users_response.length} friends are going</span>
-                                                    )}
-                                                </>
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
+                {activeTab === 'Posts' && (
+                    <div className="posts-section" >
+                        <div
+                            id="group-post"
+                            style={{
+                                marginTop: "1.5%",
+                                width: "100%",
+                                display: "grid", // Use CSS Grid
+                                gridTemplateColumns: "repeat(2, minmax(380px, 1fr))", // Auto-adjust columns
+                                gap: "30px", // Space between posts
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            {profileData.UserPosts && profileData.UserPosts.map((post, index) => (
+                                <Post post={post} />
                             ))}
                         </div>
                     </div>
-            
-            // <div className="container">
-            //     <div className="userPic" id="userPic" style={{ backgroundImage: `data:image/jpeg;base64,${user.image_url}` }}></div>
-            //     <div className="profileUsername" id="profileUsername">{user.firstName} {user.lastName} ({user.username})</div>
-            //     <div className="userInfo" id="userInfo">
-            //         <table className="userInfo">
-            //             <tbody>
-            //                 <tr>
-            //                     <th>Bio: {user.bio}</th>
-            //                 </tr>
-            //                 <tr>
-            //                     <th>Age: {age}</th>
-            //                 </tr>
-            //                 <tr>
-            //                     <th>Email: {user.email}</th>
-            //                 </tr>
-            //             </tbody>
-            //         </table>
-            //     </div>
-            //     <div className="userBarDiv">
-            //         <table className="userBar">
-            //             <tbody>
-            //                 <tr>
-            //                     <th id="PostsTh" onClick={() => changeProfileContent("Posts")}>
-            //                         Posts
-            //                     </th>
-            //                     <th id="likesTh" onClick={() => changeProfileContent("Likes")}>
-            //                         Likes
-            //                     </th>
-            //                     <th id="dislikesTh" onClick={() => changeProfileContent("DisLikes")}>
-            //                         Dislikes
-            //                     </th>
-            //                 </tr>
-            //             </tbody>
-            //         </table>
-            //         <div id="profileContent">
-            //             <p id="selectedColumn">Click on a column to change the content.</p>
-            //         </div>
-            //     </div>
-            // </div>
-            );
-    }
+                )}
+            </div>
+        </div>
+    );
 
-    return <h1>You need to login</h1>;
+    // return <h1>You need to login</h1>;
 }
 
 function calculateAge(birthDateString: string) {
@@ -291,24 +175,4 @@ function calculateAge(birthDateString: string) {
     }
 
     return age;
-}
-
-function displayPostOnProfile(Posts: any, type: string) {
-    if (Array.isArray(Posts)) {
-        createPost(Posts, type);
-    } else {
-        console.error("Invalid data format. Expected an array of posts.");
-    }
-}
-
-function createPost(Posts: any, caseString: string) {
-    const [navigationContent, setNavigationContent] = useState('');
-
-    const clearNavigationContent = () => {
-        setNavigationContent('');
-    };
-
-    Posts.forEach((post: any) => {
-
-    })
 }

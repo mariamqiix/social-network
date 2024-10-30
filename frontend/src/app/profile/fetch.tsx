@@ -1,8 +1,6 @@
 import { ProfilePageView } from '../types/Types';
 
 export async function fetchProfileData(): Promise<ProfilePageView> {
-    const query = new URLSearchParams(window.location.search);
-    const id = query.get('id'); // Get the 'id' from the query string
     const url = `http://localhost:8080/profile/`; // Append the id to the URL
 
     try {
@@ -12,7 +10,7 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
                 'Content-Type': 'application/json'
             },
             credentials: 'include', // This is the key to include cookies
-            body: JSON.stringify({ user_id: -1 })
+            body: JSON.stringify({ user_id: 3 })
         });
         if (!response.ok) {
             throw new Error(`Error: status code ${response.status}`);
@@ -26,11 +24,20 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
         console.error('Error fetching data:', error);
         // If there is an error fetching data, return a default GroupPageView object
         return {
-            user: null,
-            Posts: [],
-            LikedPosts: [],
-            DislikedPosts: [],
-            Followers: []
+            user: {
+                id: 0,
+                username: '',
+                nickname: '',
+                firstName: '',
+                lastName: '',
+                email: '',
+                image_url: '',
+                bio: '',
+                dob: '',
+            },
+            UserPosts: [],
+            UserLikedPost: [],
+            UserDislikedPost: [],
         };
     }
 }

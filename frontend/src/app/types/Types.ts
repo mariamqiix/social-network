@@ -103,13 +103,12 @@ export type GroupPageView = {
 
 // Define GroupPageView type
 export type ProfilePageView = {
-    user: User | null; // null if not logged in
-    Posts: PostResponse[];
-    LikedPosts: PostResponse[];
-    DislikedPosts: PostResponse[];
-    Followers: BasicUserResponse[];
+    // user: User | null; // null if not logged in
+    user : User,
+    UserPosts:        PostResponse[],
+    UserLikedPost:    PostResponse[],
+    UserDislikedPost: PostResponse[],
 };
-
 
 export type GroupEventResponse = {
     id: number;
