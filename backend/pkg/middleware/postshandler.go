@@ -347,7 +347,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-
 		postToCreate := structs.Post{
 			UserID:  &sessionUser.ID,
 			Content: post.Description,

@@ -4,20 +4,23 @@ import PostContent from './components/PostContent';
 import PostActions from './components/PostActions';
 import { colors, randomColor } from "./components/colors";
 import { useDispatch, useSelector } from "react-redux";
-import { selectPosts } from "./redux/selectors";
+import { selectPosts, selectUser } from "./redux/selectors";
 import Card from "./components/card";
 import { addPost, likePost } from "./redux/actions";
 import { Post } from "./types/Types";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
   const posts = useSelector(selectPosts);
+  const user = useSelector(selectUser);
   let [imageData, setImageData] = useState("");
 
   const dispatch = useDispatch();
+  const router = useRouter();
 
   function loadImage() {
     let form = document.querySelector("form");
@@ -33,32 +36,51 @@ export default function Home() {
   function addPostFormSubmit(form: HTMLFormElement) {
     let data = new FormData(form);
     let imageContent = "";
-    if (form.children[1].files) {
+    if (form.children[1].files.length > 0) {
       let reader = new FileReader();
       reader.onload = function (e) {
         imageContent = e.target?.result as string;
-        dispatch(addPost({ id: 0, author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [imageContent], likes: 0, }));
-
-        // fetch("http://localhost:8080/post/createPost/user", { credentials: 'include', method: "POST", body: JSON.stringify({
-        //   description: "",
-
-        // }) }).then(res => {
-        //   res.text().then(data => {
-        //     console.log(data);
-        //   });
-        // });
+        if (data.get("text")) {
+          sendPost(data.get("text")?.toString()!, [imageContent]);
+        }
       }
       reader.readAsDataURL(form.children[1].files[0]);
     } else {
-      dispatch(addPost({ id: 0, author: { name: "hasan", avatar: "/placeholder.jpg" }, time: "", content: data.get("text")?.toString() ?? "", images: [], likes: 0, }));
+      if (data.get("text")) {
+        sendPost(data.get("text")?.toString()!, []);
+      }
+    }
+  }
+
+  function sendPost(content: string, images: string[]) {
+    if (user) {
+      fetch("http://localhost:8080/post/createPost/user", {
+        credentials: 'include', method: "POST", body: JSON.stringify({
+          description: content,
+          image: images.length > 0 ? images[0] : [],
+          privacy: "Public",
+          recipient: [],
+        })
+      }).then(res => {
+        console.log(res.status);
+        if (res.status == 200) {
+          window.location.reload();
+        }
+        // res.text().then(data => {
+        //   dispatch(addPost({ id: 0, author: { name: user.username, avatar: user.image_url ?? "/placeholder.jpg" }, time: (new Date()).toISOString(), content, images, likes: 0, }));
+        // });
+      });
     }
   }
 
   useEffect(() => {
     fetch("http://localhost:8080").then(res => {
       res.json().then(data => {
+        // console.log(data.Posts);
         data.Posts.forEach((post: any) => {
-          dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [], likes: post.likes.count }));
+          if (post) {
+            dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [], likes: post.likes.count }));
+          }
         });
       });
     });
@@ -77,7 +99,7 @@ export default function Home() {
 
   return <div>
     <Card color={colors[9]} className="m-1">
-      <form onSubmit={(e: any) => {
+      {user != null ? <form onSubmit={(e: any) => {
         e.preventDefault();
         if (e.target && e.target instanceof HTMLFormElement) {
           addPostFormSubmit(e.target);
@@ -97,7 +119,7 @@ export default function Home() {
           </button>
           <button className="btn btn-dark" type="submit">Post</button>
         </div>
-      </form>
+      </form> : <p>Login in to create post</p>}
     </Card>
     <main style={{ display: 'flex', flexDirection: 'column' }}>
       {posts.map((post: Post, index: number) => (

@@ -7,9 +7,12 @@ import { useEffect, useState } from "react";
 import ProgressBar from "@/app/components/progress_bar";
 import { Post } from "@/app/types/Types";
 import { randomColor } from '@/app/components/colors';
+import { useSelector } from 'react-redux';
+import { selectUser } from '@/app/redux/selectors';
 
 export default function Page() {
   const id = usePathname().split("/")[2];
+  const user = useSelector(selectUser);
   type Comment =
     {
       author: {
@@ -47,6 +50,18 @@ export default function Page() {
 
     });
   }
+  function addComment(text: string) {
+    fetch("http://localhost:8080/post/addComment/user", { method: "POST", credentials: 'include', body: JSON.stringify({ parent_id: Number.parseInt(id), description: text }) }).then((res) => {
+      console.log(res.status);
+      if (res.status == 201) {
+        console.log("Comment added");
+        setComments([...(comments == null ? [] : comments), { author: { name: user?.username, avatar: user?.image_url }, content: text, time: (new Date()).toISOString(), likes: 0 }]);
+      }
+      res.text().then((data) => {
+        console.log(data);
+      });
+    });
+  }
   if (post == null) {
     return <ProgressBar progress={1} />;
   } else {
@@ -70,7 +85,7 @@ export default function Page() {
 
             {/* Comments Section */}
             <div className="mt-4">
-              <CommentList comments={comments} />
+              <CommentList comments={comments} addComment={addComment} />
             </div>
           </div>
         </div>

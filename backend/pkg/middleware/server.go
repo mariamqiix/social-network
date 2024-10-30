@@ -24,8 +24,8 @@ func GoLive() {
 	mux.HandleFunc("/post/", PostHandler)
 	mux.HandleFunc("/post/addReaction", AddReactionHandler) //  DONE >>>>>	to add a reaction to a post || checked
 	// mux.HandleFunc("/post/removeReaction", RemoveReactionHandler) //  DONE >>>>>	to remove a reaction from a post || checked
-	// mux.HandleFunc("/post/addComment/", AddCommentHandler)        //  Done >>>>>	to add a comment to a post || checked
-	// mux.HandleFunc("/post/createPost/", CreatePostHandler)        //  DONE >>>>>	to create a post || checked
+	mux.HandleFunc("/post/addComment/", AddCommentHandler) //  Done >>>>>	to add a comment to a post || checked
+	mux.HandleFunc("/post/createPost/", CreatePostHandler) //  DONE >>>>>	to create a post || checked
 
 	///// the /group api's
 	mux.HandleFunc("/group/", GroupHandler)

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Card from "../components/card";
 import { colors } from "../components/colors";
-import { redirect, RedirectType, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/actions";
 import { selectNotifications, selectUser } from "../redux/selectors";
@@ -23,7 +23,7 @@ export default function loginPage() {
                 { method: "POST", credentials: 'include', body: formData }).then(res => {
                     if (res.ok && formData.get("username")) {
                         res.json().then(data => {
-                            console.log(data);
+                            // console.log(data);
                             dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
                             router.replace("/");
                         });

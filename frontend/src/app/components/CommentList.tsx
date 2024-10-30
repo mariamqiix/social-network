@@ -1,10 +1,21 @@
 import Comment from './Comment';
 import { randomColor } from "../components/colors";
+import "./buttons.css";
 
-const CommentList = ({ comments }) => {
+const CommentList = ({ comments, addComment }) => {
   return (
     <div className="mt-4">
       <h5 className="mb-4">Comments</h5>
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        let data = new FormData(e.target as HTMLFormElement);
+        addComment(data.get("content"));
+        e.target.reset();
+      }}>
+        <textarea className="w-10rea0 form-control" name="content"></textarea>
+        <button type='submit' className='btn btn-outline-purple border-0'>Add Comment</button>
+      </form>
+      <br />
       {comments != null ?
 
         comments.map((comment, index) => (

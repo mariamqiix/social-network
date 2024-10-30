@@ -506,7 +506,9 @@ func GetPostsForUser(userId int) ([]structs.Post, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error scanning row: %v", err)
 		}
-		posts = append(posts, post)
+		if post.ParentID == nil {
+			posts = append(posts, post)
+		}
 	}
 
 	// Check if any error occurred during row iteration
@@ -639,7 +641,9 @@ func GetPostsForGuest() ([]structs.Post, error) {
 		if err != nil {
 			return nil, err
 		}
-		posts = append(posts, post)
+		if post.ParentID == nil {
+			posts = append(posts, post)
+		}
 	}
 	return posts, nil
 }
