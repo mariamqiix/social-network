@@ -125,7 +125,7 @@ export default function Nav() {
                         >
                             {link == "/" ? "Posts" : link[1].toLocaleUpperCase() + link.slice(2)}
                         </span>
-                        {link == "/notifications" ? notifications.length : ""}
+                        {link == "/notifications" && notifications.length > 0 ? notifications.length : ""}
                     </Link>
                 ) : (<div key={link}></div>))}
                 {user ?

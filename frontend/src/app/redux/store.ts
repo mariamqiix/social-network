@@ -116,8 +116,9 @@ socket.onmessage = (event) => {
     console.log("socket received: ", event.data);
     try {
         let data = JSON.parse(event.data);
+        console.log(data);
         if (data.message_type == "Notification") {
-            store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true }));
+            store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true, extraData: data.notification.group_id }));
         }
     } catch (error) {
         console.error(error);

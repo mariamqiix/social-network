@@ -12,6 +12,7 @@ export type Notifi = {
     message: string;
     link: string | null;
     showToast: boolean;
+    extraData: number | undefined
 };
 
 export type Post = {

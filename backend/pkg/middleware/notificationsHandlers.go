@@ -48,7 +48,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the path parameter from the URL
-	path := strings.TrimPrefix(r.URL.Path, "/user/responde/")
+	path := strings.TrimPrefix(r.URL.Path, "/user/responds/")
 
 	// Handle the different cases based on the path
 	switch path {
