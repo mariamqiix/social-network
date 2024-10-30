@@ -79,10 +79,12 @@ export type GroupResponse = {
     created_at: string; // ISO 8601 date string
     group_member: number;
 };
+
 export type ReactionResponse = {
     didReact: boolean;
     count: number;
 };
+
 // Define BasicUserResponse type
 export type BasicUserResponse = {
     id: number;
@@ -98,6 +100,16 @@ export type GroupPageView = {
     Group: GroupResponse;
     Members: BasicUserResponse[];
 };
+
+// Define GroupPageView type
+export type ProfilePageView = {
+    user: User | null; // null if not logged in
+    Posts: PostResponse[];
+    LikedPosts: PostResponse[];
+    DislikedPosts: PostResponse[];
+    Followers: BasicUserResponse[];
+};
+
 
 export type GroupEventResponse = {
     id: number;

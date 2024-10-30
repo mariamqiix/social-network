@@ -1,7 +1,131 @@
-.container {
+.Container {
+    width: 95%;
+    margin-left: 2.5%;
+    font-family: Arial, sans-serif;
     height: 100%;
+    /* Ensure full height stretch */
+}
+
+.ProfilePageHeader {
+    min-width: 1000px;
+    /* Ensure full width */
+    position: relative;
+    /* Ensure the button container is positioned relative to this */
+    height: 300px;
+    display: flex;
+    align-items: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    /* Stretch to full width */
+}
+
+.profile-info {
+    display: flex;
     width: 100%;
 }
+
+.profile-avatar {
+    margin: auto;
+    margin-left: 40px;
+    width: 255px;
+    height: 210px;
+    /* Adjust to keep it proportional */
+    border-radius: 200px;
+    border: 2px solid #e0e0e0;
+}
+
+.profile-details {
+    margin-left: 40px;
+    flex-grow: 1;
+    /* Allows profile details to stretch */
+    width: 100%;
+    /* Ensures it fills available width */
+}
+
+.profile-name {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.profile-desc {
+    font-size: 20px;
+    color: #555;
+    margin: 20px 0;
+}
+
+.profile-follow-info {
+    margin-top: 30px;
+    font-size: 16px;
+    color: #888;
+}
+
+
+
+.list-bar {
+    min-width: 1000px;
+    /* Ensure full width */
+    margin-top: 20px;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    /* Aligns the entire list horizontally */
+    align-items: center;
+    /* Centers the items vertically */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    /* Stretches to full width */
+}
+
+.list-bar ul {
+    height: 60px;
+    margin: 10px;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    /* Adds space between the list items */
+    width: 100%;
+    /* Stretches to full width */
+    padding: 0;
+    gap: 10px;
+    /* Adds space between the li elements */
+}
+
+.list-bar li {
+    display: flex;
+    justify-content: center;
+    /* Center text horizontally */
+    align-items: center;
+    /* Center text vertically */
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px 20px;
+    margin-bottom: 0;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    flex-grow: 1;
+    /* Ensures each li stretches evenly across the width */
+    text-align: center;
+    /* Center the text */
+    width: 100%;
+    /* Ensure li takes full width */
+}
+
+.list-bar li.active {
+    background-color: gray;
+    color: white;
+}
+
+.list-bar li:hover {
+    background-color: #e0e0e0;
+}
+
+
 
 .userBar table {
     border-collapse: collapse;
