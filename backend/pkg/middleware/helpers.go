@@ -439,7 +439,7 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 				return nil, err
 			}
 
-		case "GroupNewEvent": 
+		case "GroupNewEvent":
 			group, err := models.GetGroupByID(*notification.GroupID)
 			if err != nil {
 				return nil, err
@@ -476,23 +476,25 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 			}
 
 		case "GroupRequestToJoin":
-			group, err := models.GetGroupByID(*notification.GroupID)
-			if err != nil {
-				return nil, err
-			}
+			if notification.SenderID != nil {
+				group, err := models.GetGroupByID(*notification.GroupID)
+				if err != nil {
+					return nil, err
+				}
 
-			userRequeted, err := models.GetUserByID(notificate.SenderID)
-			if err != nil {
-				return nil, err
-			}
+				userRequeted, err := models.GetUserByID(*notification.SenderID)
+				if err != nil {
+					return nil, err
+				}
 
-			notificate = &structs.NotificatoinResponse{
-				Id:           notification.ID,
-				Type:         notification.NotificationType,
-				GroupID:      *notification.GroupID,
-				IsRead:       notification.IsRead,
-				CreationDate: notification.CreationDate,
-				Message:      userRequeted.Username + " has has rquested to join your " + group.Title + " group.",
+				notificate = &structs.NotificatoinResponse{
+					Id:           notification.ID,
+					Type:         notification.NotificationType,
+					GroupID:      *notification.GroupID,
+					IsRead:       notification.IsRead,
+					CreationDate: notification.CreationDate,
+					Message:      userRequeted.Username + " has has rquested to join your " + group.Title + " group.",
+				}
 			}
 		}
 
@@ -546,7 +548,7 @@ func createGroupNotificationResponse(notification structs.Notification, msg stri
 		GroupID:      group.ID,
 		IsRead:       notification.IsRead,
 		CreationDate: notification.CreationDate,
-		Message:      user.Username+ " has "+msg+" your invitation to join " + strings.Title(group.Title) + ".",
+		Message:      user.Username + " has " + msg + " your invitation to join " + strings.Title(group.Title) + ".",
 	}, nil
 }
 

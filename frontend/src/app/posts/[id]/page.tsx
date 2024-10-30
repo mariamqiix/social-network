@@ -25,7 +25,7 @@ export default function Page() {
   useEffect(() => {
     fetch("http://localhost:8080/postPage?id=" + id, { credentials: 'include' }).then((res) => {
       res.json().then((data) => {
-        console.log(data);
+        // console.log(data);
         let newPost: Post = { id: data.Posts.id, author: { name: data.Posts.author.username, avatar: "/placeholder.jpg" }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : [], likes: data.Posts.likes.count };
         setPost(newPost);
         if (data.Comments) {
@@ -34,6 +34,19 @@ export default function Page() {
       });
     });
   }, [fetch]);
+  function likePost() {
+    fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: Number.parseInt(id), reaction: "Like" }) }).then((res) => {
+      console.log(res.status);
+      if (res.status == 204) {
+        // console.log("remove");
+        setPost({ ...post, likes: post?.likes - 1 });
+      } else if (res.status == 201) {
+        // console.log("add");
+        setPost({ ...post, likes: post?.likes + 1 });
+      }
+
+    });
+  }
   if (post == null) {
     return <ProgressBar progress={1} />;
   } else {
@@ -53,7 +66,7 @@ export default function Page() {
               images={post.images}
             />
             {/* Post Actions */}
-            <PostActions likes={post.likes} id={post.id} />
+            <PostActions likes={post.likes} liked={likePost} />
 
             {/* Comments Section */}
             <div className="mt-4">

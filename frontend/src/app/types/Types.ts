@@ -11,6 +11,7 @@ export type Notifi = {
     title: string;
     message: string;
     link: string | null;
+    showToast: boolean;
 };
 
 export type Post = {
@@ -35,7 +36,7 @@ export type Chat = {
         name: string;
         avatar: string;
     };
-    
+
     created_at: string;
     content: string;
     image_url: string;

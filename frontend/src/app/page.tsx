@@ -6,7 +6,7 @@ import { colors, randomColor } from "./components/colors";
 import { useDispatch, useSelector } from "react-redux";
 import { selectPosts } from "./redux/selectors";
 import Card from "./components/card";
-import { addPost } from "./redux/actions";
+import { addPost, likePost } from "./redux/actions";
 import { Post } from "./types/Types";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -64,6 +64,17 @@ export default function Home() {
     });
   }, [dispatch]);
 
+  function likePostClicked(id: Number) {
+    fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
+      console.log(res.status);
+      if (res.status == 204) {
+        dispatch(likePost(id, -1));
+      } else if (res.status == 201) {
+        dispatch(likePost(id, 1));
+      }
+    });
+  }
+
   return <div>
     <Card color={colors[9]} className="m-1">
       <form onSubmit={(e: any) => {
@@ -111,7 +122,7 @@ export default function Home() {
             images={post.images}
             id={post.id.toString()}
           />
-          <PostActions likes={post.likes} id={post.id} />
+          <PostActions likes={post.likes} liked={() => likePostClicked(post.id)} />
         </div>
       ))}
     </main>

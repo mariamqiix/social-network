@@ -3,16 +3,7 @@ import { faThumbsUp, faCommentAlt, faShare } from '@fortawesome/free-solid-svg-i
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import "./buttons.css";
 
-const PostActions = ({ likes, id }) => {
-  function likePost() {
-    fetch("http://localhost:8080/post/addReaction/", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
-      res.text().then((data) => {
-        console.log(data);
-        // setPost(data);
-      });
-    });
-  }
-
+const PostActions = ({ likes, liked }) => {
   return (
     <div className="d-flex justify-content-between align-items-center text-secondary">
       {/* Show the number of likes */}
@@ -24,7 +15,7 @@ const PostActions = ({ likes, id }) => {
 
       {/* Action buttons with icons */}
       <div>
-        <button className="btn btn-outline-primary border-0 btn-sm me-2" onClick={likePost}>
+        <button className="btn btn-outline-primary border-0 btn-sm me-2" onClick={liked}>
           <FontAwesomeIcon icon={faThumbsUp} /> {likes} {likes == 1 ? "Like" : "Likes"}
         </button>
         <button className="btn btn-outline-purple border-0 btn-sm me-2">

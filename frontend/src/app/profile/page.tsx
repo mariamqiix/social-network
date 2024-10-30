@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAt, faCalendarDay, faEnvelope, faSignature } from "@fortawesome/free-solid-svg-icons";
 import { useEffect } from "react";
 
-
 // import React, { useRef, useState, useEffect } from 'react';
 
 import { useState } from "react";
@@ -26,7 +25,7 @@ export default function page() {
             body: JSON.stringify({ user_id: -1 })
         }).then((res) => {
             res.text().then((data) => {
-                console.log(data);
+                // console.log(data);
             });
         });
     }, [fetch]);
@@ -62,43 +61,43 @@ export default function page() {
         return (
             <div className="container">
                 <div className="userPic" id="userPic" style={{ backgroundImage: `data:image/jpeg;base64,${user.image_url}` }}></div>
-
                 <div className="profileUsername" id="profileUsername">{user.firstName} {user.lastName} ({user.username})</div>
-                
                 <div className="userInfo" id="userInfo">
-                    <table className= "userInfo">
-                        <tr>
-                            <th>Bio: {user.bio}</th>
-                        </tr>
-                        <tr>
-                            <th>Age: {age}</th>
-                        </tr>
-                        <tr>
-                            <th>Email: {user.email}</th>
-                        </tr>
+                    <table className="userInfo">
+                        <tbody>
+                            <tr>
+                                <th>Bio: {user.bio}</th>
+                            </tr>
+                            <tr>
+                                <th>Age: {age}</th>
+                            </tr>
+                            <tr>
+                                <th>Email: {user.email}</th>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 <div className="userBarDiv">
-                <table className= "userBar">
-                    <tr>
-                        <th id="PostsTh" onClick={() => changeProfileContent("Posts")}>
-                            Posts
-                        </th>
-                        <th id="likesTh" onClick={() => changeProfileContent("Likes")}>
-                            Likes
-                        </th>
-                        <th id="dislikesTh" onClick={() => changeProfileContent("DisLikes")}>
-                            Dislikes
-                        </th>
-                    </tr>
-                </table>
-
-                <div id="profileContent">
-                    <p id="selectedColumn">Click on a column to change the content.</p>
-                </div>
+                    <table className="userBar">
+                        <tbody>
+                            <tr>
+                                <th id="PostsTh" onClick={() => changeProfileContent("Posts")}>
+                                    Posts
+                                </th>
+                                <th id="likesTh" onClick={() => changeProfileContent("Likes")}>
+                                    Likes
+                                </th>
+                                <th id="dislikesTh" onClick={() => changeProfileContent("DisLikes")}>
+                                    Dislikes
+                                </th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div id="profileContent">
+                        <p id="selectedColumn">Click on a column to change the content.</p>
+                    </div>
                 </div>
             </div>);
-
     }
 
     return <h1>You need to login</h1>;

@@ -11,15 +11,8 @@ import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid
 import { RequestToJoin, sendInvite, fetchEventData, fetchMembers, fetchGroupData, LeaveGroup } from "./fetching";
 import { randomColor } from "@/app/components/colors";
 
-
-
-
-
 const query = new URLSearchParams(window.location.search);
 const id = query.get('id') || ''; // Get the 'id' from the query string and ensure it's a string
-
-
-
 
 const GroupPage = () => {
     const handleTabClick = (tabName: string) => {

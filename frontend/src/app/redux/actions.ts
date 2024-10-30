@@ -5,6 +5,11 @@ export const addPost = (post: Post) => ({
     payload: post,
 });
 
+export const likePost = (id: Number, value: Number) => ({
+    type: 'posts/like',
+    payload: {id, value},
+});
+
 export const addChat = (chat: Chat) => ({
     type: 'chats/add',
     payload: chat,
@@ -13,6 +18,11 @@ export const addChat = (chat: Chat) => ({
 export const addNotification = (notification: Notifi) => ({
     type: 'notifications/add',
     payload: notification,
+});
+
+export const hideToastNotification = (id: number) => ({
+    type: 'notifications/hideToast',
+    payload: id,
 });
 
 export const login = (user: User) => ({

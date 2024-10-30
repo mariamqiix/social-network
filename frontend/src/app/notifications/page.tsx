@@ -18,13 +18,23 @@ export default function page() {
     const dispatch = useDispatch();
     useEffect(() => {
         fetch("http://localhost:8080/user/notifications/", { credentials: 'include' }).then((res) => {
-            res.text().then((data) => {
+            res.json().then((data) => {
                 console.log(data);
-                // dispatch(addNotification({}));
+                if (data) {
+                    data.forEach((element: any) => {
+                        dispatch(addNotification({ id: element.id, type: "message", title: element.type, message: element.message, link: "", showToast: false, }));
+                    });
+                }
             });
         });
     }, [fetch]);
-    return notifications.map(notification => <Card key={notification.id} title={notification.title} color={notificationColors[notification.type]}>
-        <p>{notification.message}</p>
-    </Card>);
+
+    if (notifications.length > 0) {
+
+        return notifications.map(notification => <Card key={notification.id} title={notification.title} color={notificationColors[notification.type]}>
+            <p>{notification.message}</p>
+        </Card>);
+    } else {
+        return <p>You have no notifications</p>
+    }
 }

@@ -1,5 +1,7 @@
 import { createStore } from "redux";
 import { Notifi, Post, State, Chat } from "../types/Types";
+import { addNotification } from "./actions";
+import { useDispatch } from "react-redux";
 
 const initialState: State = {
     posts: [],
@@ -28,6 +30,22 @@ const reducer = (state = initialState, action: any) => {
                     posts: [action.payload, ...state.posts]
                 };
             }
+        case "posts/like":
+            if (state.posts.some((post: Post) => post.id == action.payload.id)) {
+                for (let i = 0; i < state.posts.length; i++) {
+                    if (state.posts[i].id == action.payload.id) {
+                        state.posts[i].likes += action.payload.value;
+                    }
+                }
+                return {
+                    ...state,
+                    posts: [...state.posts]
+                };
+            }
+            return {
+                ...state,
+                posts: [...state.posts]
+            };
         case 'chats/add':
             if (state.chats.some((chat: Chat) => chat.id == action.payload.id)) {
                 for (let i = 0; i < state.posts.length; i++) {
@@ -46,9 +64,33 @@ const reducer = (state = initialState, action: any) => {
                 };
             }
         case 'notifications/add':
+            if (state.notifications.some((not: Notifi) => not.id == action.payload.id)) {
+                for (let i = 0; i < state.posts.length; i++) {
+                    if (state.notifications[i].id == action.payload.id) {
+                        // console.log("update post: ", i);
+                        state.notifications[i] = action.payload;
+                    }
+                }
+                return {
+                    ...state,
+                    notifications: [...state.notifications]
+                };
+            } else {
+                return {
+                    ...state,
+                    notifications: [action.payload, ...state.notifications]
+                };
+            }
+        case 'notifications/hideToast':
             return {
                 ...state,
-                notifications: [action.payload, ...state.notifications]
+                notifications: state.notifications.map(not => {
+                    if (not.id == action.payload) {
+                        return { ...not, showToast: false };
+                    } else {
+                        return not;
+                    }
+                })
             };
         case 'user/login':
             return {
@@ -72,6 +114,14 @@ console.log("socket created: ", socket);
 socket.onmessage = (event) => {
     // setMessages((prevMessages) => [...prevMessages, event.data]);
     console.log("socket received: ", event.data);
+    try {
+        let data = JSON.parse(event.data);
+        if (data.message_type == "Notification") {
+            store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true }));
+        }
+    } catch (error) {
+        console.error(error);
+    }
 };
 
 export default store;

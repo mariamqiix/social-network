@@ -2,8 +2,10 @@
 
 import { faExclamation } from "@fortawesome/free-solid-svg-icons/faExclamation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ReactNode, useState } from "react";
-import { type Notifi } from "../types/Types";
+import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectNotifications } from "../redux/selectors";
+import { hideToastNotification } from "../redux/actions";
 
 const toastIcons = {
     "error": <FontAwesomeIcon className="me-2" icon={faExclamation} />,
@@ -21,39 +23,24 @@ const toastIcons = {
             clipRule="evenodd"
         />
     </svg>,
-    "chat" : <div></div>
+    "chat": <div></div>
 };
 
 let id: number = 0;
 
 export default function Toasts() {
-    const [toasts, setToasts] = useState<Notifi[]>([]);
-
-    function addToast(title: string, message: string, type: "error" | "message") {
-        const index = id;
-        id++
-        setToasts([...toasts, {
-            id: index,
-            title,
-            type,
-            message,
-        }]);
-    }
+    const notifications = useSelector(selectNotifications);
+    const dispatch = useDispatch();
 
     return <div className="toast-container position-fixed m-2 top-0 end-0">
-        {/* <button onClick={() => {
-            addToast("error", "test", "error");
-        }}>add Notification</button> */}
-        {toasts.map((not) => <div key={not.id} className="toast text-bg-danger show" role="alert" aria-live="assertive" aria-atomic="true">
+        {notifications.filter((not) => not.showToast).map((not) => <div key={not.id} className={not.type == "error" ? "toast show text-bg-danger" : "toast show"} role="alert" aria-live="assertive" aria-atomic="true">
             <div className="toast-header">
                 {/* <img src="..." className="rounded me-2" alt="..." /> */}
                 {toastIcons[not.type]}
                 <strong className="me-auto">{not.title}</strong>
                 <small className="text-body-secondary">just now</small>
                 <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close" onClick={() => {
-                    setToasts(t => {
-                        return t.filter((n) => n.id != not.id);
-                    });
+                    dispatch(hideToastNotification(not.id));
                 }}></button>
             </div>
             <div className="toast-body">
