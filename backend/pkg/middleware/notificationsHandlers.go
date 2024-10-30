@@ -72,13 +72,23 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		}
 
 		models.RemoveInvite(group.ID, user.ID)
-
+		invites, err := models.GetUserGroupInvites(user.ID, groupInviteResponse.GroupID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
 		if groupInviteResponse.Response == "Accept" {
-			models.AddMember(user.ID, groupInviteResponse.GroupID)
+			err := models.AddMember(groupInviteResponse.GroupID, user.ID)
+			if err != nil {
+				errorServer(w, http.StatusInternalServerError)
+				return
+			}
 			notificationType = "GroupInviteAccept"
 			code = "accepted"
+			for _, invite := range invites {
+				models.UpdateInviteStatus(invite.ID, user.ID, "Accepted")
+			}
 		}
-
 		notification := structs.Notification{
 			UserID:           group.CreatorID,
 			SenderID:         &user.ID,
@@ -115,7 +125,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if GroupRequestResponse.Response == "Accept" {
-			models.AddMember(user.ID, GroupRequestResponse.GroupID)
+			models.AddMember(GroupRequestResponse.GroupID, user.ID)
 			notificationType = "GroupRequestAccept"
 			code = "approved"
 		}

@@ -391,3 +391,41 @@ func GetGroupByRequest(requestType string, userId int) ([]structs.Group, error) 
 	}
 	return groups, nil
 }
+
+// GetUserInvites fetches all group invites for a given user.
+func GetUserGroupInvites(userID, groupId int) ([]structs.GroupRequest, error) {
+	// Execute a read query to fetch the group requests for the user with type 'Invite'
+	rows, err := Read("GroupRequest", []string{"*"}, []string{"user_id", "request_type", "group_id"}, []interface{}{userID, "Invite", groupId})
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	// Create a slice to hold the group requests
+	var requests []structs.GroupRequest
+
+	// Iterate over the rows and scan each row into a GroupRequest struct
+	for rows.Next() {
+		var request structs.GroupRequest
+		err := rows.Scan(
+			&request.ID,
+			&request.GroupID,
+			&request.UserID,
+			&request.Status,
+			&request.Type,
+			&request.CreationDate,
+		)
+		if err != nil {
+			return nil, err
+		}
+		requests = append(requests, request)
+	}
+
+	// Check if there was an error after iterating
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	// Return the group requests if everything was successful
+	return requests, nil
+}
