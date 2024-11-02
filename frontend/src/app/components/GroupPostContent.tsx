@@ -17,7 +17,7 @@ const Post = ({ post }: { post: PostResponse }) => (
             padding: "20px",
             marginBottom: "20px",
             minHeight: "800px",
-            maxHeight:"800px",
+            maxHeight: "800px",
         }}
     >
         {/* Group and User Info */}
@@ -28,7 +28,8 @@ const Post = ({ post }: { post: PostResponse }) => (
                 marginBottom: "15px",
             }}
         >
-            <img
+
+            {post.group && <img
                 src={`data:image/jpeg;base64,${post.group.image_url}`}
                 alt="Group"
                 style={{
@@ -37,9 +38,9 @@ const Post = ({ post }: { post: PostResponse }) => (
                     width: "70px",
                     height: "70px",
                 }}
-            />
+            />}
             <div style={{ flexGrow: 1, marginLeft: "10px" }}>
-                <h3
+                {post.group && <h3
                     style={{
                         margin: 0,
                         fontSize: "1rem",
@@ -48,7 +49,7 @@ const Post = ({ post }: { post: PostResponse }) => (
                     }}
                 >
                     {post.group.title}
-                </h3>
+                </h3>}
                 <div
                     style={{
                         marginTop: "10px",
@@ -58,7 +59,7 @@ const Post = ({ post }: { post: PostResponse }) => (
                         color: "#888",
                     }}
                 >
-                    <img
+                    {post.author &&  <img
                         src={`data:image/jpeg;base64,${post.author.image_url}`}
                         alt="User"
                         style={{
@@ -67,7 +68,7 @@ const Post = ({ post }: { post: PostResponse }) => (
                             width: "30px",
                             height: "30px",
                         }}
-                    />
+                    />}
                     <span style={{ color: "#0073e6", marginRight: "5px" }}>{post.author.username}</span>
                     <span style={{ fontSize: "0.8rem", color: "#aaa" }}>{post.created_at}</span>
                 </div>
@@ -84,7 +85,7 @@ const Post = ({ post }: { post: PostResponse }) => (
                     style={{
                         width: "100%",
                         maxHeight: "600px",
-                        minHeight:"600px",
+                        minHeight: "600px",
                         borderRadius: "8px",
                         margin: "auto",
                         objectFit: "cover", // Ensures the image covers the container

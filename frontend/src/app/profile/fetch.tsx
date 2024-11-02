@@ -1,13 +1,13 @@
 import { ProfilePageView } from '../types/Types';
 
 export async function fetchProfileData(): Promise<ProfilePageView> {
-    const url = `http://localhost:8080/profile/`; // Append the id to the URL
+    const url = `http://localhost:8080/user/profile/`; // Append the id to the URL
 
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
             credentials: 'include', // This is the key to include cookies
             body: JSON.stringify({ user_id: 3 })
@@ -18,7 +18,10 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
 
         // Fetch the group data from the API
         const userData: ProfilePageView = await response.json();
+        console.log(userData)
+
         return userData;
+
 
     } catch (error) {
         console.error('Error fetching data:', error);

@@ -72,8 +72,8 @@ const GroupPage = () => {
                 username: '',
                 nickname: '',
                 email: '',
-                firstName: '',
-                lastName: '',
+                first_name: '',
+                last_name: '',
                 dob: '',
                 bio: '',
                 image_url: ''

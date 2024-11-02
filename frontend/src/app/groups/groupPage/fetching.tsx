@@ -30,8 +30,8 @@ export async function fetchGroupData(): Promise<GroupPageView> {
                     username: '',
                     nickname: '',
                     email: '',
-                    firstName: '',
-                    lastName: '',
+                    first_name: '',
+                    last_name: '',
                     dob: '',
                     bio: '',
                     image_url: ''

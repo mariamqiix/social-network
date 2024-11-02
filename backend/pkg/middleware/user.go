@@ -4,6 +4,7 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -81,8 +82,11 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		UserDislikedPost: UserDislikedPost,
 	}
 
+	fmt.Println(profile)
+
 	switch path {
 	case "":
+		fmt.Print("here")
 		writeToJson(profile, w)
 		return
 

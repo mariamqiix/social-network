@@ -83,10 +83,10 @@ export default function page() {
                     />
 
                     <div className="profile-details">
-                        <h1 className="profile-name">{profileData.User.first_name} {profileData.User.last_name} ({profileData.User.username})</h1>
-                        <p className="profile-desc">{profileData.User.bio}</p>
-                        {/* <p className="profile-desc">{calculateAge(profileData.user.DateOfBirth)}</p> */}
-                        <p className="profile-desc">{profileData.User.email}</p>
+                        <h1 className="profile-name">{profileData.first_name} {profileData.last_name} ({profileData.username})</h1>
+                        <p className="profile-desc">{profileData.bio}</p>
+                        {/* <p className="profile-desc">{calculateAge(profileData.DateOfBirth)}</p> */}
+                        <p className="profile-desc">{profileData.email}</p>
 
                         <div className="profile-follow-info">
                             {/* {profileData.Followers &&
@@ -150,7 +150,7 @@ export default function page() {
                                 alignItems: "center",
                             }}
                         >
-                            {profileData.Posts && profileData.Posts.map((post, index) => (
+                            {profileData.user_posts && profileData.user_posts.map((post, index) => (
                                 <Post post={post} />
                             ))}
                         </div>
