@@ -12,18 +12,18 @@ import React, { useRef, useState, useEffect } from 'react';
 
 export default function page() {
     const [profileData, setProfileData] = useState<ProfilePageView>({
-        user: {
+        User: {
             id: 0,
             username: '',
             nickname: '',
-            firstName: '',
-            lastName: '',
+            first_name: '',
+            last_name: '',
             email: '',
             image_url: '',
             bio: '',
             dob: '',
         },
-        UserPosts: [],
+        Posts: [],
         UserLikedPost: [],
         UserDislikedPost: [],
     });
@@ -83,10 +83,10 @@ export default function page() {
                     />
 
                     <div className="profile-details">
-                        <h1 className="profile-name">{profileData.user.firstName} {profileData.user.lastName} ({profileData.user.username})</h1>
-                        <p className="profile-desc">{profileData.user.bio}</p>
+                        <h1 className="profile-name">{profileData.User.first_name} {profileData.User.last_name} ({profileData.User.username})</h1>
+                        <p className="profile-desc">{profileData.User.bio}</p>
                         {/* <p className="profile-desc">{calculateAge(profileData.user.DateOfBirth)}</p> */}
-                        <p className="profile-desc">{profileData.user.email}</p>
+                        <p className="profile-desc">{profileData.User.email}</p>
 
                         <div className="profile-follow-info">
                             {/* {profileData.Followers &&
@@ -150,7 +150,7 @@ export default function page() {
                                 alignItems: "center",
                             }}
                         >
-                            {profileData.UserPosts && profileData.UserPosts.map((post, index) => (
+                            {profileData.Posts && profileData.Posts.map((post, index) => (
                                 <Post post={post} />
                             ))}
                         </div>

@@ -24,18 +24,18 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
         console.error('Error fetching data:', error);
         // If there is an error fetching data, return a default GroupPageView object
         return {
-            user: {
+            User: {
                 id: 0,
                 username: '',
                 nickname: '',
-                firstName: '',
-                lastName: '',
+                first_name: '',
+                last_name: '',
                 email: '',
                 image_url: '',
                 bio: '',
                 dob: '',
             },
-            UserPosts: [],
+            Posts: [],
             UserLikedPost: [],
             UserDislikedPost: [],
         };

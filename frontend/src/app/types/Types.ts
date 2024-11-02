@@ -48,8 +48,8 @@ export type User = {
     id: number;
     username: string;
     nickname: string;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     email: string;
     image_url: string | null;
     bio: string;
@@ -104,8 +104,8 @@ export type GroupPageView = {
 // Define GroupPageView type
 export type ProfilePageView = {
     // user: User | null; // null if not logged in
-    user : User,
-    UserPosts:        PostResponse[],
+    User : User,
+    Posts:        PostResponse[],
     UserLikedPost:    PostResponse[],
     UserDislikedPost: PostResponse[],
 };
