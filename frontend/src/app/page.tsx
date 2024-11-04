@@ -35,29 +35,29 @@ export default function Home() {
 
   function addPostFormSubmit(form: HTMLFormElement) {
     let data = new FormData(form);
-    let imageContent = "";
+    let imageContent: ArrayBuffer | undefined;
     if (form.children[1].files.length > 0) {
       let reader = new FileReader();
       reader.onload = function (e) {
-        imageContent = e.target?.result as string;
-        if (data.get("text")) {
-          sendPost(data.get("text")?.toString()!, [imageContent]);
+        imageContent = e.target?.result as ArrayBuffer;
+        if (data.get("text") && imageContent) {
+          sendPost(data.get("text")?.toString()!, imageContent);
         }
       }
-      reader.readAsDataURL(form.children[1].files[0]);
+      reader.readAsArrayBuffer(form.children[1].files[0]);
     } else {
       if (data.get("text")) {
-        sendPost(data.get("text")?.toString()!, []);
+        sendPost(data.get("text")?.toString()!, null);
       }
     }
   }
 
-  function sendPost(content: string, images: string[]) {
+  function sendPost(content: string, image: ArrayBuffer | null) {
     if (user) {
       fetch("http://localhost:8080/post/createPost/user", {
         credentials: 'include', method: "POST", body: JSON.stringify({
           description: content,
-          image: images.length > 0 ? images[0] : [],
+          image: image == null ? null : new Int8Array(image),
           privacy: "Public",
           recipient: [],
         })
@@ -66,9 +66,10 @@ export default function Home() {
         if (res.status == 200) {
           window.location.reload();
         }
-        // res.text().then(data => {
-        //   dispatch(addPost({ id: 0, author: { name: user.username, avatar: user.image_url ?? "/placeholder.jpg" }, time: (new Date()).toISOString(), content, images, likes: 0, }));
-        // });
+        res.text().then(data => {
+          console.log(data);
+          // dispatch(addPost({ id: 0, author: { name: user.username, avatar: user.image_url ?? "/placeholder.jpg" }, time: (new Date()).toISOString(), content, images, likes: 0, }));
+        });
       });
     }
   }
