@@ -493,6 +493,7 @@ func MapNotifications(sessionUser structs.User, notifications []structs.Notifica
 					GroupID:      *notification.GroupID,
 					IsRead:       notification.IsRead,
 					CreationDate: notification.CreationDate,
+					SenderID:     *notification.SenderID,
 					Message:      userRequeted.Username + " has has rquested to join your " + group.Title + " group.",
 				}
 			}

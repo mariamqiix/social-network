@@ -128,7 +128,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if GroupRequestResponse.Response == "Accept" {
-			models.AddMember(GroupRequestResponse.GroupID, user.ID)
+			models.AddMember(GroupRequestResponse.GroupID, GroupRequestResponse.UserID)
 			notificationType = "GroupRequestAccept"
 			code = "approved"
 		}
@@ -136,7 +136,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		models.RemoveRequest(GroupRequestResponse.GroupID, GroupRequestResponse.UserID)
 
 		notification := structs.Notification{
-			UserID:           user.ID,
+			UserID:           GroupRequestResponse.UserID,
 			SenderID:         &group.CreatorID,
 			NotificationType: notificationType,
 			GroupID:          &GroupRequestResponse.GroupID,
