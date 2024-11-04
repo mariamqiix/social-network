@@ -63,24 +63,21 @@ export default function page() {
                                 message: element.message,
                                 link: "",
                                 showToast: false,
-                                function: {
-                                    "GroupInvite": () => {
-                                        fetch("http://localhost:8080/user/responds/groupInviteResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ group_id: element.group_id, response: "Accept" }) }).then((res) => {
-                                            console.log(res.status);
-                                            res.text().then((data) => {
-                                                console.log(data);
-                                            });
+                                function: element.type == "GroupInvite" ? () => {
+                                    fetch("http://localhost:8080/user/responds/groupInviteResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ group_id: element.group_id, response: "Accept" }) }).then((res) => {
+                                        console.log(res.status);
+                                        res.text().then((data) => {
+                                            console.log(data);
                                         });
-                                    },
-                                    "GroupRequestToJoin": () => {
-                                        fetch("http://localhost:8080/user/responds/adminGroupRequestResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ group_id: element.group_id, user_id: element.sender_id, response: "Accept" }) }).then((res) => {
-                                            console.log(res.status);
-                                            res.text().then((data) => {
-                                                console.log(data);
-                                            });
+                                    });
+                                } : element.type == "GroupRequestToJoin" ? () => {
+                                    fetch("http://localhost:8080/user/responds/adminGroupRequestResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ group_id: element.group_id, user_id: element.sender_id, response: "Accept" }) }).then((res) => {
+                                        console.log(res.status);
+                                        res.text().then((data) => {
+                                            console.log(data);
                                         });
-                                    }
-                                }[element.type]
+                                    });
+                                } : null,
                             }));
                         });
                     }
