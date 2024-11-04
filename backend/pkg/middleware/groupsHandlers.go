@@ -244,7 +244,7 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := models.GetUserByID(sessionUser.ID) 
+	user, err := models.GetUserByID(sessionUser.ID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
@@ -395,6 +395,7 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 	notification := structs.Notification{
 		UserID:           Invite.UserID,
 		NotificationType: "GroupInvite",
+		SenderID:         &sessionUser.ID,
 		GroupID:          &Invite.GroupID,
 		IsRead:           false,
 	}

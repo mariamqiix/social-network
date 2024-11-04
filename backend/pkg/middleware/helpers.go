@@ -538,6 +538,7 @@ func createGroupNotificationResponse(notification structs.Notification, msg stri
 
 	user, err := models.GetUserByID(*notification.SenderID)
 	if err != nil {
+		fmt.Println("notification", notification)
 		return nil, err
 	}
 
