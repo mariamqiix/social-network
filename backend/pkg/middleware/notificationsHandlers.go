@@ -143,7 +143,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			IsRead:           false,
 		}
 
-		models.CreateMessagesNotification(notification)
+		models.CreateGroupsNotification(notification)
 		notificate, err := createGroupNotificationRequestResponse(notification, code)
 		if err != nil {
 			return
