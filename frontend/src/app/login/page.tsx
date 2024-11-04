@@ -51,11 +51,60 @@ export default function loginPage() {
             {/* <h3 className="text-center">Please enter your account details</h3> */}
             <div className="mb-3">
                 <label className="form-label">Email</label>
+                <div id="usernameHelp" style={{ color: "red", fontSize: "0.875rem" }}>Your email must contain @.</div>
                 <input type="email" className="form-control" name="email" aria-describedby="emailHelp" />
             </div>
             <div className="mb-3">
                 <label className="form-label">User name</label>
-                <input type="text" className="form-control" name="username" aria-describedby="emailHelp" />
+                <div id="usernameHelp" style={{ color: "red", fontSize: "0.875rem" }}>{/*Your username must be between 6 and 12 characters.*/}</div>
+                <input type="text" className="form-control" name="username" aria-describedby="usernameHelp" />
+            </div>
+
+            <div className="mb-3">
+                <label className="form-label">First name</label>
+                <input type="text" className="form-control" name="firstName" aria-describedby="firstNameHelp" />
+            </div>
+
+            <div className="mb-3">
+                <label className="form-label">Last name</label>
+                <input type="text" className="form-control" name="firstName" aria-describedby="lastNameHelp" />
+            </div>
+
+            <div className="mb-3">
+                <label className="form-label">Date of birth</label>
+                <input 
+                    type="date" 
+                    className="form-control" 
+                    name="dob" 
+                    aria-describedby="dobHelp"
+                    max={new Date().toISOString().split("T")[0]} />{/** Restrict to dates before today */}
+            </div>
+
+            <div className="mb-3">
+                <label className="form-label">Avatar</label>
+                <input 
+                    type="file" 
+                    className="form-control" 
+                    name="avatar" 
+                    aria-describedby="avatarHelp"
+                    accept="image/*" /> {/* Only allows image files */}
+
+                    <small id="avatarHelp" className="form-text text-muted">
+                        Please upload an image file (e.g., .jpg, .png).
+                    </small>
+            </div>
+
+            <div className="mb-3">
+                <label className="form-label">About Me</label>
+                    <textarea
+                        className="form-control"
+                        name="aboutMe"
+                        aria-describedby="aboutMeHelp"
+                        rows={4} // Adjust the number of rows as needed
+                    ></textarea>
+                <small id="aboutMeHelp" className="form-text text-muted">
+                    Tell us a little about yourself.
+                </small>
             </div>
 
             <div className="mb-3">
