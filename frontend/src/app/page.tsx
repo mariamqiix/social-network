@@ -13,11 +13,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 
-
 export default function Home() {
   const posts = useSelector(selectPosts);
   const user = useSelector(selectUser);
   let [imageData, setImageData] = useState("");
+  const [isImageSelected, setIsImageSelected] = useState(false); // New state to track image selection
 
   const dispatch = useDispatch();
   const router = useRouter();
@@ -28,8 +28,18 @@ export default function Home() {
       let reader = new FileReader();
       reader.onload = function (e) {
         setImageData(e.target?.result as string);
+        setIsImageSelected(true); // Set to true when an image is selected
       }
       reader.readAsDataURL(form.children[1].files[0]);
+    }
+  }
+
+  function deselectImage() {
+    setImageData(""); // Clear the image data
+    setIsImageSelected(false); // Set to false when the image is deselected
+    let form = document.querySelector("form");
+    if (form && form.children[1]) {
+      form.children[1].value = ""; // Clear the file input
     }
   }
 
@@ -112,11 +122,22 @@ export default function Home() {
         }} />
         <div className="d-flex justify-content-between mt-3">
           <button type="button" className="btn" onClick={() => {
-            document.querySelector("input[type='file']").click();
+            if (!isImageSelected) { // Only open file selector if no image is selected
+              document.querySelector("input[type='file']").click();
+            }
           }}>
             <FontAwesomeIcon icon={faImage} className="me-2" />
             Image
-            {imageData != "" ? <img src={imageData} height={20} className="mx-2" /> : <div></div>}
+            {imageData !== "" ? (
+              <>
+                <img src={imageData} height={20} className="mx-2" />
+                <span 
+                  onClick={deselectImage} 
+                  style={{ color: 'red', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.8rem' }}> {/* Adjusted font size */}
+                  Remove
+                </span> {/* Deselect as red text */}
+              </>
+            ) : <div></div>}
           </button>
           <button className="btn btn-dark" type="submit">Post</button>
         </div>
@@ -127,7 +148,6 @@ export default function Home() {
         <div key={index} className="card shadow-sm p-4" style={{
           width: '100%',
           maxWidth: '900px',
-          // height: '150px', // Set a fixed height
           margin: '10px 0',
           padding: '10px',
           border: '1px solid #e1e1e1',
@@ -135,7 +155,7 @@ export default function Home() {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: randomColor(), // Set the background color to a random color
+          backgroundColor: randomColor(),
         }}>
           <PostContent
             avatar={post.author.avatar}
