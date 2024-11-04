@@ -4,6 +4,7 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 )
@@ -96,6 +97,8 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			GroupID:          &group.ID,
 			IsRead:           false,
 		}
+
+		fmt.Print(notification)
 
 		models.CreateGroupsNotification(notification)
 		notificate, err := createGroupNotificationRequestResponse(notification, code)
