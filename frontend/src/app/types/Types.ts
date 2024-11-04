@@ -12,7 +12,7 @@ export type Notifi = {
     message: string;
     link: string | null;
     showToast: boolean;
-    extraData: number | undefined
+    function: Function | null;
 };
 
 export type Post = {
@@ -104,9 +104,9 @@ export type GroupPageView = {
 // Define GroupPageView type
 export type ProfilePageView = {
     // user: User | null; // null if not logged in
-    User : User,
-    Posts:        PostResponse[],
-    UserLikedPost:    PostResponse[],
+    User: User,
+    Posts: PostResponse[],
+    UserLikedPost: PostResponse[],
     UserDislikedPost: PostResponse[],
 };
 
