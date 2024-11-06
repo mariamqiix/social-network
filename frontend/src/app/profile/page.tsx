@@ -1,17 +1,14 @@
 'use client';
 import "../../../public/profilePage.css";
 import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAt, faCalendarDay, faEnvelope, faSignature } from "@fortawesome/free-solid-svg-icons";
-import { ProfilePageView } from "../types/Types";
 import { fetchProfileData } from "./fetch";
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import PostContent from "../components/PostContent";
 import PostActions from '../components/PostActions';
-import { Post } from "../types/Types";
+import { Post, ProfilePageView } from "../types/Types";
 import { addPost, clearPosts, likePost } from "../redux/actions";
 import { selectPosts, selectUser } from "../redux/selectors";
-import { colors, randomColor } from "../components/colors";
+import { randomColor } from "../components/colors";
 import { useDispatch, useSelector } from "react-redux";
 
 
@@ -38,24 +35,23 @@ export default function page() {
     const handleTabClick = (tabName: string) => {
         switch (tabName) {
             case 'Posts':
-                setIsMember(false);  // Update the membership status
                 setActiveTab(tabName);
-                handlePostData(profileData.user_posts)
+                handlePostData(profileData?.user_posts)
                 break;
 
             case 'LikedPosts':
                 setActiveTab(tabName);
-                handlePostData(profileData.user_Liked_posts)
+                handlePostData(profileData?.user_Liked_posts)
                 break;
 
             case 'DisLikedPosts':
                 setActiveTab(tabName);
-                handlePostData(profileData.user_Disliked_posts)
+                handlePostData(profileData?.user_Disliked_posts)
                 break;
 
             default:
                 setActiveTab(tabName);
-                handlePostData(profileData.user_posts)
+                handlePostData(profileData?.user_posts)
                 break;
         }
     };
