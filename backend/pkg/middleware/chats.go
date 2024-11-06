@@ -83,9 +83,9 @@ func UserAbleToChatHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Print unique followers and following
-	for _, follower := range uniqueFollowersSlice {
-		fmt.Printf("ID: %d, FollowingID: %d, FollowerID: %d, Status: %v\n", follower.ID, follower.FollowingID, follower.FollowerID, follower.Status)
-	}
+	// for _, follower := range uniqueFollowersSlice {
+	// 	fmt.Printf("ID: %d, FollowingID: %d, FollowerID: %d, Status: %v\n", follower.ID, follower.FollowingID, follower.FollowerID, follower.Status)
+	// }
 
 }
 

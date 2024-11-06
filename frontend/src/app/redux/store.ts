@@ -102,6 +102,11 @@ const reducer = (state = initialState, action: any) => {
                 ...state,
                 user: null,
             }
+        case "posts/clear":
+            return {
+                ...state,
+                posts: []
+            };
         default:
             return state;
     }

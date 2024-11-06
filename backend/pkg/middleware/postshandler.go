@@ -16,7 +16,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/post/")
 
 	if strings.Contains(path, "createPost/") {
-		fmt.Println("jhfkslcd;")
 		CreatePostHandler(w, r)
 		return
 	}
@@ -269,7 +268,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With")
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println(sessionUser)
+
 	limiterUsername := "[GUESTS]"
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
@@ -281,7 +280,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if sessionUser == nil {
-		fmt.Print("ghjfdksld;' hello")
 		errorServer(w, http.StatusUnauthorized)
 		return
 	}

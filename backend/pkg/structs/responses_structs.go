@@ -107,18 +107,10 @@ type ChatResponse struct {
 }
 
 type ProfileResponse struct {
-	Id               int       `json:"id"`
-	Username         string    `json:"username"`
-	Nickname         string    `json:"nickname"`
-	Email            string    `json:"email"`
-	FirstName        string    `json:"first_name"`
-	LastName         string    `json:"last_name"`
-	DateOfBirth      time.Time `json:"DateOfBirth"`
-	Bio              string    `json:"bio"`
-	Image            string    `json:"image_url"`
-	UserPosts        []Post    `json:"user_posts"`
-	UserLikedPost    []Post    `json:"user_Liked_posts"`
-	UserDislikedPost []Post    `json:"user_Disliked_posts"`
+	User             UserResponse `json:"user"`
+	UserPosts        []PostResponse       `json:"user_posts"`
+	UserLikedPost    []PostResponse       `json:"user_Liked_posts"`
+	UserDislikedPost []PostResponse       `json:"user_Disliked_posts"`
 }
 
 type WebsocketResponse struct {

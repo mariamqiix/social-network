@@ -1,41 +1,32 @@
 'use client';
-import { useSelector } from "react-redux";
-import { selectUser } from "../redux/selectors";
 import "../../../public/profilePage.css";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAt, faCalendarDay, faEnvelope, faSignature } from "@fortawesome/free-solid-svg-icons";
 import { ProfilePageView } from "../types/Types";
 import { fetchProfileData } from "./fetch";
-import Post from '../components/GroupPostContent';
 import React, { useRef, useState, useEffect } from 'react';
+import PostContent from "../components/PostContent";
+import PostActions from '../components/PostActions';
+import { Post } from "../types/Types";
+import { addPost, clearPosts, likePost } from "../redux/actions";
+import { selectPosts, selectUser } from "../redux/selectors";
+import { colors, randomColor } from "../components/colors";
+import { useDispatch, useSelector } from "react-redux";
+
 
 export default function page() {
-    const [profileData, setProfileData] = useState<ProfilePageView>({
-        User: {
-            id: 0,
-            username: '',
-            nickname: '',
-            first_name: '',
-            last_name: '',
-            email: '',
-            image_url: '',
-            bio: '',
-            dob: '',
-        },
-        Posts: [],
-        UserLikedPost: [],
-        UserDislikedPost: [],
-    });
+    const [profileData, setProfileData] = useState<any>();
+    const dispatch = useDispatch();
+    const [isMember, setIsMember] = useState(true);
+    const [activeTab, setActiveTab] = useState('Posts');
+    var posts = useSelector(selectPosts);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const data = await fetchProfileData();
                 setProfileData(data);
-                console.log(data)
-                console.log(profileData)
-
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -49,44 +40,71 @@ export default function page() {
             case 'Posts':
                 setIsMember(false);  // Update the membership status
                 setActiveTab(tabName);
-                // send a request to leave the group
+                handlePostData(profileData.user_posts)
                 break;
+
             case 'LikedPosts':
                 setActiveTab(tabName);
-                // RequestToJoin();
-                // send a request to join the group
+                handlePostData(profileData.user_Liked_posts)
                 break;
+
             case 'DisLikedPosts':
                 setActiveTab(tabName);
-                // RequestToJoin();
-                // send a request to join the group
+                handlePostData(profileData.user_Disliked_posts)
                 break;
+
             default:
                 setActiveTab(tabName);
-
+                handlePostData(profileData.user_posts)
+                break;
         }
     };
 
-    const [isMember, setIsMember] = useState(true);
-    const [activeTab, setActiveTab] = useState('Posts');
+    const handlePostData = (postsArray) => {
+        clearPosts();
+        if (Array.isArray(postsArray)) {
+            postsArray.forEach((post) => {
+                if (post) {
+                    dispatch(addPost({
+                        id: post.id,
+                        author: { name: post.author.username, avatar: "/placeholder.jpg" },
+                        time: post.created_at,
+                        content: post.content,
+                        images: post.image_url === "" ? [] : [],
+                        likes: post.likes.count
+                    }));
+                }
+            });
+        }
+    };
+
+    function likePostClicked(id: Number) {
+        fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
+            console.log(res.status);
+            if (res.status == 204) {
+                dispatch(likePost(id, -1));
+            } else if (res.status == 201) {
+                dispatch(likePost(id, 1));
+            }
+        });
+    }
 
     return (
         <div className="Container">
-
             {/* Profile Header */}
             <div className="ProfilePageHeader">
                 <div className="profile-info">
                     <img
-                        // src={`data:image/jpeg;base64,${profileData.Image}`}
+                        // src={`data:image/jpeg;base64,${profileData?.image_url}`}
                         alt="Avatar"
                         className="profile-avatar"
                     />
 
                     <div className="profile-details">
-                        <h1 className="profile-name">{profileData.first_name} {profileData.last_name} ({profileData.username})</h1>
-                        <p className="profile-desc">{profileData.bio}</p>
-                        {/* <p className="profile-desc">{calculateAge(profileData.DateOfBirth)}</p> */}
-                        <p className="profile-desc">{profileData.email}</p>
+                        <h1 className="profile-name">{profileData?.user.first_name} {profileData?.user.last_name} ({profileData?.user.username})</h1>
+                        <p className="profile-desc">{profileData?.user.bio}</p>
+                        {/* <p className="profile-desc">{calculateAge(profileData?.DateOfBirth)}</p> */}
+                        <p className="profile-desc">{profileData?.user.email}</p>
 
                         <div className="profile-follow-info">
                             {/* {profileData.Followers &&
@@ -107,7 +125,6 @@ export default function page() {
                     </div>)
                 }
             </div>
-
 
             {/* Navigation Bar */}
             <div className="list-bar">
@@ -135,32 +152,34 @@ export default function page() {
             </div>
 
             {/* Main Content Area */}
-            <div className="content-area">
-                {activeTab === 'Posts' && (
-                    <div className="posts-section" >
-                        <div
-                            id="group-post"
-                            style={{
-                                marginTop: "1.5%",
-                                width: "100%",
-                                display: "grid", // Use CSS Grid
-                                gridTemplateColumns: "repeat(2, minmax(380px, 1fr))", // Auto-adjust columns
-                                gap: "30px", // Space between posts
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        >
-                            {profileData.user_posts && profileData.user_posts.map((post, index) => (
-                                <Post post={post} />
-                            ))}
-                        </div>
+            <main style={{ display: 'flex', flexDirection: 'column' }}>
+                {posts.map((post: Post, index: number) => (
+                    <div key={index} className="card shadow-sm p-4" style={{
+                        width: '100%',
+                        maxWidth: '900px',
+                        margin: '10px 0',
+                        padding: '10px',
+                        border: '1px solid #e1e1e1',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        backgroundColor: randomColor(),
+                    }}>
+                        <PostContent
+                            avatar={post.author.avatar}
+                            name={post.author.name}
+                            time={post.time}
+                            content={post.content}
+                            images={post.images}
+                            id={post.id.toString()}
+                        />
+                        <PostActions likes={post.likes} liked={() => likePostClicked(post.id)} />
                     </div>
-                )}
-            </div>
+                ))}
+            </main>
         </div>
     );
-
-    // return <h1>You need to login</h1>;
 }
 
 function calculateAge(birthDateString: string) {
@@ -176,3 +195,4 @@ function calculateAge(birthDateString: string) {
 
     return age;
 }
+

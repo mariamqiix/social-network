@@ -275,7 +275,7 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 // // leave group function
 func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
-	fmt.Print("hello")
+	// fmt.Print("hello")
 	if sessionUser == nil {
 		errorServer(w, http.StatusBadRequest)
 		return
@@ -296,7 +296,7 @@ func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 	}
-	fmt.Print(sessionUser.ID, groupID)
+	// fmt.Print(sessionUser.ID, groupID)
 	w.WriteHeader(http.StatusCreated)
 }
 
@@ -347,13 +347,13 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 		writeToJson(view, w)
 		return
 	}
-	fmt.Print(groupId)
+	// fmt.Print(groupId)
 	posts, err := models.GetGroupPosts(groupId)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	fmt.Print((posts))
+	// fmt.Print((posts))
 
 	groupMembers, err := models.GetGroupMembers(groupId)
 	if err != nil {

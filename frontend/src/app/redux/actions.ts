@@ -5,9 +5,13 @@ export const addPost = (post: Post) => ({
     payload: post,
 });
 
+export const clearPosts = () => ({
+    type: 'posts/clear',
+});
+
 export const likePost = (id: Number, value: Number) => ({
     type: 'posts/like',
-    payload: {id, value},
+    payload: { id, value },
 });
 
 export const addChat = (chat: Chat) => ({

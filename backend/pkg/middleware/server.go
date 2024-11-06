@@ -89,7 +89,6 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		posts, err = models.GetPostsForGuest()
-		fmt.Print(posts)
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
 			return

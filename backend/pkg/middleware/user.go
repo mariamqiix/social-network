@@ -49,40 +49,40 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		requestUserId = sessionUser.ID
 	}
 
-	UserPosts, err := returnProfilePosts("", profileUserId, requestUserId)
+	UserPosts, err := returnProfilePosts("", profileUserId, requestUserId, sessionUser)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
 
-	UserLikedPost, err := returnProfilePosts("like", profileUserId, requestUserId)
+	UserLikedPost, err := returnProfilePosts("like", profileUserId, requestUserId, sessionUser)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
 
-	UserDislikedPost, err := returnProfilePosts("dislike", profileUserId, requestUserId)
+	UserDislikedPost, err := returnProfilePosts("dislike", profileUserId, requestUserId, sessionUser)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
 
 	profile := structs.ProfileResponse{
-		Id:               userProfile.ID,
-		Username:         userProfile.Username,
-		Nickname:         *userProfile.Nickname,
-		Email:            userProfile.Email,
-		FirstName:        userProfile.FirstName,
-		LastName:         userProfile.LastName,
-		DateOfBirth:      userProfile.DateOfBirth,
-		Bio:              *userProfile.Bio,
-		Image:            GetImageData(userProfile.ImageID),
+		User: structs.UserResponse{
+			Id:          userProfile.ID,
+			Username:    userProfile.Username,
+			Nickname:    *userProfile.Nickname,
+			Email:       userProfile.Email,
+			FirstName:   userProfile.FirstName,
+			LastName:    userProfile.LastName,
+			DateOfBirth: userProfile.DateOfBirth,
+			Bio:         *userProfile.Bio,
+			Image:       GetImageData(userProfile.ImageID),
+		},
 		UserPosts:        UserPosts,
 		UserLikedPost:    UserLikedPost,
 		UserDislikedPost: UserDislikedPost,
 	}
-
-	fmt.Println(profile)
 
 	switch path {
 	case "":
@@ -121,27 +121,27 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func returnProfilePosts(mode string, profileUserId int, sessionUserID int) ([]structs.Post, error) {
+func returnProfilePosts(mode string, profileUserId int, sessionUserID int, sessionUser *structs.User) ([]structs.PostResponse, error) {
 	var posts []structs.Post
 	var err error
 	if mode == "like" {
 		posts, err = models.GetPostsByReaction(profileUserId, sessionUserID, "Like")
 		if err != nil {
-			return []structs.Post{}, err
+			return []structs.PostResponse{}, err
 		}
 
 	} else if mode == "dislike" {
 		posts, err = models.GetPostsByReaction(profileUserId, sessionUserID, "Disike")
 		if err != nil {
-			return []structs.Post{}, err
+			return []structs.PostResponse{}, err
 		}
 
 	} else {
 		posts, err = models.ProfilePagePosts(profileUserId, sessionUserID)
 		if err != nil {
-			return []structs.Post{}, err
+			return []structs.PostResponse{}, err
 		}
 	}
 
-	return posts, nil
+	return mapPosts(sessionUser, posts), nil
 }

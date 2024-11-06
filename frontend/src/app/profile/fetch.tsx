@@ -18,10 +18,9 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
 
         // Fetch the group data from the API
         const userData: ProfilePageView = await response.json();
-        console.log(userData)
+        // console.log(userData)
 
         return userData;
-
 
     } catch (error) {
         console.error('Error fetching data:', error);
