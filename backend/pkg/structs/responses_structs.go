@@ -107,10 +107,12 @@ type ChatResponse struct {
 }
 
 type ProfileResponse struct {
-	User             UserResponse `json:"user"`
-	UserPosts        []PostResponse       `json:"user_posts"`
-	UserLikedPost    []PostResponse       `json:"user_Liked_posts"`
-	UserDislikedPost []PostResponse       `json:"user_Disliked_posts"`
+	User             UserResponse      `json:"user"`
+	Followigs        []BasicUserResponse `json:"followigs"`
+	Followers        []BasicUserResponse `json:"followers"`
+	UserPosts        []PostResponse    `json:"user_posts"`
+	UserLikedPost    []PostResponse    `json:"user_Liked_posts"`
+	UserDislikedPost []PostResponse    `json:"user_Disliked_posts"`
 }
 
 type WebsocketResponse struct {

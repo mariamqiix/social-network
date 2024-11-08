@@ -4,7 +4,6 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 )
@@ -67,6 +66,30 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	followings, err := models.GetFollowings(userProfile.ID)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	followingsStruct, err := mapBasicUsers(followings, 1)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	followers, err := models.GetFollowers(userProfile.ID)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	followersStruct, err := mapBasicUsers(followers, 2)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
 	profile := structs.ProfileResponse{
 		User: structs.UserResponse{
 			Id:          userProfile.ID,
@@ -79,6 +102,8 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 			Bio:         *userProfile.Bio,
 			Image:       GetImageData(userProfile.ImageID),
 		},
+		Followigs:        followingsStruct,
+		Followers:        followersStruct,
 		UserPosts:        UserPosts,
 		UserLikedPost:    UserLikedPost,
 		UserDislikedPost: UserDislikedPost,
@@ -86,7 +111,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch path {
 	case "":
-		fmt.Print("here")
 		writeToJson(profile, w)
 		return
 
@@ -99,21 +123,11 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case "following":
-		following, err := models.GetFollowings(userProfile.ID)
-		if err != nil {
-			errorServer(w, http.StatusInternalServerError)
-			return
-		}
-		writeToJson(following, w)
+		writeToJson(followingsStruct, w)
 		return
 
 	case "followers":
-		followers, err := models.GetFollowers(userProfile.ID)
-		if err != nil {
-			errorServer(w, http.StatusInternalServerError)
-			return
-		}
-		writeToJson(followers, w)
+		writeToJson(followingsStruct, w)
 		return
 
 	default:
@@ -144,4 +158,32 @@ func returnProfilePosts(mode string, profileUserId int, sessionUserID int, sessi
 	}
 
 	return mapPosts(sessionUser, posts), nil
+}
+
+func mapBasicUsers(followers []structs.Follower, code int) ([]structs.BasicUserResponse, error) {
+	var basicUsers []structs.BasicUserResponse
+	var user *structs.User
+	var err error
+	for _, followee := range followers {
+		if code == 1 {
+			user, err = models.GetUserByID(followee.FollowingID)
+			if err != nil {
+				return nil, err
+			}
+		} else if code == 2 {
+			user, err = models.GetUserByID(followee.FollowerID)
+			if err != nil {
+				return nil, err
+			}
+		}
+		basicUsers = append(basicUsers,
+			structs.BasicUserResponse{
+				Id:       user.ID,
+				Username: user.Username,
+				Nickname: *user.Nickname,
+				Image:    GetImageData(user.ImageID),
+			},
+		)
+	}
+	return basicUsers, nil
 }

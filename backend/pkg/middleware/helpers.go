@@ -78,6 +78,7 @@ func GetImageData(imageID *int) string {
 	base64Image := base64.StdEncoding.EncodeToString(imageData.Data)
 	return base64Image
 }
+
 func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostResponse {
 	var postResponses []structs.PostResponse
 	for _, post := range posts {
@@ -140,6 +141,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 	}
 	return postResponses
 }
+
 func ReturnUserResponse(user *structs.User) *structs.UserResponse {
 	if user == nil {
 		return nil

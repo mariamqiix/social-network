@@ -10,7 +10,7 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
                 'Content-Type': 'application/json',
             },
             credentials: 'include', // This is the key to include cookies
-            body: JSON.stringify({ user_id: 3 })
+            body: JSON.stringify({ user_id: 2 })
         });
         if (!response.ok) {
             throw new Error(`Error: status code ${response.status}`);

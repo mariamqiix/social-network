@@ -6,7 +6,7 @@ import React, { useState, useEffect } from 'react';
 import PostContent from "../components/PostContent";
 import PostActions from '../components/PostActions';
 import { Post, ProfilePageView } from "../types/Types";
-import { addPost, clearPosts, likePost } from "../redux/actions";
+import { likePost } from "../redux/actions";
 import { selectPosts, selectUser } from "../redux/selectors";
 import { randomColor } from "../components/colors";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,9 +15,10 @@ import { useDispatch, useSelector } from "react-redux";
 export default function page() {
     const [profileData, setProfileData] = useState<any>();
     const dispatch = useDispatch();
-    const [isMember, setIsMember] = useState(true);
     const [activeTab, setActiveTab] = useState('Posts');
     var posts = useSelector(selectPosts);
+    var [posts, setposts] = useState<Post[]>([]);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,27 +52,13 @@ export default function page() {
 
             default:
                 setActiveTab(tabName);
-                handlePostData(profileData?.user_posts)
+                // handlePostData(profileData?.user_posts)
                 break;
         }
     };
 
     const handlePostData = (postsArray) => {
-        clearPosts();
-        if (Array.isArray(postsArray)) {
-            postsArray.forEach((post) => {
-                if (post) {
-                    dispatch(addPost({
-                        id: post.id,
-                        author: { name: post.author.username, avatar: "/placeholder.jpg" },
-                        time: post.created_at,
-                        content: post.content,
-                        images: post.image_url === "" ? [] : [],
-                        likes: post.likes.count
-                    }));
-                }
-            });
-        }
+        setposts(postsArray)
     };
 
     function likePostClicked(id: Number) {
@@ -103,8 +90,8 @@ export default function page() {
                         <p className="profile-desc">{profileData?.user.email}</p>
 
                         <div className="profile-follow-info">
-                            {/* {profileData.Followers &&
-                                // <span>{profileData.Followers ? profileData.Followers.length : 0} Member</span>
+                            {/* {profileData?.followigs &&
+                                <span>{profileData.followigs ? profileData.Followers.followigs : 0} Member</span>
                             } */}
                         </div>
                     </div>
@@ -144,36 +131,90 @@ export default function page() {
                     >
                         Dislikes
                     </li>
+
+                    <li
+                        className={activeTab === 'Followers' ? 'active' : ''}
+                        onClick={() => handleTabClick('Followers')}
+                    >
+                        Followers
+                    </li>
+
+                    <li
+                        className={activeTab === 'Following' ? 'active' : ''}
+                        onClick={() => handleTabClick('Following')}
+                    >
+                        Following
+                    </li>
                 </ul>
             </div>
 
             {/* Main Content Area */}
             <main style={{ display: 'flex', flexDirection: 'column' }}>
-                {posts.map((post: Post, index: number) => (
-                    <div key={index} className="card shadow-sm p-4" style={{
-                        width: '100%',
-                        maxWidth: '900px',
-                        margin: '10px 0',
-                        padding: '10px',
-                        border: '1px solid #e1e1e1',
-                        borderRadius: '8px',
-                        overflow: 'hidden',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        backgroundColor: randomColor(),
-                    }}>
-                        <PostContent
-                            avatar={post.author.avatar}
-                            name={post.author.name}
-                            time={post.time}
-                            content={post.content}
-                            images={post.images}
-                            id={post.id.toString()}
-                        />
-                        <PostActions likes={post.likes} liked={() => likePostClicked(post.id)} />
-                    </div>
-                ))}
+                {posts != null ?
+                    (posts.map((post: Post, index: number) => (
+                        <div key={index} className="card shadow-sm p-4" style={{
+                            width: '100%',
+                            maxWidth: '900px',
+                            margin: '10px 0',
+                            padding: '10px',
+                            border: '1px solid #e1e1e1',
+                            borderRadius: '8px',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            backgroundColor: randomColor(),
+                        }}>
+
+                            <PostContent
+                                avatar={post.author.avatar}
+                                name={post.author.username}
+                                time={post.created_at}
+                                content={post.content}
+                                images={post.image_url === "" ? [] : []}
+                                id={post.id.toString()}
+                            />
+                            <PostActions likes={post.likes.count} liked={() => likePostClicked(post.id)} />
+                        </div>
+                    ))) : activeTab != "Followers" && activeTab != "Following" && (
+                        <div>
+                            <br>
+                            </br>
+                            <p>No posts available</p>
+                        </div>
+                    )}
             </main>
+
+            {activeTab === 'Followers' && profileData.followers && (
+                <div className="members-section">
+                    <ul className="member-list">
+                        {profileData?.followers.map((member) => (
+                            <li key={member.id} className="member-item">
+                                <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
+                                <div className="member-details">
+                                    <h3 className="member-name">{member.username}</h3>
+                                    <p className="member-username">{member.nickname}</p> {/* Username added here */}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            {activeTab === 'Following' && profileData.following && (
+                <div className="members-section">
+                    <ul className="member-list">
+                        {profileData?.followigs.map((member) => (
+                            <li key={member.id} className="member-item">
+                                <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
+                                <div className="member-details">
+                                    <h3 className="member-name">{member.username}</h3>
+                                    <p className="member-username">{member.nickname}</p> {/* Username added here */}
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }
