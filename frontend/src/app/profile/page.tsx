@@ -1,6 +1,5 @@
 'use client';
 import "../../../public/profilePage.css";
-import Image from "next/image";
 import { fetchProfileData } from "./fetch";
 import React, { useState, useEffect } from 'react';
 import PostContent from "../components/PostContent";
@@ -14,15 +13,18 @@ export default function page(id: number) {
     const [profileData, setProfileData] = useState<any>();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('Posts');
+
     var [posts, setposts] = useState<Post[]>([]);
+    var [follows, setFollows] = useState([]);
     var [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchProfileData(9);
+                const data = await fetchProfileData(5);
                 setProfileData(data);
-                setIsActive(data.is_user_profile || data.user_status == "Accepted" || data.user_profile_type == "Public" ? true : false)
+                setIsActive(data.is_user_profile || data.user_status == "Accepted" || data.user_profile_type == "Public")
+
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -35,24 +37,28 @@ export default function page(id: number) {
     const handleTabClick = (tabName: string) => {
         switch (tabName) {
             case 'Posts':
-                setActiveTab(tabName);
-                handlePostData(profileData?.user_posts)
+                setposts(profileData?.user_posts)
                 break;
 
             case 'LikedPosts':
-                setActiveTab(tabName);
-                handlePostData(profileData?.user_Liked_posts)
+                setposts(profileData?.user_Liked_posts)
+                break;
+
+            case 'Followers':
+                setFollows(profileData?.followers)
+                break;
+
+            case 'Following':
+                setFollows(profileData?.followigs)
                 break;
 
             default:
-                setActiveTab(tabName);
-                handlePostData([])
+                setposts([])
+                setFollows([])
                 break;
         }
-    };
 
-    const handlePostData = (postsArray: Post[]) => {
-        setposts(postsArray)
+        setActiveTab(tabName);
     };
 
     // Function to handle when the button is disabled
@@ -91,11 +97,6 @@ export default function page(id: number) {
         setProfileData(updatedProfileData);
     }
 
-    const handlePendingRequest = () => {
-
-
-    }
-
     function likePostClicked(id: Number) {
         fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
             console.log(res.status);
@@ -121,15 +122,14 @@ export default function page(id: number) {
                         <div className="profile-details">
                             <h1 className="profile-name">{profileData?.user.first_name} {profileData?.user.last_name} ({profileData?.user.username})</h1>
                             <p className="profile-desc">{profileData?.user.bio}</p>
-                            <p className="profile-desc">{calculateAge(profileData?.DateOfBirth)}</p>
-                            <p className="profile-desc">{profileData?.user.email}</p>
-
+                            {isActive && (
+                                <div>
+                                    <p className="profile-desc">{calculateAge(profileData?.user.DateOfBirth)}</p>
+                                    <p className="profile-desc">{profileData?.user.email}</p>
+                                </div>
+                            )
+                            }
                             <div className="profile-follow-info">
-                                {/* {profileData?.followigs &&
-                                <span>{profileData.followigs ? profileData.Followers.followigs : 0} Member</span>
-                            } */}
-
-
                                 {!profileData?.is_user_profile && (
                                     <div className="button-container">
                                         {profileData?.user_status === "" ? (
@@ -141,7 +141,7 @@ export default function page(id: number) {
                                         ) : (profileData?.user_status === "Accepted") ? (
                                             <button className="unfollowBtn requestBtn"
                                                 onClick={() => handleUnfollowRequest()}>
-                                                <span>Unfollow</span>
+                                                <span>UnFollow</span>
                                             </button>
 
                                         ) : profileData?.user_status === "Pending" && (
@@ -216,32 +216,16 @@ export default function page(id: number) {
                             <div>
                                 <br>
                                 </br>
-                                <p>No posts available</p>
+                                <p>No Post Available</p>
                             </div>
                         ))}
 
             </main>
 
-            {activeTab === 'Followers' && profileData.followers && (
+            {(activeTab === 'Followers' || activeTab === 'Following') && (
                 <div className="members-section">
                     <ul className="member-list">
-                        {profileData?.followers.map((member) => (
-                            <li key={member.id} className="member-item">
-                                <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
-                                <div className="member-details">
-                                    <h3 className="member-name">{member.username}</h3>
-                                    <p className="member-username">{member.nickname}</p> {/* Username added here */}
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
-            {activeTab === 'Following' && profileData.followigs && (
-                <div className="members-section">
-                    <ul className="member-list">
-                        {profileData?.followigs.map((member) => (
+                        { follows!= null && follows.map((member) => (
                             <li key={member.id} className="member-item">
                                 <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
                                 <div className="member-details">
