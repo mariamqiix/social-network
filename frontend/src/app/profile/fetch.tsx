@@ -1,6 +1,6 @@
 import { ProfilePageView } from '../types/Types';
 
-export async function fetchProfileData(): Promise<ProfilePageView> {
+export async function fetchProfileData(id : number): Promise<ProfilePageView> {
     const url = `http://localhost:8080/user/profile/`; // Append the id to the URL
 
     try {
@@ -10,7 +10,7 @@ export async function fetchProfileData(): Promise<ProfilePageView> {
                 'Content-Type': 'application/json',
             },
             credentials: 'include', // This is the key to include cookies
-            body: JSON.stringify({ user_id: 2 })
+            body: JSON.stringify({ user_id: id })
         });
         if (!response.ok) {
             throw new Error(`Error: status code ${response.status}`);

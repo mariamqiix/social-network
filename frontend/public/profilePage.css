@@ -94,6 +94,7 @@
     /* Adds space between the li elements */
 }
 
+.requestBtn,
 .list-bar li {
     display: flex;
     justify-content: center;
@@ -111,16 +112,34 @@
     text-align: center;
     /* Center the text */
     width: 100%;
+    border: none;
     /* Ensure li takes full width */
 }
 
+.unfollowBtn {
+    background-color: rgb(243, 48, 48);
+    color: azure;
+}
+
+.followBtn {
+    background-color: rgb(48, 243, 87);
+    color: azure;
+}
+
+.requestBtn.active,
 .list-bar li.active {
     background-color: gray;
     color: white;
 }
 
+.requestBtn:hover,
 .list-bar li:hover {
     background-color: #e0e0e0;
+}
+
+.list-bar li.inactive {
+    opacity: 0.5; /* Decrease opacity for inactive state */
+    cursor: not-allowed; /* Change cursor to not allowed for inactive state */
 }
 
 .members-section {
@@ -175,4 +194,9 @@
     color: #666;
     /* Slightly darker color */
     margin: 6px 0 0 0;
+}
+
+.list-bar li.disabled-button {
+    cursor: not-allowed;
+    opacity: 0.5; /* Optionally reduce opacity to indicate disabled state */
 }

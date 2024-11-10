@@ -14,6 +14,8 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	sessionUser := GetUser(r)
 	limiterUsername := "[GUESTS]"
+	isUserProfile := false
+	canSeeInfo := ""
 
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
@@ -35,6 +37,10 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	profileUserId := userProfileRequest.UserID
 	if userProfileRequest.UserID == -1 && sessionUser != nil {
 		profileUserId = sessionUser.ID
+	}
+
+	if profileUserId == sessionUser.ID {
+		isUserProfile = true
 	}
 
 	userProfile, err := models.GetUserByID(profileUserId)
@@ -90,6 +96,22 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if requestUserId != -1 {
+		for _, user := range followings {
+			if user.FollowingID == requestUserId {
+				canSeeInfo = *user.Status
+				break
+			}
+		}
+
+		for _, user := range followers {
+			if user.FollowerID == requestUserId && canSeeInfo != "Accept" {
+				canSeeInfo = *user.Status
+				break
+			}
+		}
+	}
+
 	profile := structs.ProfileResponse{
 		User: structs.UserResponse{
 			Id:          userProfile.ID,
@@ -107,6 +129,9 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		UserPosts:        UserPosts,
 		UserLikedPost:    UserLikedPost,
 		UserDislikedPost: UserDislikedPost,
+		IsUserProfile:    isUserProfile,
+		UserStatus:       canSeeInfo,
+		UserProfiletype: userProfile.ProfileType,
 	}
 
 	switch path {

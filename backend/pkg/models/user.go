@@ -280,6 +280,7 @@ func GetFollowers(userID int) ([]structs.Follower, error) {
 func GetFollowings(userID int) ([]structs.Follower, error) {
 	return GetFollows(userID, "follower_id")
 }
+
 func GetUsersToInvite(userID int, groupId int) ([]structs.User, error) {
 	query := `
         SELECT * 

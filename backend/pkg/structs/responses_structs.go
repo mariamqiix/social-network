@@ -107,12 +107,15 @@ type ChatResponse struct {
 }
 
 type ProfileResponse struct {
-	User             UserResponse      `json:"user"`
+	IsUserProfile    bool                `json:"is_user_profile"`
+	UserStatus       string              `json:"user_status"`
+	UserProfiletype  string              `json:"user_profile_type"`
+	User             UserResponse        `json:"user"`
 	Followigs        []BasicUserResponse `json:"followigs"`
 	Followers        []BasicUserResponse `json:"followers"`
-	UserPosts        []PostResponse    `json:"user_posts"`
-	UserLikedPost    []PostResponse    `json:"user_Liked_posts"`
-	UserDislikedPost []PostResponse    `json:"user_Disliked_posts"`
+	UserPosts        []PostResponse      `json:"user_posts"`
+	UserLikedPost    []PostResponse      `json:"user_Liked_posts"`
+	UserDislikedPost []PostResponse      `json:"user_Disliked_posts"`
 }
 
 type WebsocketResponse struct {
@@ -120,4 +123,8 @@ type WebsocketResponse struct {
 	UserChat     ChatResponse         `json:"user_chat"`
 	GroupChat    GroupChatResponse    `json:"group_chat"`
 	Notification NotificatoinResponse `json:"notification"`
+}
+
+type StatusResponse struct {
+	Status string `json:"status"`
 }

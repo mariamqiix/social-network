@@ -214,20 +214,32 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if userToFollow.ProfileType == "Public" {
-			status = "Accept"
+			status = "Accepted"
 			notificationType = "startFollow"
 			code = 3
 		}
 
+		followings, err := models.GetFollowings(user.ID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+
+		for _, user := range followings {
+			if user.FollowingID == userToFollow.ID {
+				return
+			}
+		}
+
 		models.CreateFollower(structs.Follower{
-			FollowingID: user.ID,
-			FollowerID:  userRequestToFollow.UserID,
+			FollowingID: userToFollow.ID,
+			FollowerID:  user.ID,
 			Status:      &status,
 		})
 
 		notification := structs.Notification{
-			UserID:           user.ID,
-			SenderID:         &userRequestToFollow.UserID,
+			UserID:           userToFollow.ID,
+			SenderID:         &user.ID,
 			NotificationType: notificationType,
 			IsRead:           false,
 		}
@@ -239,7 +251,32 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 		models.CreateMessagesNotification(notification)
 
-		SendNotification(user.ID, *notificate)
+		SendNotification(userToFollow.ID, *notificate)
+
+		writeToJson(
+			structs.StatusResponse{
+				Status: status,
+		}, w)
+
+	case "requestToUnfollow":
+		var userRequestToUnfollow *structs.UserInfoRequest
+
+		err := json.NewDecoder(r.Body).Decode(&userRequestToUnfollow)
+		if err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		userToFollow, err := models.GetUserByID(userRequestToUnfollow.UserID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+
+		models.DeleteFollower(structs.Follower{
+			FollowingID: userToFollow.ID,
+			FollowerID:  user.ID,
+		})
 
 	default:
 		http.NotFound(w, r)
