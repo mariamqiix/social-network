@@ -82,6 +82,12 @@ export default function Nav() {
     return (
         <nav className="h-sm-100 w-auto">
             <ul className="nav d-flex flex-sm-column flex-row p-sm-5 justify-content-center position-sm-sticky bottom-0 p-2">
+                <Image
+                    src={"/LOGO.png"}
+                    width={200}
+                    height={80}
+                    alt="Logo"
+                />
                 {user != null ?
                     <div className="container-fluid d-flex flex-column align-items-center">
                         <a className="navbar-brand m-0 p-0" href="#">

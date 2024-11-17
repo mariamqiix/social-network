@@ -29,6 +29,8 @@ export default function loginPage() {
                             dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
                             router.replace("/");
                         });
+                    } else {
+                        alert("credentials not entered correctly");
                     }
                 });
         }}>

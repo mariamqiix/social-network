@@ -333,15 +333,14 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
-
-		imageBytes, err := base64.StdEncoding.DecodeString(*post.Image)
-		if err != nil {
-			fmt.Println("Error decoding base64 image:", err)
-			errorServer(w, http.StatusBadRequest)
-			return
-		}
 		imageID := 0
 		if post.Image != nil {
+			imageBytes, err := base64.StdEncoding.DecodeString(*post.Image)
+			if err != nil {
+				fmt.Println("Error decoding base64 image:", err)
+				errorServer(w, http.StatusBadRequest)
+				return
+			}
 			isImage, _ := IsDataImage(imageBytes)
 			if isImage {
 				imageID, err = models.UploadImage(imageBytes)

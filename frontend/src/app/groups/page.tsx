@@ -346,7 +346,7 @@ export default function Page() {
 
                             {/* Display images of friends, showing only the first three and a + if there are more */}
                             <p className="group-friends">
-                                {group.options && (
+                                {group.options && group.options[0].users_response && (
                                     <>
                                         <i className="icon-friends"></i>
                                         {group.options[0].users_response.slice(0, 3).map((friend, index) => (
@@ -385,7 +385,7 @@ export default function Page() {
                     alignItems: "center",
                     backgroundColor: "#f0f4f7",
                     minHeight: "400px",
-                    maxHeight:"400px",
+                    maxHeight: "400px",
                 }}
             >
                 {groupData.Posts && groupData.Posts.map((post, index) => (
@@ -393,61 +393,61 @@ export default function Page() {
                 ))}
             </div>
 
-            {/* Expandable div for Create Group Popup */ }
-    {
-        isCreateGroupPopupOpen && (
-            <div className="popup">
-                <div className="popup-header">
-                    <h3>Create a Group</h3>
-                    <button className="close-button" onClick={closeCreateGroupPopup}>
-                        X
-                    </button>
-                </div>
-
-
-                {/* Image Upload */}
-                <label htmlFor="groupImageUpload" className="image-upload-label">
-                    {groupImage ? (
-                        <img src={groupImage} alt="Uploaded Group Image Preview" className="uploaded-image" />
-                    ) : (
-                        <div className="upload-placeholder">
-                            <p>Upload Group Image</p>
+            {/* Expandable div for Create Group Popup */}
+            {
+                isCreateGroupPopupOpen && (
+                    <div className="popup">
+                        <div className="popup-header">
+                            <h3>Create a Group</h3>
+                            <button className="close-button" onClick={closeCreateGroupPopup}>
+                                X
+                            </button>
                         </div>
-                    )}
-                </label>
 
 
-                {/* Group Title Input */}
-                <input
-                    type="text"
-                    placeholder="Enter group title"
-                    value={groupTitle}
-                    onChange={(e) => setGroupTitle(e.target.value)}
-                    className="title-input"
-                />
-                <input
-                    type="file"
-                    id="groupImageUpload"
-                    accept="image/*"
-                    onChange={handleGroupImageUpload}
-                    style={{ display: 'none' }}
-                />
+                        {/* Image Upload */}
+                        <label htmlFor="groupImageUpload" className="image-upload-label">
+                            {groupImage ? (
+                                <img src={groupImage} alt="Uploaded Group Image Preview" className="uploaded-image" />
+                            ) : (
+                                <div className="upload-placeholder">
+                                    <p>Upload Group Image</p>
+                                </div>
+                            )}
+                        </label>
 
-                {/* Group Description Input */}
-                <textarea
-                    placeholder="Write a group description..."
-                    value={groupDescription}
-                    onChange={(e) => setGroupDescription(e.target.value)}
-                    className="description-input"
-                />
 
-                {/* Create Group Button */}
-                <button className="create-group-button" onClick={handleGroupCreation}>
-                    Create Group
-                </button>
-            </div>
-        )
-    }
+                        {/* Group Title Input */}
+                        <input
+                            type="text"
+                            placeholder="Enter group title"
+                            value={groupTitle}
+                            onChange={(e) => setGroupTitle(e.target.value)}
+                            className="title-input"
+                        />
+                        <input
+                            type="file"
+                            id="groupImageUpload"
+                            accept="image/*"
+                            onChange={handleGroupImageUpload}
+                            style={{ display: 'none' }}
+                        />
+
+                        {/* Group Description Input */}
+                        <textarea
+                            placeholder="Write a group description..."
+                            value={groupDescription}
+                            onChange={(e) => setGroupDescription(e.target.value)}
+                            className="description-input"
+                        />
+
+                        {/* Create Group Button */}
+                        <button className="create-group-button" onClick={handleGroupCreation}>
+                            Create Group
+                        </button>
+                    </div>
+                )
+            }
 
 
         </div >

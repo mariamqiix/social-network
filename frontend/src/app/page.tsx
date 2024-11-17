@@ -51,25 +51,25 @@ export default function Home() {
       reader.onload = function (e) {
         imageContent = e.target?.result as string;
         if (data.get("text") && imageContent) {
-          sendPost(data.get("text")?.toString()!, imageContent);
+          sendPost(data.get("text")?.toString()!, data.get("privacy")?.toString()!, imageContent);
         }
       }
       reader.readAsDataURL(form.children[1].files[0]);
     } else {
       if (data.get("text")) {
-        sendPost(data.get("text")?.toString()!, null);
+        sendPost(data.get("text")?.toString()!, data.get("privacy")?.toString()!, null);
       }
     }
   }
 
-  function sendPost(content: string, image: string | null) {
-    console.log(content, image.indexOf(","), image.substring(image.indexOf(",") + 1));
+  function sendPost(content: string, privacy: string, image: string | null) {
+    console.log(privacy);
     if (user) {
       fetch("http://localhost:8080/post/createPost/user", {
         credentials: 'include', method: "POST", body: JSON.stringify({
           description: content,
           image: image == null ? null : image.substring(image.indexOf(",") + 1),
-          privacy: "Public",
+          privacy: privacy,
           recipient: [],
         })
       }).then(res => {
@@ -122,24 +122,31 @@ export default function Home() {
           loadImage();
         }} />
         <div className="d-flex justify-content-between mt-3">
-          <button type="button" className="btn" onClick={() => {
-            if (!isImageSelected) { // Only open file selector if no image is selected
-              document.querySelector("input[type='file']").click();
-            }
-          }}>
-            <FontAwesomeIcon icon={faImage} className="me-2" />
-            Image
-            {imageData !== "" ? (
-              <>
-                <img src={imageData} height={20} className="mx-2" />
-                <span
-                  onClick={deselectImage}
-                  style={{ color: 'red', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.8rem' }}> {/* Adjusted font size */}
-                  Remove
-                </span> {/* Deselect as red text */}
-              </>
-            ) : <div></div>}
-          </button>
+          <div className="d-flex">
+            <button type="button" className="btn" onClick={() => {
+              if (!isImageSelected) { // Only open file selector if no image is selected
+                document.querySelector("input[type='file']").click();
+              }
+            }}>
+              <FontAwesomeIcon icon={faImage} className="me-2" />
+              Image
+              {imageData !== "" ? (
+                <>
+                  <img src={imageData} height={20} className="mx-2" />
+                  <span
+                    onClick={deselectImage}
+                    style={{ color: 'red', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.8rem' }}> {/* Adjusted font size */}
+                    Remove
+                  </span> {/* Deselect as red text */}
+                </>
+              ) : <div></div>}
+            </button>
+            <select className="rounded" name="privacy" defaultValue={"Public"}>
+              <option value="Public">Public</option>
+              <option value="Private">Private</option>
+              <option value="Almost">Custom</option>
+            </select>
+          </div>
           <button className="btn btn-dark" type="submit">Post</button>
         </div>
       </form> : <p>Login in to create post</p>}
