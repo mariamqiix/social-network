@@ -99,8 +99,10 @@ const reducer = (state = initialState, action: any) => {
             }
         case "user/logout":
             return {
-                ...state,
                 user: null,
+                posts: [],
+                chats: [],
+                notifications: [],
             }
         default:
             return state;
