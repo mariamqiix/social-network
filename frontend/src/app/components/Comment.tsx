@@ -2,7 +2,7 @@ const Comment = ({ author, content, time }) => {
   return (
     <div className="d-flex align-items-start">
       <img
-        src={"placeholder.jpg"}
+        src={author.avatar}
         alt="Avatar"
         className="rounded-circle"
         style={{ width: '40px', height: '40px', marginRight: '10px' }}

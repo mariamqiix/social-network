@@ -76,10 +76,10 @@ export default function Home() {
         if (res.status == 200) {
           window.location.reload();
         }
-        res.text().then(data => {
-          console.log(data);
-          // dispatch(addPost({ id: 0, author: { name: user.username, avatar: user.image_url ?? "/placeholder.jpg" }, time: (new Date()).toISOString(), content, images, likes: 0, }));
-        });
+        // res.text().then(data => {
+        // console.log(data);
+        // dispatch(addPost({ id: 0, author: { name: user.username, avatar: user.image_url ?? "/placeholder.jpg" }, time: (new Date()).toISOString(), content, images, likes: 0, }));
+        // });
       });
     }
   }
@@ -90,7 +90,7 @@ export default function Home() {
         // console.log(data.Posts);
         data.Posts.forEach((post: any) => {
           if (post) {
-            dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "/placeholder.jpg" }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : [], likes: post.likes.count }));
+            dispatch(addPost({ id: post.id, author: { name: post.author.username, avatar: "data:image/jpeg;base64," + post.author.image_url }, time: post.created_at, content: post.content, images: post.image_url == "" ? [] : ["data:image/jpeg;base64," + post.image_url], likes: post.likes.count }));
           }
         });
       });
@@ -131,8 +131,8 @@ export default function Home() {
             {imageData !== "" ? (
               <>
                 <img src={imageData} height={20} className="mx-2" />
-                <span 
-                  onClick={deselectImage} 
+                <span
+                  onClick={deselectImage}
                   style={{ color: 'red', cursor: 'pointer', textDecoration: 'underline', fontSize: '0.8rem' }}> {/* Adjusted font size */}
                   Remove
                 </span> {/* Deselect as red text */}

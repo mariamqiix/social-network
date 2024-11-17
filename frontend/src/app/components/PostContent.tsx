@@ -9,7 +9,7 @@ const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
         {/* Author Info */}
         <div className="d-flex align-items-center" >
           <Image
-            src={"/placeholder.jpg"}
+            src={avatar}
             alt="Author's Avatar"
             width={50}
             height={50}
@@ -26,7 +26,16 @@ const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
           <p className="card-text">{content}</p>
 
           {/* Post Image */}
-          {images && images.length > 0 && (
+          {images.map((image: string, i: number) => (<div className="mb-4">
+            <Image
+              src={images[i]}
+              alt="Post Image"
+              width={200}
+              height={200}
+              className="img-fluid rounded"
+            />
+          </div>))}
+          {/* {images && images.length > 0 && (
             <div className="mb-4">
               <Image
                 src={images[0]} // Assuming only one image is used
@@ -36,7 +45,7 @@ const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
                 className="img-fluid rounded"
               />
             </div>
-          )}
+          )} */}
         </div>
       </div>
     </Link>

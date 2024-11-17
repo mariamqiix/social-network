@@ -7,6 +7,7 @@ import { selectNotifications, selectUser } from "../redux/selectors";
 import { useDispatch, useSelector } from "react-redux";
 import { login, logout } from "../redux/actions";
 import { useEffect } from "react";
+import { GetUserImage } from "./user_image";
 
 const links = ["/", "/chat", "/groups", "/profile", "/notifications", "/login"];
 
@@ -53,7 +54,9 @@ export default function Nav() {
             { method: "POST", credentials: 'include' }).then(res => {
                 if (res.ok) {
                     res.json().then(data => {
-                        dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
+                        GetUserImage(data.ID).then((img) => {
+                            dispatch(login({ id: data.ID, username: data.Username, nickname: data.Nickname, first_name: data.FirstName, last_name: data.LastName, email: data.Email, image_url: img, dob: data.DateOfBirth, bio: data.Bio }));
+                        })
                     });
                 }
             });
@@ -93,7 +96,7 @@ export default function Nav() {
                         </a>
                         <span className="d-none d-sm-block">
                             <br />
-                            {user.firstName} {user.lastName}
+                            {user.first_name} {user.last_name}
                             <br />
                             <span className="text-body-tertiary">{user.username}</span>
                         </span>
