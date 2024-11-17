@@ -7,6 +7,7 @@ import { randomColor } from "../components/colors";
 import * as FaIcons from "react-icons/fa"; // Import all FontAwesome icons
 import { IconType } from 'react-icons'; // Import IconType from react-icons
 import internal from "stream";
+import Metadata from "../components/Metadata";
 
 export const getIconComponent = (iconDisplayName: string): JSX.Element | null => {
     if (!iconDisplayName || typeof iconDisplayName !== 'string') {
@@ -183,6 +184,7 @@ export default function Page() {
                 backgroundColor: "#f0f4f7", // Light background
             }}
         >
+            <Metadata seoTitle="Friendz | Groups" seoDescription="The next gen social network" />
             <div className="tabs">
 
                 <div className="tab-group-left">

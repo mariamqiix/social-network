@@ -7,9 +7,12 @@ import PostActions from '../components/PostActions';
 import { Post, ProfilePageView } from "../types/Types";
 import { likePost } from "../redux/actions";
 import { randomColor } from "../components/colors";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import Metadata from "../components/Metadata";
+import { selectUser } from "../redux/selectors";
 
 export default function page(id: number) {
+    const user = useSelector(selectUser);
     const [profileData, setProfileData] = useState<any>();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('Posts');
@@ -21,7 +24,7 @@ export default function page(id: number) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchProfileData(5);
+                const data = await fetchProfileData(user?.id ?? 1);
                 setProfileData(data);
                 setIsActive(data.is_user_profile || data.user_status == "Accepted" || data.user_profile_type == "Public")
 
@@ -110,6 +113,7 @@ export default function page(id: number) {
 
     return (
         <div className="Container">
+            <Metadata seoTitle={"Friendz | " + profileData?.user.username} seoDescription="The next gen social network" />
             {/* Profile Header */}
             <div className="ProfilePageHeader">
                 <div className="profile-info">
@@ -225,7 +229,7 @@ export default function page(id: number) {
             {(activeTab === 'Followers' || activeTab === 'Following') && (
                 <div className="members-section">
                     <ul className="member-list">
-                        { follows!= null && follows.map((member) => (
+                        {follows != null && follows.map((member) => (
                             <li key={member.id} className="member-item">
                                 <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
                                 <div className="member-details">

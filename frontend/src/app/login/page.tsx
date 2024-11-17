@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/actions";
 import { selectNotifications, selectUser } from "../redux/selectors";
+import Metadata from "../components/Metadata";
 
 const color = colors[0];
 export default function loginPage() {
@@ -16,6 +17,7 @@ export default function loginPage() {
     const router = useRouter()
     let [isRegister, setIsRegister] = useState(true);
     return isRegister ? <Card title="Login" color={color}>
+        <Metadata seoTitle="Friendz | Login" seoDescription="The next gen social network" />
         <form className="d-flex flex-column" onSubmit={(e) => {
             e.preventDefault();
             let formData = new FormData(e.target as HTMLFormElement);
@@ -47,6 +49,7 @@ export default function loginPage() {
             <button type="submit" className="btn btn-dark mt-3">Login</button>
         </form>
     </Card > : <Card title="Register" color={color}>
+        <Metadata seoTitle="Friendz | Register" seoDescription="The next gen social network" />
         <form className="d-flex flex-column">
             {/* <h3 className="text-center">Please enter your account details</h3> */}
             <div className="mb-3">
@@ -72,36 +75,36 @@ export default function loginPage() {
 
             <div className="mb-3">
                 <label className="form-label">Date of birth</label>
-                <input 
-                    type="date" 
-                    className="form-control" 
-                    name="dob" 
+                <input
+                    type="date"
+                    className="form-control"
+                    name="dob"
                     aria-describedby="dobHelp"
                     max={new Date().toISOString().split("T")[0]} />{/** Restrict to dates before today */}
             </div>
 
             <div className="mb-3">
                 <label className="form-label">Avatar</label>
-                <input 
-                    type="file" 
-                    className="form-control" 
-                    name="avatar" 
+                <input
+                    type="file"
+                    className="form-control"
+                    name="avatar"
                     aria-describedby="avatarHelp"
                     accept="image/*" /> {/* Only allows image files */}
 
-                    <small id="avatarHelp" className="form-text text-muted">
-                        Please upload an image file (e.g., .jpg, .png).
-                    </small>
+                <small id="avatarHelp" className="form-text text-muted">
+                    Please upload an image file (e.g., .jpg, .png).
+                </small>
             </div>
 
             <div className="mb-3">
                 <label className="form-label">About Me</label>
-                    <textarea
-                        className="form-control"
-                        name="aboutMe"
-                        aria-describedby="aboutMeHelp"
-                        rows={4} // Adjust the number of rows as needed
-                    ></textarea>
+                <textarea
+                    className="form-control"
+                    name="aboutMe"
+                    aria-describedby="aboutMeHelp"
+                    rows={4} // Adjust the number of rows as needed
+                ></textarea>
                 <small id="aboutMeHelp" className="form-text text-muted">
                     Tell us a little about yourself.
                 </small>

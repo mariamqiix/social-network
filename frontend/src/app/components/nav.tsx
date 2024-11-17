@@ -48,7 +48,6 @@ export default function Nav() {
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotifications);
     const dispatch = useDispatch();
-
     useEffect(() => {
         fetch("http://localhost:8080/login",
             { method: "POST", credentials: 'include' }).then(res => {
