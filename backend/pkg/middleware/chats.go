@@ -56,7 +56,7 @@ func UserAbleToChatHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	followers, _ := models.GetFollowers(user.ID) 
+	followers, _ := models.GetFollowers(user.ID)
 	following, _ := models.GetFollowings(user.ID)
 
 	// Map to store unique entries based on the composite key
@@ -95,7 +95,7 @@ func UserChatsHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	
+
 	if !userLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return

@@ -29,7 +29,7 @@ export default function Page() {
     fetch("http://localhost:8080/postPage?id=" + id, { credentials: 'include' }).then((res) => {
       res.json().then((data) => {
         console.log(data);
-        let newPost: Post = { id: data.Posts.id, author: { name: data.Posts.author.username, avatar: "data:image/jpeg;base64," + data.Posts.author.image_url }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : [], likes: data.Posts.likes.count };
+        let newPost: Post = { id: data.Posts.id, author: { name: data.Posts.author.username, avatar: "data:image/jpeg;base64," + data.Posts.author.image_url }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : ["data:image/jpeg;base64,"+data.Posts.image_url], likes: data.Posts.likes.count };
         setPost(newPost);
         if (data.Comments) {
           setComments(data.Comments.map((comment: any) => ({ author: { name: comment.author.username, avatar: "data:image/jpeg;base64," + comment.author.image_url }, content: comment.content, time: comment.created_at, likes: comment.likes.count })));

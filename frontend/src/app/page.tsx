@@ -45,16 +45,16 @@ export default function Home() {
 
   function addPostFormSubmit(form: HTMLFormElement) {
     let data = new FormData(form);
-    let imageContent: ArrayBuffer | undefined;
+    let imageContent: string | undefined;
     if (form.children[1].files.length > 0) {
       let reader = new FileReader();
       reader.onload = function (e) {
-        imageContent = e.target?.result as ArrayBuffer;
+        imageContent = e.target?.result as string;
         if (data.get("text") && imageContent) {
           sendPost(data.get("text")?.toString()!, imageContent);
         }
       }
-      reader.readAsArrayBuffer(form.children[1].files[0]);
+      reader.readAsDataURL(form.children[1].files[0]);
     } else {
       if (data.get("text")) {
         sendPost(data.get("text")?.toString()!, null);
@@ -62,12 +62,13 @@ export default function Home() {
     }
   }
 
-  function sendPost(content: string, image: ArrayBuffer | null) {
+  function sendPost(content: string, image: string | null) {
+    console.log(content, image.indexOf(","), image.substring(image.indexOf(",") + 1));
     if (user) {
       fetch("http://localhost:8080/post/createPost/user", {
         credentials: 'include', method: "POST", body: JSON.stringify({
           description: content,
-          image: image == null ? null : new Int8Array(image),
+          image: image == null ? null : image.substring(image.indexOf(",") + 1),
           privacy: "Public",
           recipient: [],
         })

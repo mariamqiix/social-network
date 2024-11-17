@@ -283,7 +283,6 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusUnauthorized)
 		return
 	}
-
 	path := strings.TrimPrefix(r.URL.Path, "/post/createPost/")
 	switch path {
 	case "group":
@@ -330,15 +329,22 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		var post structs.PostRequest
 		err := json.NewDecoder(r.Body).Decode(&post)
 		if err != nil {
+			fmt.Println(err)
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
 
+		imageBytes, err := base64.StdEncoding.DecodeString(*post.Image)
+		if err != nil {
+			fmt.Println("Error decoding base64 image:", err)
+			errorServer(w, http.StatusBadRequest)
+			return
+		}
 		imageID := 0
 		if post.Image != nil {
-			isImage, _ := IsDataImage(post.Image)
+			isImage, _ := IsDataImage(imageBytes)
 			if isImage {
-				imageID, err = models.UploadImage(post.Image)
+				imageID, err = models.UploadImage(imageBytes)
 				if err != nil {
 					errorServer(w, http.StatusInternalServerError)
 					return

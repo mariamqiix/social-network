@@ -26,26 +26,15 @@ const PostContent = ({ content, images, avatar, name, time, id = "" }) => {
           <p className="card-text">{content}</p>
 
           {/* Post Image */}
-          {images.map((image: string, i: number) => (<div className="mb-4">
+          {images.map((image: string, i: number) => (
             <Image
-              src={images[i]}
+              key={"image" + i}
+              src={image}
               alt="Post Image"
-              width={200}
-              height={200}
-              className="img-fluid rounded"
-            />
-          </div>))}
-          {/* {images && images.length > 0 && (
-            <div className="mb-4">
-              <Image
-                src={images[0]} // Assuming only one image is used
-                alt="Post Image"
-                width={200}
-                height={200}
-                className="img-fluid rounded"
-              />
-            </div>
-          )} */}
+              width={500}
+              height={500}
+              className="img-fluid rounded ms-auto me-auto d-block"
+            />))}
         </div>
       </div>
     </Link>

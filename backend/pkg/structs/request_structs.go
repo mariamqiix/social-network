@@ -18,10 +18,10 @@ type UserRquest struct {
 // // used for http.HandleFunc("/post/addComment", AddCommentHandler)
 // // http.HandleFunc("/post/createPost", CreatePostHandler)
 type PostRequest struct {
-	Description string `json:"description"`
-	Image       []byte `json:"image"`
-	Privacy     string `json:"privacy"`
-	Recipient   []int  `json:"recipient"` /// wil return array of the user names
+	Description string  `json:"description"`
+	Image       *string `json:"image"`
+	Privacy     string  `json:"privacy"`
+	Recipient   []int   `json:"recipient"` /// wil return array of the user names
 }
 
 // // used for http.HandleFunc("/post/addComment", AddCommentHandler)
@@ -75,7 +75,6 @@ type EventResponseRequest struct {
 	EventID  int `json:"event_id"`
 	OptionID int `json:"option_id"`
 }
-
 
 type ReactoinRequest struct {
 	PostID   int    `json:"post_id"`

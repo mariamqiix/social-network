@@ -1,4 +1,4 @@
-const Comment = ({ author, content, time }) => {
+const Comment = ({ author, content, time }: { author: any, content: string, time: string }) => {
   return (
     <div className="d-flex align-items-start">
       <img
