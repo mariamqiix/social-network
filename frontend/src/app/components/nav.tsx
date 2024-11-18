@@ -87,6 +87,7 @@ export default function Nav() {
                     width={200}
                     height={80}
                     alt="Logo"
+                    priority={true}
                 />
                 {user != null ?
                     <div className="container-fluid d-flex flex-column align-items-center">
@@ -108,7 +109,7 @@ export default function Nav() {
                     </div> : <p>Not logged in</p>}
                 {links.map((link, i) => link != "/login" || user == null ? (
                     <Link
-                        href={link}
+                        href={link == "/profile" && user ? link + "/" + user?.id : link}
                         key={link}
                         className={
                             (pathName == link || (pathName == "" && link == "/") ? "btn-dark" : "") +

@@ -131,7 +131,7 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		UserDislikedPost: UserDislikedPost,
 		IsUserProfile:    isUserProfile,
 		UserStatus:       canSeeInfo,
-		UserProfiletype: userProfile.ProfileType,
+		UserProfiletype:  userProfile.ProfileType,
 	}
 
 	switch path {
@@ -211,4 +211,26 @@ func mapBasicUsers(followers []structs.Follower, code int) ([]structs.BasicUserR
 		)
 	}
 	return basicUsers, nil
+}
+
+func ListUsersHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+	limiterUsername := "[GUESTS]"
+
+	if sessionUser != nil {
+		limiterUsername = sessionUser.Username
+	}
+
+	if !userLimiter.Allow(limiterUsername) {
+		errorServer(w, http.StatusTooManyRequests)
+		return
+	}
+	users, err := models.GetAllUsers()
+
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	writeToJson(users, w)
 }

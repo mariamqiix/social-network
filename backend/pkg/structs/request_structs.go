@@ -21,7 +21,7 @@ type PostRequest struct {
 	Description string  `json:"description"`
 	Image       *string `json:"image"`
 	Privacy     string  `json:"privacy"`
-	Recipient   []int   `json:"recipient"` /// wil return array of the user names
+	Recipient   []int   `json:"recipient"` /// wil return array of the user ids
 }
 
 // // used for http.HandleFunc("/post/addComment", AddCommentHandler)

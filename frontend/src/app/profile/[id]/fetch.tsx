@@ -1,6 +1,6 @@
-import { ProfilePageView } from '../types/Types';
+import { ProfilePageView } from '../../types/Types';
 
-export async function fetchProfileData(id : number): Promise<ProfilePageView> {
+export async function fetchProfileData(id: number): Promise<ProfilePageView> {
     const url = `http://localhost:8080/user/profile/`; // Append the id to the URL
 
     try {

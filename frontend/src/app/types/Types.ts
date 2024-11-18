@@ -18,6 +18,7 @@ export type Notifi = {
 export type Post = {
     id: number;
     author: {
+        id: number;
         name: string;
         avatar: string;
     };

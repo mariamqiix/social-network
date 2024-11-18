@@ -1,17 +1,19 @@
 'use client';
-import "../../../public/profilePage.css";
+import "../../../../public/profilePage.css";
 import { fetchProfileData } from "./fetch";
 import React, { useState, useEffect } from 'react';
-import PostContent from "../components/PostContent";
-import PostActions from '../components/PostActions';
-import { Post, ProfilePageView } from "../types/Types";
-import { likePost } from "../redux/actions";
-import { randomColor } from "../components/colors";
+import PostContent from "../../components/PostContent";
+import PostActions from '../../components/PostActions';
+import { Post } from "../../types/Types";
+import { likePost } from "../../redux/actions";
+import { randomColor } from "../../components/colors";
 import { useDispatch, useSelector } from "react-redux";
-import Metadata from "../components/Metadata";
-import { selectUser } from "../redux/selectors";
+import Metadata from "../../components/Metadata";
+import { selectUser } from "../../redux/selectors";
 
-export default function page(id: number) {
+export default function page(params: any) {
+    let id = Number.parseInt(params.params.id) ?? 1;
+    // console.log(id);
     const user = useSelector(selectUser);
     const [profileData, setProfileData] = useState<any>();
     const dispatch = useDispatch();
@@ -24,7 +26,7 @@ export default function page(id: number) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await fetchProfileData(user?.id ?? 1);
+                const data = await fetchProfileData(id);
                 setProfileData(data);
                 setIsActive(data.is_user_profile || data.user_status == "Accepted" || data.user_profile_type == "Public")
 
@@ -207,11 +209,12 @@ export default function page(id: number) {
                                 backgroundColor: randomColor(),
                             }}>
                                 <PostContent
-                                    avatar={post.author.avatar}
+                                    avatar={"data:image/jpeg;base64," + post.author.image_url}
                                     name={post.author.username}
+                                    userID={post.author.id}
                                     time={post.created_at}
                                     content={post.content}
-                                    images={post.image_url === "" ? [] : []}
+                                    images={post.image_url === "" ? [] : ["data:image/jpeg;base64," + post.image_url]}
                                     id={post.id.toString()}
                                 />
                                 <PostActions likes={post.likes.count} liked={() => likePostClicked(post.id)} />
