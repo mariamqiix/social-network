@@ -198,7 +198,6 @@ export default function page(params: any) {
                         (posts.map((post: Post, index: number) => (
                             <div key={index} className="card shadow-sm p-4" style={{
                                 width: '100%',
-                                maxWidth: '900px',
                                 margin: '10px 0',
                                 padding: '10px',
                                 border: '1px solid #e1e1e1',

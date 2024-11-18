@@ -1,13 +1,13 @@
 .Container {
-    width: 95%;
-    margin-left: 2.5%;
+    /* width: 95%; */
+    /* margin-left: 2.5%; */
     font-family: Arial, sans-serif;
     height: 100%;
     /* Ensure full height stretch */
 }
 
 .ProfilePageHeader {
-    min-width: 1000px;
+    /* min-width: 1000px; */
     /* Ensure full width */
     position: relative;
     /* Ensure the button container is positioned relative to this */
@@ -19,20 +19,20 @@
     border-radius: 15px;
     margin-top: 20px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 100%;
+    /* width: 100%; */
     /* Stretch to full width */
 }
 
 .profile-info {
     display: flex;
-    width: 100%;
+    /* width: 100%; */
 }
 
 .profile-avatar {
     margin: auto;
     margin-left: 40px;
-    width: 255px;
-    height: 210px;
+    width: 200px;
+    height: 200px;
     /* Adjust to keep it proportional */
     border-radius: 200px;
     border: 2px solid #e0e0e0;
@@ -42,7 +42,7 @@
     margin-left: 40px;
     flex-grow: 1;
     /* Allows profile details to stretch */
-    width: 100%;
+    /* width: 100%; */
     /* Ensures it fills available width */
 }
 
@@ -65,7 +65,7 @@
 }
 
 .list-bar {
-    min-width: 1000px;
+    /* min-width: 1000px; */
     /* Ensure full width */
     margin-top: 20px;
     background: #fff;
@@ -138,8 +138,10 @@
 }
 
 .list-bar li.inactive {
-    opacity: 0.5; /* Decrease opacity for inactive state */
-    cursor: not-allowed; /* Change cursor to not allowed for inactive state */
+    opacity: 0.5;
+    /* Decrease opacity for inactive state */
+    cursor: not-allowed;
+    /* Change cursor to not allowed for inactive state */
 }
 
 .members-section {
@@ -198,5 +200,6 @@
 
 .list-bar li.disabled-button {
     cursor: not-allowed;
-    opacity: 0.5; /* Optionally reduce opacity to indicate disabled state */
+    opacity: 0.5;
+    /* Optionally reduce opacity to indicate disabled state */
 }
