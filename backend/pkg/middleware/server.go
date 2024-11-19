@@ -17,7 +17,7 @@ func GoLive() {
 	mux.HandleFunc("/postPage", PostPageHandler) //  DONE >>>>>	return the group Page view || checked
 	mux.HandleFunc("/login", LoginHandler)       //  DONE >>>>>	login function || checked
 	mux.HandleFunc("/logout", LogoutHandler)
-	// mux.HandleFunc("/signup", SignupHandler)
+	mux.HandleFunc("/signup", SignupHandler)
 	mux.HandleFunc("/socket", websocketHandler)
 
 	// ///// the /post api's

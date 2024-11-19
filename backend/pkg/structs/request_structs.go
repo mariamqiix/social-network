@@ -4,15 +4,16 @@ import "time"
 
 // /// for http.HandleFunc("/signup", SignupHandler)
 type UserRquest struct {
-	FirstName   string    `json:"first_name"`
-	LastName    string    `json:"last_name"`
-	Username    string    `json:"username"`
-	Password    string    `json:"password"`
-	Email       string    `json:"email"`
-	DateOfBirth time.Time `json:"date_of_birth"`
-	Image       []byte    `json:"image"`
-	Bio         string    `json:"bio"`
-	Nickname    string    `json:"nickname"`
+	FirstName   string  `json:"first_name"`
+	LastName    string  `json:"last_name"`
+	Username    string  `json:"username"`
+	Password    string  `json:"password"`
+	Email       string  `json:"email"`
+	DateOfBirth string  `json:"date_of_birth"`
+	Image       *string `json:"image"`
+	Bio         string  `json:"bio"`
+	Nickname    string  `json:"nickname"`
+	ProfileType string  `json:"type"`
 }
 
 // // used for http.HandleFunc("/post/addComment", AddCommentHandler)

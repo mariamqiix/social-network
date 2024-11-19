@@ -133,7 +133,7 @@ export default function Home() {
         }
       }}>
         <textarea className="w-10rea0 form-control" name="text" />
-        <input type="file" name="image" className="d-none" onChange={() => {
+        <input type="file" name="image" className="d-none" accept="image/*" onChange={() => {
           loadImage();
         }} />
         <div className="d-flex justify-content-between mt-3">

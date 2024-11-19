@@ -50,14 +50,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid username or email", http.StatusConflict)
 		return
 	}
-	// if err := CompareHashAndPassword(user.HashedPassword, Password); err != HasherErrorNone {
-	// 	http.Error(w, "Invalid password", http.StatusConflict)
-	// 	return
-	// }
-	if "123456789" != Password {
+	if err := CompareHashAndPassword(user.HashedPassword, Password); err != HasherErrorNone {
 		http.Error(w, "Invalid password", http.StatusConflict)
 		return
 	}
+	// if "123456789" != Password {
+	// 	http.Error(w, "Invalid password", http.StatusConflict)
+	// 	return
+	// }
 	// Create a new session and set the cookie
 	err2 := CreateSessionAndSetCookie("", w, user)
 	if err2 != nil {

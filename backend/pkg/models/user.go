@@ -9,8 +9,8 @@ import (
 
 func CreateUser(u structs.User) error {
 	// Create a new record in the User table
-	columns := []string{"username", "user_type", "email", "hashed_password", "first_name", "last_name", "profile_type", "date_of_birth", "profile_type", "image_id"}
-	values := []interface{}{u.Username, u.UserType, u.Email, u.HashedPassword, u.FirstName, u.LastName, u.ProfileType, u.DateOfBirth, u.ProfileType, "-1"}
+	columns := []string{"username", "user_type", "email", "hashed_password", "first_name", "last_name", "profile_type", "date_of_birth", "profile_type", "image_id", "bio", "nickname"}
+	values := []interface{}{u.Username, u.UserType, u.Email, u.HashedPassword, u.FirstName, u.LastName, u.ProfileType, u.DateOfBirth, u.ProfileType, u.ImageID, u.Bio, u.Nickname}
 	return Create("User", columns, values)
 }
 
