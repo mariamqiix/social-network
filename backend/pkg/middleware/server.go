@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"fmt"
 	"net/http"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 var userLimiter *UserRateLimiter
@@ -48,9 +49,9 @@ func GoLive() {
 	mux.HandleFunc("/user/responds/", UserResponde)
 
 	mux.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
-	mux.HandleFunc("/user/Chats", UserChatsHandler)            // to return the chats of the user
+	mux.HandleFunc("/user/Chats", UserChatHandler)             // to return the chats of the user
 
-	//mux.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //// to return the users that can be talked with
+	mux.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //// to return the users that can be talked with
 	// mux.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)        // to return the user information that will be showen in the front
 	// mux.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler)       // to update the user information
 	corsWrappedMux := Cors(mux)

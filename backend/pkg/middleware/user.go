@@ -1,14 +1,15 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func PrivacyChangeHandler(w http.ResponseWriter, r *http.Request) {
