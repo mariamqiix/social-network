@@ -8,6 +8,52 @@ import (
 	"strings"
 )
 
+func PrivacyChangeHandler(w http.ResponseWriter, r *http.Request) {
+	sessionUser := GetUser(r)
+	limiterUsername := "[GUESTS]"
+
+	if sessionUser != nil {
+		limiterUsername = sessionUser.Username
+	}
+
+	if !userLimiter.Allow(limiterUsername) {
+		errorServer(w, http.StatusTooManyRequests)
+		return
+	}
+
+	var userChangeRequest *structs.UserChangeRequest
+
+	err := json.NewDecoder(r.Body).Decode(&userChangeRequest)
+	if err != nil {
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	profileUserId := userChangeRequest.UserID
+	if userChangeRequest.UserID == -1 && sessionUser != nil {
+		profileUserId = sessionUser.ID
+	}
+
+	userProfile, err := models.GetUserByID(profileUserId)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	if sessionUser.ID != userProfile.ID {
+		errorServer(w, http.StatusUnauthorized)
+		return
+	} else if userChangeRequest.Privacy != "Public" && userChangeRequest.Privacy != "Private" {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+
+	userProfile.ProfileType = userChangeRequest.Privacy
+	models.UpdateUser(*userProfile)
+	errorServer(w, http.StatusOK)
+	return
+}
+
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	// Extract the endpoint from the request path
 	path := strings.TrimPrefix(r.URL.Path, "/user/profile/")

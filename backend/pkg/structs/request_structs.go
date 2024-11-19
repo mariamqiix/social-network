@@ -97,6 +97,11 @@ type UserInfoRequest struct {
 	Response string `json:"response"`
 }
 
+type UserChangeRequest struct {
+	UserID  int    `json:"user_id"`
+	Privacy string `json:"privacy"`
+}
+
 type MessageRequest struct {
 	Type       string `json:"type"`
 	SenderId   string `json:"sender_id"`

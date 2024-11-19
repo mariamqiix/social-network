@@ -135,8 +135,9 @@ export default function page(params: any) {
                                 </div>
                             )
                             }
+
                             <div className="profile-follow-info">
-                                {!profileData?.is_user_profile && (
+                                {!profileData?.is_user_profile ? (
                                     <div className="button-container">
                                         {profileData?.user_status === "" ? (
                                             <button className="followBtn requestBtn"
@@ -159,7 +160,25 @@ export default function page(params: any) {
                                         }
 
                                     </div>)
-                                }
+                                    : <div className="button-container">
+                                        <select className="form-select form-select-lg" value={profileData.user_profile_type} onChange={(e) => {
+                                            console.log(e.target.value);
+                                            fetch("http://localhost:8080/user/changePrivacy/", { method: "POST", credentials: 'include', body: JSON.stringify({ user_id: user?.id, privacy: e.target.value }) }).then((res) => {
+                                                if (res.ok) {
+                                                    window.location.reload();
+                                                    // profileData.user_profile_type = e.target.value;
+                                                    // setProfileData(profileData);
+                                                } else {
+                                                    res.text().then((data) => {
+                                                        alert(data);
+                                                    });
+                                                }
+                                            });
+                                        }}>
+                                            <option>Public</option>
+                                            <option>Private</option>
+                                        </select>
+                                    </div>}
                             </div>
                         </div>
                     )}

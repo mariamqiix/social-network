@@ -42,6 +42,7 @@ func GoLive() {
 
 	///// the /user api's
 	mux.HandleFunc("/user/profile/", ProfilePageHandler)
+	mux.HandleFunc("/user/changePrivacy/", PrivacyChangeHandler)
 	mux.HandleFunc("/user/list/", ListUsersHandler)
 	mux.HandleFunc("/user/notifications/", NotificationsHandler)
 	mux.HandleFunc("/user/responds/", UserResponde)
