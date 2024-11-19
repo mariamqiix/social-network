@@ -1,10 +1,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"backend/pkg/models"
 	"backend/pkg/structs"
-	"fmt"
-	"net/http"
 )
 
 func UserChatHandler(w http.ResponseWriter, r *http.Request) {
@@ -56,48 +56,28 @@ func UserAbleToChatHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	followers, _ := models.GetFollowers(user.ID)
-	following, _ := models.GetFollowings(user.ID)
+	followers1, _ := models.GetFollowers(user.ID)
+	following2, _ := models.GetFollowings(user.ID)
+	followers, _ := mapBasicUsers(followers1, 1)
+	following, _ := mapBasicUsers(following2, 2)
 
-	// Map to store unique entries based on the composite key
-	uniqueFollowers := make(map[string]structs.Follower)
+	var users []structs.BasicUserResponse
+	users = append(users, followers...)
 
-	// Add followers to the map
-	for _, follower := range followers {
-		key := fmt.Sprintf("%d-%d", follower.FollowingID, follower.FollowerID)
-		uniqueFollowers[key] = follower
-	}
-
-	// Add following to the map
-	for _, follower := range following {
-		key := fmt.Sprintf("%d-%d", follower.FollowingID, follower.FollowerID)
-		if _, ok := uniqueFollowers[key]; !ok {
-			uniqueFollowers[key] = follower
+	for _, followee := range following {
+		if !contains(users, followee) {
+			users = append(users, followee)
 		}
 	}
-
-	// Convert the map back to a slice
-	var uniqueFollowersSlice []structs.Follower
-	for _, follower := range uniqueFollowers {
-		uniqueFollowersSlice = append(uniqueFollowersSlice, follower)
-	}
-
-	// Print unique followers and following
-	// for _, follower := range uniqueFollowersSlice {
-	// 	fmt.Printf("ID: %d, FollowingID: %d, FollowerID: %d, Status: %v\n", follower.ID, follower.FollowingID, follower.FollowerID, follower.Status)
-	// }
-
+	writeToJson(users, w)
 }
 
-func UserChatsHandler(w http.ResponseWriter, r *http.Request) {
-	sessionUser := GetUser(r)
-	limiterUsername := "[GUESTS]"
-	if sessionUser != nil {
-		limiterUsername = sessionUser.Username
+// contains checks if a slice of BasicUserResponse contains a specific BasicUserResponse
+func contains(users []structs.BasicUserResponse, user structs.BasicUserResponse) bool {
+	for _, u := range users {
+		if u.Id == user.Id {
+			return true
+		}
 	}
-
-	if !userLimiter.Allow(limiterUsername) {
-		errorServer(w, http.StatusTooManyRequests)
-		return
-	}
+	return false
 }
