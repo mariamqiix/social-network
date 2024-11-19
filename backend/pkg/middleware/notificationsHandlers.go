@@ -4,6 +4,7 @@ import (
 	"backend/pkg/models"
 	"backend/pkg/structs"
 	"encoding/json"
+
 	// "fmt"
 	"net/http"
 	"strings"
@@ -256,7 +257,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		writeToJson(
 			structs.StatusResponse{
 				Status: status,
-		}, w)
+			}, w)
 
 	case "requestToUnfollow":
 		var userRequestToUnfollow *structs.UserInfoRequest

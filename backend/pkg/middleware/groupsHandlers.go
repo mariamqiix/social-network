@@ -560,7 +560,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		notification := structs.Notification{
 			UserID:           member.UserID,
 			NotificationType: "GroupNewEvent",
-			GroupID:          &eventRequest.GroupID,
+			GroupID:          &group.ID,
 			EventID:          &eventID,
 			IsRead:           false,
 		}
@@ -570,7 +570,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		SendNotification(member.ID, structs.NotificatoinResponse{
 			Id:           notification.ID,
 			Type:         notification.NotificationType,
-			GroupID:      eventRequest.GroupID,
+			GroupID:      group.ID,
 			EventID:      *notification.EventID,
 			IsRead:       notification.IsRead,
 			CreationDate: notification.CreationDate,

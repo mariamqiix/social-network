@@ -10,12 +10,18 @@ func CreateNotification(userID int, sender_id, entityId *int, notificationType, 
 	return Create("UserNotification", columns, values)
 }
 
+func CreateGroupEventNotification(userID int, sender_id, entityId *int, groupId int, notificationType string, isRead bool) error {
+	columns := []string{"user_id", "notification_type", "event_id", "group_id", "is_read", "sender_id"}
+	values := []interface{}{userID, notificationType, entityId, groupId, isRead, sender_id}
+	return Create("UserNotification", columns, values)
+}
+
 func CreateGroupsNotification(notification structs.Notification) error {
 	return CreateNotification(notification.UserID, notification.SenderID, notification.GroupID, notification.NotificationType, "group_id", notification.IsRead)
 }
 
 func CreateEventsNotification(notification structs.Notification) error {
-	return CreateNotification(notification.UserID, notification.SenderID, notification.EventID, notification.NotificationType, "event_id", notification.IsRead)
+	return CreateGroupEventNotification(notification.UserID, notification.SenderID, notification.EventID, *notification.GroupID, notification.NotificationType, notification.IsRead)
 }
 
 func CreateMessagesNotification(notification structs.Notification) error {
