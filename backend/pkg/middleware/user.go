@@ -116,7 +116,12 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	err = models.CreateUser(user)
 	if err != nil {
 		fmt.Println(err)
-		errorServer(w, http.StatusInternalServerError)
+		if err.Error() == "UNIQUE constraint failed: User.email" {
+			w.WriteHeader(http.StatusInternalServerError)
+			fmt.Fprint(w, "User already exists")
+		} else {
+			errorServer(w, http.StatusInternalServerError)
+		}
 		return
 	}
 	errorServer(w, http.StatusOK)

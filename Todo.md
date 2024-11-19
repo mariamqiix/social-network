@@ -1,9 +1,4 @@
 social network :
-1. Registration backend
-2. login should check the password
-3. (Email, Password, First Name, Last Name, Date of Birth, Avatar/Image (Optional), Nickname (Optional), About Me (Optional)) frontend
-5. Try to register the same user you already registered. backend
-
 8. following a private / public user (frontend + backend)
 
 15. invite followers to join a group (front/ back)
