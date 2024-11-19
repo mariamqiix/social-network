@@ -302,6 +302,7 @@ func returnProfilePosts(mode string, profileUserId int, sessionUserID int, sessi
 		}
 	}
 
+
 	return mapPosts(sessionUser, posts), nil
 }
 

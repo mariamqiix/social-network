@@ -1,9 +1,10 @@
 package models
 
 import (
+	"fmt"
+
 	"backend/pkg/db"
 	"backend/pkg/structs"
-	"fmt"
 )
 
 func CreateUserPost(p structs.Post) (int, error) {
@@ -519,6 +520,8 @@ func GetPostsForUser(userId int) ([]structs.Post, error) {
 	// Return the posts if everything was successful
 	return posts, nil
 }
+
+// 		posts, err = models.ProfilePagePosts(profileUserId, sessionUserID)
 
 func ProfilePagePosts(userId, FollowerID int) ([]structs.Post, error) {
 	query := `

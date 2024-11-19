@@ -23,5 +23,6 @@ CREATE TABLE GroupRequest (
     user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     request_status VARCHAR(50) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
     request_type VARCHAR(50) CHECK (request_type IN ('Invite', 'Request')),
-    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(group_id, user_id,request_status)
 );

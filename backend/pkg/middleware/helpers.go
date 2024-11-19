@@ -1,17 +1,17 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"regexp"
 	"strings"
 	"time"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 var emailRegex = regexp.MustCompile(`^[\w]+@[\w]+\.[a-zA-Z]{2,}$`)
@@ -33,7 +33,7 @@ func GetUser(r *http.Request) *structs.User {
 
 	session, err := models.GetSession(sessionCookie.Value)
 	if err != nil {
-		log.Printf("error getting session: %s\n", err.Error())
+		fmt.Printf("error getting session: %s\n", err.Error())
 		return nil
 	}
 	// a nill foreign key means the user is a guest
@@ -44,7 +44,7 @@ func GetUser(r *http.Request) *structs.User {
 	}
 	user, err := models.GetUserByID(*session.UserID)
 	if err != nil {
-		log.Printf("error getting user by user id: %s\n", err.Error())
+		fmt.Printf("error getting user by user id: %s\n", err.Error())
 		return nil
 	}
 	return user
@@ -84,27 +84,28 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 	for _, post := range posts {
 		user, err := models.GetUserByID(*post.UserID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
+		auther := ReturnUserResponse(user)
 
 		var Group structs.GroupResponse
 		if post.GroupID != nil {
 			group, err := models.GetGroupByID(*post.GroupID)
 			if err != nil {
-				log.Printf("error getting group by group id: %s\n", err.Error())
+				fmt.Printf("error getting group by group id: %s\n", err.Error())
 				continue
 			}
 			user, err = models.GetUserByID(group.CreatorID)
 			if err != nil {
-				log.Printf("error getting user by user id: %s\n", err.Error())
+				fmt.Printf("error getting user by user id: %s\n", err.Error())
 				continue
 			}
 			var IsUserMember bool
 			if sessionUser != nil {
 				IsUserMember, err = models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
 				if err != nil {
-					log.Printf("error sea: %s\n", err.Error())
+					fmt.Printf("error sea: %s\n", err.Error())
 					continue
 				}
 			} else {
@@ -112,7 +113,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 			}
 			members, err := models.GetGroupMembers(group.ID)
 			if err != nil {
-				log.Printf("error getting group members by group id: %s\n", err.Error())
+				fmt.Printf("error getting group members by group id: %s\n", err.Error())
 				continue
 			}
 			GroupCreator := ReturnUserResponse(user)
@@ -127,7 +128,6 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 				GroupMember:  len(members),
 			}
 		}
-		auther := ReturnUserResponse(user)
 		postResponses = append(postResponses, structs.PostResponse{
 			Id:           post.ID,
 			Author:       *auther,
@@ -169,7 +169,7 @@ func MapReaction(User *structs.User, post *structs.Post, reactionType string) *s
 
 	count, err := models.GetPostReactions(post.ID)
 	if err != nil {
-		log.Printf("error counting reactions by post id: %s\n", err.Error())
+		fmt.Printf("error counting reactions by post id: %s\n", err.Error())
 		return nil
 	}
 	return &structs.ReactionResponse{
@@ -184,14 +184,14 @@ func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.Grou
 	for _, group := range groups {
 		user, err := models.GetUserByID(group.CreatorID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
 		var IsUserMember bool
 		if sessionUser != nil {
 			IsUserMember, err = models.CheckExistance("GroupMember", []string{"group_id", "user_id"}, []interface{}{group.ID, sessionUser.ID})
 			if err != nil {
-				log.Printf("error checking if user is member of group: %s\n", err.Error())
+				fmt.Printf("error checking if user is member of group: %s\n", err.Error())
 				continue
 			}
 		} else {
@@ -199,7 +199,7 @@ func mapGroups(sessionUser *structs.User, groups []structs.Group) []structs.Grou
 		}
 		members, err := models.GetGroupMembers(group.ID)
 		if err != nil {
-			log.Printf("error getting group members by group id: %s\n", err.Error())
+			fmt.Printf("error getting group members by group id: %s\n", err.Error())
 			continue
 		}
 
@@ -232,12 +232,12 @@ func mapEvents(sessionUser structs.User, events []structs.Event) []structs.Group
 	for _, event := range events {
 		user, err := models.GetUserByID(event.CreatorID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
 		Group, err := models.GetGroupByID(event.GroupID)
 		if err != nil {
-			log.Printf("error getting group by group id: %s\n", err.Error())
+			fmt.Printf("error getting group by group id: %s\n", err.Error())
 			continue
 		}
 		GroupResponse := mapGroups(&sessionUser, []structs.Group{*Group})[0]
@@ -260,13 +260,13 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 	var optionResponses []structs.EventOptionsResponse
 	options, err := models.GetEventOptions(groupId)
 	if err != nil {
-		log.Printf("error getting event options by group id: %s\n", err.Error())
+		fmt.Printf("error getting event options by group id: %s\n", err.Error())
 		return nil
 	}
 	for _, option := range options {
 		responses, err := models.GetEventResponsesByEventIdAndEventOptionId(option.EventID, option.ID)
 		if err != nil {
-			log.Printf("error getting event responses by event id and event option id: %s\n", err.Error())
+			fmt.Printf("error getting event responses by event id and event option id: %s\n", err.Error())
 			continue
 		}
 		var users []structs.BasicUserResponse
@@ -279,7 +279,7 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 		} else {
 			didRespone, err = models.CheckExistance("EventResponse", []string{"event_id", "user_id", "response_id"}, []interface{}{option.EventID, sessionUser.ID, option.ID})
 			if err != nil {
-				log.Printf("error checking if user is member of group: %s\n", err.Error())
+				fmt.Printf("error checking if user is member of group: %s\n", err.Error())
 				continue
 			}
 		}
@@ -299,7 +299,7 @@ func MapOptions(groupId int, sessionUser *structs.User) []structs.EventOptionsRe
 func ReturnBasicUser(userId int) *structs.BasicUserResponse {
 	user, err := models.GetUserByID(userId)
 	if err != nil {
-		log.Printf("error getting user by user id: %s\n", err.Error())
+		fmt.Printf("error getting user by user id: %s\n", err.Error())
 		return nil
 	}
 	nickname := user.FirstName + " " + user.LastName
@@ -319,7 +319,7 @@ func mapChats(sessionuser structs.User, chats []structs.GroupChat) []structs.Gro
 	for _, chat := range chats {
 		user, err := models.GetUserByID(chat.SenderID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
 		IsItTheUserMessage := chat.SenderID == sessionuser.ID
@@ -350,12 +350,12 @@ func mapMessages(Messages []structs.UserChat) []structs.ChatResponse {
 	for _, chat := range Messages {
 		Sender, err := models.GetUserByID(chat.SenderID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
 		Receiver, err := models.GetUserByID(chat.ReceiverID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
 		chatResponses = append(chatResponses, structs.ChatResponse{
@@ -375,7 +375,7 @@ func MapUsers(followers []structs.Follower) []structs.UserResponse {
 	for _, follower := range followers {
 		user, err := models.GetUserByID(follower.FollowerID)
 		if err != nil {
-			log.Printf("error getting user by user id: %s\n", err.Error())
+			fmt.Printf("error getting user by user id: %s\n", err.Error())
 			continue
 		}
 		UserResponse := ReturnUserResponse(user)

@@ -21,7 +21,8 @@ CREATE TABLE Follower (
     following_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     follower_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     Follower_status VARCHAR(50),
-    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    creation_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(following_id, follower_id)
 );
 
 CREATE TABLE UserSession (
