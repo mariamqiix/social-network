@@ -1,4 +1,4 @@
-import { Notifi, Post, User, Chat } from "../types/Types";
+import { Notifi, Post, User, ChatMessage, Chat } from "../types/Types";
 
 export const addPost = (post: Post) => ({
     type: 'posts/add',
@@ -12,6 +12,16 @@ export const likePost = (id: Number, value: Number) => ({
 
 export const addChat = (chat: Chat) => ({
     type: 'chats/add',
+    payload: chat,
+});
+
+export const addMessage = (message: ChatMessage) => ({
+    type: 'message/add',
+    payload: message,
+});
+
+export const SelectChat = (chat: Chat) => ({
+    type: 'chat/select',
     payload: chat,
 });
 

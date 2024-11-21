@@ -5,6 +5,7 @@ import (
 
 	"backend/pkg/models"
 	"backend/pkg/structs"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -30,6 +31,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 var connections []Connection
+var emptyString = ""
 
 func websocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
@@ -58,21 +60,48 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		MessageRequest := BodyToMessage(p)
 		if MessageRequest == nil {
-			// log.Println("Message is nil or invalid.")
+			log.Println("Message is nil or invalid.")
 			continue
 		}
-		SenderId, err := models.GetUserByUsername(MessageRequest.SenderId)
+		// fmt.Println(MessageRequest)
+		SenderId, err := models.GetUserByUsername(MessageRequest.SenderUsername)
+		// fmt.Println(SenderId)
 		if err != nil {
-			// log.Println("Error getting user by username:", err)
-			return
+			log.Println("Error getting user by username:", err)
+			continue
 		}
 		if SenderId == nil {
 			continue
 		}
+		// fmt.Println(MessageRequest)
 		if MessageRequest.Type == "GroupMessage" {
 			isExist, err := models.CheckExistance("GroupTable", []string{"id"}, []interface{}{MessageRequest.GroupID})
 			if err != nil || !isExist {
 				errorServer(w, http.StatusInternalServerError)
+				continue
+			}
+			imageId := 0
+			if MessageRequest.Image != nil {
+				imageBytes, err := base64.StdEncoding.DecodeString(*MessageRequest.Image)
+				if err != nil {
+					fmt.Println("Error decoding base64 image:", err)
+				}
+				id, err := models.UploadImage(imageBytes)
+				if err != nil {
+					fmt.Println(err)
+				}
+				imageId = id
+			}
+			message := structs.GroupChat{
+				SenderID:     SenderId.ID,
+				GroupID:      MessageRequest.GroupID,
+				Message:      MessageRequest.Message,
+				ImageID:      &imageId,
+				CreationDate: time.Now(),
+			}
+			err = models.CreateGroupMessage(message)
+			if err != nil {
+				fmt.Println(err)
 				continue
 			}
 			groupMembers, err := models.GetGroupMembers(MessageRequest.GroupID)
@@ -82,7 +111,10 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			for _, member := range groupMembers {
 				reciver := ReturnBasicUser(member.UserID)
-				err := SendMessageToGroupOrUser(SenderId.ID, MessageRequest.GroupID, MessageRequest.Message, reciver.Username, "GroupMessage", (MessageRequest.Image))
+				if MessageRequest.Image == nil {
+					MessageRequest.Image = &emptyString
+				}
+				err := SendMessageToGroupOrUser(SenderId.ID, MessageRequest.GroupID, MessageRequest.Message, reciver.Username, "GroupMessage", (MessageRequest.Image), imageId)
 				if err != nil {
 					fmt.Print(err)
 					continue
@@ -90,7 +122,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 		} else {
-			err := SendMessageToGroupOrUser(SenderId.ID, 0, MessageRequest.Message, MessageRequest.ReceiverId, "UserMessage", (MessageRequest.Image))
+			err := SendMessageToGroupOrUser(SenderId.ID, 0, MessageRequest.Message, MessageRequest.ReceiverId, "UserMessage", (MessageRequest.Image), -1)
 			if err != nil {
 				fmt.Print(err)
 				continue
@@ -100,7 +132,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, MessageType string, image []byte) error {
+func SendMessageToGroupOrUser(SenderId, GroupID int, Message, ReceiverUsername, MessageType string, image *string, imageID int) error {
 	ReceiverId, err := models.GetUserByUsername(ReceiverUsername)
 	if err != nil {
 		return err
@@ -109,33 +141,16 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 		return fmt.Errorf("user with username %s not found", ReceiverUsername)
 	}
 	if MessageType == "GroupMessage" {
-		imageId := 0
-		if image != nil {
-			id, err := models.UploadImage(image)
-			if err != nil {
-				return err
-			}
-			imageId = id
-		}
 		message := structs.GroupChat{
 			SenderID:     SenderId,
 			GroupID:      GroupID,
-			Message:      Messag,
-			ImageID:      &imageId,
+			Message:      Message,
+			ImageID:      &imageID,
 			CreationDate: time.Now(),
 		}
-		err = models.CreateGroupMessage(message)
-		if err != nil {
-			return err
-		}
-		reciverConnections, ok := GetConnectionByID(ReceiverId.ID)
+		receiverConnections, ok := GetConnectionByID(ReceiverId.ID)
 		if !ok {
-			fmt.Println("No connection found for the user with id:", ReceiverId.ID)
-			return fmt.Errorf("no connection found for the user with id: %d", ReceiverId.ID)
-		}
-		image, err := models.GetImageByID(*message.ImageID)
-		if err != nil {
-			return err
+			return fmt.Errorf("no connection found for the user with id: %d\n", ReceiverId.ID)
 		}
 		newMessageStruct := structs.WebsocketResponse{
 			MessageType: "Group",
@@ -143,15 +158,21 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 				Sender:       *ReturnBasicUser(message.SenderID),
 				Sended:       false,
 				Content:      message.Message,
-				Image:        string(image.Data),
+				GroupID:      GroupID,
+				Image:        *image,
 				CreationDate: message.CreationDate,
 			},
 		}
-		SendMessage(*reciverConnections, &newMessageStruct)
+		SendMessage(*receiverConnections, &newMessageStruct)
 	} else {
 		imageId := 0
 		if image != nil {
-			id, err := models.UploadImage(image)
+			imageBytes, err := base64.StdEncoding.DecodeString(*image)
+			if err != nil {
+				fmt.Println("Error decoding base64 image:", err)
+				return err
+			}
+			id, err := models.UploadImage(imageBytes)
 			if err != nil {
 				return err
 			}
@@ -160,7 +181,7 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 		message := structs.UserChat{
 			SenderID:     SenderId,
 			ReceiverID:   ReceiverId.ID,
-			Message:      Messag,
+			Message:      Message,
 			IsRead:       false,
 			ImageID:      &imageId,
 			CreationDate: time.Now(),
@@ -178,13 +199,18 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Messag, ReceiverUsername, M
 		if err != nil {
 			return err
 		}
+		imageData := ""
+		if image != nil {
+			imageData = string(image.Data)
+		}
+
 		newMessageStruct := structs.WebsocketResponse{
 			MessageType: "User",
 			UserChat: structs.ChatResponse{
 				Sender:       *ReturnBasicUser(message.SenderID),
 				Receiver:     *ReturnBasicUser(message.ReceiverID),
 				Content:      message.Message,
-				Image:        string(image.Data),
+				Image:        imageData,
 				CreationDate: message.CreationDate,
 			},
 		}
@@ -216,6 +242,7 @@ func BodyToMessage(body []byte) *structs.MessageRequest {
 	var message structs.MessageRequest
 	err := json.Unmarshal(body, &message)
 	if err != nil {
+		log.Println(err)
 		return nil
 	}
 	return &message

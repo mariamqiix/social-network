@@ -104,10 +104,10 @@ type UserChangeRequest struct {
 }
 
 type MessageRequest struct {
-	Type       string `json:"type"`
-	SenderId   string `json:"sender_id"`
-	ReceiverId string `json:"receiver_id"`
-	GroupID    int    `json:"group_id"`
-	Message    string `json:"message"`
-	Image      []byte `json:"image"`
+	Type           string  `json:"type"`
+	SenderUsername string  `json:"sender_username"`
+	ReceiverId     string  `json:"receiver_id"`
+	GroupID        int     `json:"group_id"`
+	Message        string  `json:"message"`
+	Image          *string `json:"image"`
 }

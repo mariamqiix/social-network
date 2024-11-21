@@ -48,6 +48,9 @@ export default function Nav() {
     const user = useSelector(selectUser);
     const notifications = useSelector(selectNotifications);
     const dispatch = useDispatch();
+    if (user) {
+        links[3] = "/profile/" + user.id;
+    }
     useEffect(() => {
         fetch("http://localhost:8080/login",
             { method: "POST", credentials: 'include' }).then(res => {
@@ -109,7 +112,7 @@ export default function Nav() {
                     </div> : <p>Not logged in</p>}
                 {links.map((link, i) => link != "/login" || user == null ? (
                     <Link
-                        href={link == "/profile" && user ? link + "/" + user?.id : link}
+                        href={link}
                         key={link}
                         className={
                             (pathName == link || (pathName == "" && link == "/") ? "btn-dark" : "") +
@@ -132,7 +135,7 @@ export default function Nav() {
                                 " text-start nav-link d-none d-sm-block"
                             }
                         >
-                            {link == "/" ? "Posts" : link[1].toLocaleUpperCase() + link.slice(2)}
+                            {link == "/" ? "Posts" : link[1].toLocaleUpperCase() + link.slice(2).split("/")[0]}
                         </span>
                         {link == "/notifications" && notifications.length > 0 ? notifications.length : ""}
                     </Link>

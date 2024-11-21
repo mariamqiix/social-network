@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectNotifications } from "../redux/selectors";
 import { hideToastNotification } from "../redux/actions";
+import Link from "next/link";
 
 const toastIcons = {
     "error": <FontAwesomeIcon className="me-2" icon={faExclamation} />,
@@ -34,18 +35,20 @@ export default function Toasts() {
 
     return <div className="toast-container position-fixed m-2 top-0 end-0">
         {notifications.filter((not) => not.showToast).map((not) => <div key={not.id} className={not.type == "error" ? "toast show text-bg-danger" : "toast show"} role="alert" aria-live="assertive" aria-atomic="true">
-            <div className="toast-header">
-                {/* <img src="..." className="rounded me-2" alt="..." /> */}
-                {toastIcons[not.type]}
-                <strong className="me-auto">{not.title}</strong>
-                <small className="text-body-secondary">just now</small>
-                <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close" onClick={() => {
-                    dispatch(hideToastNotification(not.id));
-                }}></button>
-            </div>
-            <div className="toast-body">
-                {not.message}
-            </div>
+            <Link href="/notifications">
+                <div className="toast-header">
+                    {/* <img src="..." className="rounded me-2" alt="..." /> */}
+                    {toastIcons[not.type]}
+                    <strong className="me-auto">{not.title}</strong>
+                    <small className="text-body-secondary">just now</small>
+                    <button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close" onClick={() => {
+                        dispatch(hideToastNotification(not.id));
+                    }}></button>
+                </div>
+                <div className="toast-body">
+                    {not.message}
+                </div>
+            </Link>
         </div>)}
     </div>;
 }

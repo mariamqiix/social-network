@@ -119,7 +119,6 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if splitPath != "" {
-
 		Posts, err := models.GetGroupPostsForUser(sessionUser.ID)
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
@@ -127,8 +126,9 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		var groups []structs.Group
 		switch splitPath {
-		case "joind":
+		case "joined":
 			groups, err = models.GetUserGroups(sessionUser.ID)
+			fmt.Println(groups)
 			if err != nil {
 				errorServer(w, http.StatusInternalServerError)
 				return
@@ -486,7 +486,9 @@ func GroupChatsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if chats == nil {
-		errorServer(w, http.StatusInternalServerError)
+		// fmt.Println("no chats found")
+		// errorServer(w, http.StatusInternalServerError)
+		writeToJson([]structs.UserChat{}, w)
 		return
 	}
 

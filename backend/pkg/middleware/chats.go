@@ -58,8 +58,8 @@ func UserAbleToChatHandler(w http.ResponseWriter, r *http.Request) {
 
 	followers1, _ := models.GetFollowers(user.ID)
 	following2, _ := models.GetFollowings(user.ID)
-	followers, _ := mapBasicUsers(followers1, 1)
-	following, _ := mapBasicUsers(following2, 2)
+	followers, _ := mapBasicUsers(followers1, 2)
+	following, _ := mapBasicUsers(following2, 1)
 
 	var users []structs.BasicUserResponse
 	users = append(users, followers...)

@@ -142,43 +142,44 @@ func GetGroupRequests(groupID int) ([]structs.GroupRequest, error) {
 	return requests, nil
 }
 func GetGroupMembers(groupID int) ([]structs.GroupMember, error) {
-    // Execute a read query to fetch the group members
-    rows, err := Read("GroupMember", []string{"*"}, []string{"group_id"}, []interface{}{groupID})
-    if err != nil {
-        return nil, err
-    }
-    defer rows.Close()
+	// Execute a read query to fetch the group members
+	rows, err := Read("GroupMember", []string{"*"}, []string{"group_id"}, []interface{}{groupID})
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-    // Create a map to hold unique group members based on UserID
-    memberMap := make(map[int]structs.GroupMember)
+	// Create a map to hold unique group members based on UserID
+	memberMap := make(map[int]structs.GroupMember)
 
-    // Iterate over the rows and scan each row into a Member struct
-    for rows.Next() {
-        var member structs.GroupMember
-        err := rows.Scan(
-            &member.ID,
-            &member.GroupID,
-            &member.UserID,
-        )
-        if err != nil {
-            return nil, err
-        }
+	// Iterate over the rows and scan each row into a Member struct
+	for rows.Next() {
+		var member structs.GroupMember
+		err := rows.Scan(
+			&member.ID,
+			&member.GroupID,
+			&member.UserID,
+		)
+		if err != nil {
+			return nil, err
+		}
 
-        // Check if the UserID already exists in the map
-        if _, exists := memberMap[member.UserID]; !exists {
-            memberMap[member.UserID] = member
-        }
-    }
+		// Check if the UserID already exists in the map
+		if _, exists := memberMap[member.UserID]; !exists {
+			memberMap[member.UserID] = member
+		}
+	}
 
-    // Convert the map to a slice
-    var members []structs.GroupMember
-    for _, member := range memberMap {
-        members = append(members, member)
-    }
+	// Convert the map to a slice
+	var members []structs.GroupMember
+	for _, member := range memberMap {
+		members = append(members, member)
+	}
 
-    // Return the group members if everything was successful
-    return members, nil
+	// Return the group members if everything was successful
+	return members, nil
 }
+
 // GetUserInvites fetches all group invites for a given user.
 func GetUserInvites(userID int) ([]structs.GroupRequest, error) {
 	// Execute a read query to fetch the group requests for the user with type 'Invite'

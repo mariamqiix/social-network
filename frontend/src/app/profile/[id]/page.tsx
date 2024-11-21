@@ -28,8 +28,7 @@ export default function page(params: any) {
             try {
                 const data = await fetchProfileData(id);
                 setProfileData(data);
-                setIsActive(data.is_user_profile || data.user_status == "Accepted" || data.user_profile_type == "Public")
-
+                setIsActive(data.is_user_profile || data.user_status == "Accepted" || data.user_profile_type == "Public");
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -130,7 +129,7 @@ export default function page(params: any) {
                             <p className="profile-desc">{profileData?.user.bio}</p>
                             {isActive && (
                                 <div>
-                                    <p className="profile-desc">{calculateAge(profileData?.user.DateOfBirth)}</p>
+                                    <p className="profile-desc">{calculateAge(profileData?.user.DateOfBirth)} Years</p>
                                     <p className="profile-desc">{profileData?.user.email}</p>
                                 </div>
                             )

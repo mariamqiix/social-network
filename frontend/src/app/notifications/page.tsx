@@ -11,6 +11,7 @@ import { addNotification } from "../redux/actions";
 import { faExclamation } from "@fortawesome/free-solid-svg-icons/faExclamation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPeopleGroup } from "@fortawesome/free-solid-svg-icons";
+import { getNotification } from "./get_notification";
 
 const notificationColors = {
     "error": colors[3],
@@ -49,63 +50,21 @@ export default function page() {
     const notifications = useSelector(selectNotifications);
     const dispatch = useDispatch();
     useEffect(() => {
-        fetch("http://localhost:8080/user/notifications/", { credentials: 'include' }).then((res) => {
-            if (res.status == 200) {
-
-                res.json().then((data) => {
-                    console.log(data);
-                    if (data) {
-                        console.log(data);
-                        data.forEach((element: any) => {
-                            dispatch(addNotification({
-                                id: element.id,
-                                type: element.type,
-                                title: element.type,
-                                message: element.message,
-                                link: "",
-                                showToast: false,
-                                function: element.type == "GroupInvite" ? () => {
-                                    fetch("http://localhost:8080/user/responds/groupInviteResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ group_id: element.group_id, response: "Accept" }) }).then((res) => {
-                                        console.log(res.status);
-                                        res.text().then((data) => {
-                                            console.log(data);
-                                        });
-                                    });
-                                } : element.type == "GroupRequestToJoin" ? () => {
-                                    fetch("http://localhost:8080/user/responds/adminGroupRequestResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ group_id: element.group_id, user_id: element.sender_id, response: "Accept" }) }).then((res) => {
-                                        console.log(res.status);
-                                        res.text().then((data) => {
-                                            console.log(data);
-                                        });
-                                    });
-                                } : element.type == "followRequest" ? () => {
-                                    fetch("http://localhost:8080/user/responds/followResponse", { method: "POST", credentials: 'include', body: JSON.stringify({ user_id: element.sender_id, response: "Accept" }) }).then((res) => {
-                                        console.log(res.status);
-                                        res.text().then((data) => {
-                                            console.log(data);
-                                        });
-                                    });
-                                } : null,
-                            }));
-                        });
-                    }
-                });
-            } else {
-                res.text().then(text => {
-                    console.error(text);
-                })
-            }
+        getNotification().then(notis => {
+            notis.forEach(element => {
+                dispatch(addNotification(element));
+            });
         });
-    }, [fetch]);
+    }, [getNotification]);
 
     if (notifications.length > 0) {
         return notifications.map(notification => <Card key={notification.id} title={notification.title} color={notificationColors[notification.type]}>
             <p>{notificationIcons[notification.type]} {notification.message}</p>
-            {notification.function != null ? <button className="btn btn-primary" onClick={() => {
+            {notification.function != null && (<button className="btn btn-primary" onClick={() => {
                 if (notification.function != null) {
                     notification.function();
                 }
-            }}>Accept</button> : <div></div>}
+            }}>Accept</button>)}
         </Card>);
     } else {
         return <p>You have no notifications</p>

@@ -80,6 +80,7 @@ type GroupChatResponse struct {
 	Id           int               `json:"id"`
 	Sender       BasicUserResponse `json:"Sender"`
 	Sended       bool              `json:"sended"` /// if the user is the one who sent the message or not
+	GroupID      int               `json:"group_id"`
 	Content      string            `json:"content"`
 	Image        string            `json:"image_url"`
 	Color        string            `json:"color"`

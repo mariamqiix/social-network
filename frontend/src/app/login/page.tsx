@@ -25,9 +25,9 @@ export default function loginPage() {
                 { method: "POST", credentials: 'include', body: formData }).then(res => {
                     if (res.ok && formData.get("username")) {
                         res.json().then(data => {
-                            // console.log(data);
-                            dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
-                            router.replace("/");
+                            // dispatch(login({ id: data.ID, username: data.Username, first_name: data.FirstName, last_name: data.LastName, email: data.Email, image_url: "", dob: data.DateOfBirth, bio: data.Bio, nickname: data.Nickname }));
+                            // router.replace("/");
+                            location.replace("/");
                         });
                     } else {
                         alert("credentials not entered correctly");

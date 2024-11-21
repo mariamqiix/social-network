@@ -150,6 +150,7 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&userProfileRequest)
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
