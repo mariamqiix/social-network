@@ -195,14 +195,14 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Message, ReceiverUsername, 
 			fmt.Println("No connection found for the user with id:", message.ReceiverID)
 			return fmt.Errorf("no connection found for the user with id: %d", message.ReceiverID)
 		}
-		image, err := models.GetImageByID(*message.ImageID)
-		if err != nil {
-			return err
-		}
-		imageData := ""
-		if image != nil {
-			imageData = string(image.Data)
-		}
+		// image, err := models.GetImageByID(*message.ImageID)
+		// if err != nil {
+		// 	return err
+		// }
+		// imageData := ""
+		// if image != nil {
+		// 	imageData = string(image.Data)
+		// }
 
 		newMessageStruct := structs.WebsocketResponse{
 			MessageType: "User",
@@ -210,7 +210,7 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Message, ReceiverUsername, 
 				Sender:       *ReturnBasicUser(message.SenderID),
 				Receiver:     *ReturnBasicUser(message.ReceiverID),
 				Content:      message.Message,
-				Image:        imageData,
+				Image:        *image,
 				CreationDate: message.CreationDate,
 			},
 		}

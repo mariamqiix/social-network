@@ -329,7 +329,7 @@ func mapChats(sessionuser structs.User, chats []structs.GroupChat) []structs.Gro
 			Content:      chat.Message,
 			CreationDate: chat.CreationDate,
 			Sended:       IsItTheUserMessage, /// if the user is the one who sent the message or not
-			Image:        GetImageData(user.ImageID),
+			Image:        GetImageData(chat.ImageID),
 			Color:        randomLightColor(),
 		})
 	}

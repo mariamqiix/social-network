@@ -6,7 +6,6 @@ import { addChat, addMessage, SelectChat } from "../redux/actions";
 import Metadata from "../components/Metadata";
 import { Chat, ChatMessage } from "../types/Types";
 import { socket } from "../redux/store";
-import { randomInt } from "crypto";
 
 export default function page() {
     const user = useSelector(selectUser);
@@ -14,6 +13,29 @@ export default function page() {
     const messages = useSelector(selectMessages);
     const selectedChat = useSelector(selectChat);
     const dispatch = useDispatch();
+    let [imageData, setImageData] = useState("");
+    const [isImageSelected, setIsImageSelected] = useState(false); // New state to track image selection
+
+    function loadImage() {
+        let form = document.querySelector("form");
+        if (form && form.children[1].files) {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                setImageData((e.target?.result as string));
+                setIsImageSelected(true); // Set to true when an image is selected
+            }
+            reader.readAsDataURL(form.children[1].files[0]);
+        }
+    }
+    function selectImage() {
+        setImageData(""); // Clear the image data
+        setIsImageSelected(false); // Set to false when the image is deselected
+        let form = document.querySelector("form");
+        if (form && form.children[1]) {
+            form.children[1].value = ""; // Clear the file input
+            form.children[1].click();
+        }
+    }
 
     function renderChatList(newChats: Chat[]) {
         return newChats.map((chat: Chat) => (<button key={chat.id + chat.type} className={"list-group-item list-group-item-action" + (selectedChat?.name == chat.name && selectedChat?.type == chat.type ? " active" : "")} onClick={() => {
@@ -64,9 +86,11 @@ export default function page() {
                     <span>
                         {message.sender.name}
                         <br />
-                        {message.created_at}
+                        {message.created_at.replace("T", " ").replace("Z", "").split("+")[0].split(".")[0]}
                         <br />
                         {message.content}
+                        <br />
+                        {message.image_url != "" && message.image_url != "data:image/jpeg;base64," && (<img src={message.image_url} className="w-100" />)}
                     </span>
                 </div>
             )}
@@ -120,14 +144,23 @@ export default function page() {
                         if (selectedChat != null && formData.get("message")) {
                             let message: string = formData.get("message")?.toString() ?? "";
                             let receiverUsername = selectedChat.name;
-                            socket.send(JSON.stringify({ message: message, type: selectedChat.type == "group" ? "GroupMessage" : "User message", sender_username: user?.username, receiver_id: receiverUsername, group_id: selectedChat?.id, image: null }));
+                            socket.send(JSON.stringify({ message: message, type: selectedChat.type == "group" ? "GroupMessage" : "User message", sender_username: user?.username, receiver_id: receiverUsername, group_id: selectedChat?.id, image: imageData != "" ? imageData.substring(imageData.indexOf(",") + 1) : null }));
                             if (selectedChat.type == "user") {
-                                dispatch(addMessage({ id: 0, content: message, created_at: (new Date()).toISOString(), image_url: "", sender: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, type: selectedChat.type, group_name: (selectedChat.type == "group" ? selectedChat.id : null) }));
+                                dispatch(addMessage({ id: 0, content: message, created_at: (new Date()).toISOString(), image_url: imageData, sender: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, type: selectedChat.type, group_name: (selectedChat.type == "group" ? selectedChat.id : null) }));
                             }
+                            setImageData("");
                             e.target.reset();
                         }
                     }}>
                         <input type="text" name="message" className="form-control" />
+                        <input type="file" className="d-none" id="inputFile" aria-describedby="inputGroupFileAddon03" aria-label="Upload" onChange={() => {
+                            loadImage();
+                        }} />
+                        <button className="btn btn-outline-secondary" type="button">
+                            <img src={imageData} height={30} width={40} alt="Image" onClick={() => {
+                                selectImage();
+                            }} />
+                        </button>
                         <button type="submit" className="btn btn-outline-secondary text-bg-primary">Send</button>
                     </form>
                 </div>
