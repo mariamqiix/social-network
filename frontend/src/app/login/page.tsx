@@ -21,7 +21,7 @@ export default function loginPage() {
         <form className="d-flex flex-column" onSubmit={(e) => {
             e.preventDefault();
             let formData = new FormData(e.target as HTMLFormElement);
-            fetch("http://localhost:8080/login",
+            fetch("http://127.0.0.1:8080/login",
                 { method: "POST", credentials: 'include', body: formData }).then(res => {
                     if (res.ok && formData.get("username")) {
                         res.json().then(data => {
@@ -63,7 +63,7 @@ export default function loginPage() {
                 reader.onload = function (e) {
                     imageContent = e.target?.result as string;
                     if (imageContent) {
-                        fetch("http://localhost:8080/signup",
+                        fetch("http://127.0.0.1:8080/signup",
                             {
                                 method: "POST", body: JSON.stringify({
                                     first_name: formData.get("first_name"),

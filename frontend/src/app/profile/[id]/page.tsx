@@ -71,7 +71,7 @@ export default function page(params: any) {
     };
 
     const handleFollowRequest = () => {
-        fetch("http://localhost:8080/user/responds/requestToFollow", {
+        fetch("http://127.0.0.1:8080/user/responds/requestToFollow", {
             method: "POST",
             credentials: 'include',
             body: JSON.stringify({ user_id: profileData.user.id, response: '' })
@@ -90,7 +90,7 @@ export default function page(params: any) {
     }
 
     const handleUnfollowRequest = () => {
-        fetch("http://localhost:8080/user/responds/requestToUnfollow", { method: "POST", credentials: 'include', body: JSON.stringify({ user_id: profileData?.user.id, reaction: '' }) }).then((res) => {
+        fetch("http://127.0.0.1:8080/user/responds/requestToUnfollow", { method: "POST", credentials: 'include', body: JSON.stringify({ user_id: profileData?.user.id, reaction: '' }) }).then((res) => {
             console.log(res.status);
         });
 
@@ -102,7 +102,7 @@ export default function page(params: any) {
     }
 
     function likePostClicked(id: Number) {
-        fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
+        fetch("http://127.0.0.1:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
             console.log(res.status);
             if (res.status == 204) {
                 dispatch(likePost(id, -1));
@@ -162,7 +162,7 @@ export default function page(params: any) {
                                     : <div className="button-container">
                                         <select className="form-select form-select-lg" value={profileData.user_profile_type} onChange={(e) => {
                                             console.log(e.target.value);
-                                            fetch("http://localhost:8080/user/changePrivacy/", { method: "POST", credentials: 'include', body: JSON.stringify({ user_id: user?.id, privacy: e.target.value }) }).then((res) => {
+                                            fetch("http://127.0.0.1:8080/user/changePrivacy/", { method: "POST", credentials: 'include', body: JSON.stringify({ user_id: user?.id, privacy: e.target.value }) }).then((res) => {
                                                 if (res.ok) {
                                                     window.location.reload();
                                                     // profileData.user_profile_type = e.target.value;

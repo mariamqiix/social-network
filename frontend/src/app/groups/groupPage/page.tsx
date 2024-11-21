@@ -141,7 +141,7 @@ const GroupPage = () => {
             };
             try {
                 console.log(postData)
-                const response = await fetch('http://localhost:8080/post/createPost/group', {
+                const response = await fetch('http://127.0.0.1:8080/post/createPost/group', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -186,7 +186,7 @@ const GroupPage = () => {
             };
 
             try {
-                const response = await fetch('http://localhost:8080/group/event/create', {
+                const response = await fetch('http://127.0.0.1:8080/group/event/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -333,7 +333,7 @@ const GroupPage = () => {
 
     const handleReact = async (option_id: number, event_id: number) => {
         try {
-            const response = await fetch('http://localhost:8080/group/event/userResponse', {
+            const response = await fetch('http://127.0.0.1:8080/group/event/userResponse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

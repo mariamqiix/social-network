@@ -126,7 +126,7 @@ const reducer = (state = initialState, action: any) => {
 
 const store = createStore(reducer);
 
-export const socket = new WebSocket('ws://localhost:8080/socket');
+export const socket = new WebSocket('ws://127.0.0.1:8080/socket');
 console.log("socket created: ", socket);
 socket.onmessage = (event) => {
     // setMessages((prevMessages) => [...prevMessages, event.data]);

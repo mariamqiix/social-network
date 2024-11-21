@@ -47,7 +47,7 @@ export default function page() {
     async function LoadMessages(chat: Chat) {
         dispatch(SelectChat(chat));
         if (chat.type == "user") {
-            fetch("http://localhost:8080/user/Chats?Username=" + chat.name, { credentials: 'include' }).then((res) => {
+            fetch("http://127.0.0.1:8080/user/Chats?Username=" + chat.name, { credentials: 'include' }).then((res) => {
                 if (res.ok) {
                     res.json().then((data) => {
                         // console.log(data);
@@ -60,7 +60,7 @@ export default function page() {
                 }
             });
         } else {
-            fetch("http://localhost:8080/group/messages?id=" + chat.id, { credentials: 'include' }).then((res) => {
+            fetch("http://127.0.0.1:8080/group/messages?id=" + chat.id, { credentials: 'include' }).then((res) => {
                 if (res.ok) {
                     res.json().then((data) => {
                         // console.log(data);
@@ -98,7 +98,7 @@ export default function page() {
     }
 
     useEffect(() => {
-        fetch("http://localhost:8080/user/usersAbleToChat", { credentials: 'include' }).then((res) => {
+        fetch("http://127.0.0.1:8080/user/usersAbleToChat", { credentials: 'include' }).then((res) => {
             if (res.ok) {
                 res.json().then((data) => {
                     // console.log(data);
@@ -109,7 +109,7 @@ export default function page() {
                 });
             }
         });
-        fetch("http://localhost:8080/group/list/joined", { credentials: 'include' }).then((res) => {
+        fetch("http://127.0.0.1:8080/group/list/joined", { credentials: 'include' }).then((res) => {
             if (res.ok) {
                 res.json().then((data) => {
                     // console.log(data);

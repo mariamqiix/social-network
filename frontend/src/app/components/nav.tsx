@@ -52,7 +52,7 @@ export default function Nav() {
         links[3] = "/profile/" + user.id;
     }
     useEffect(() => {
-        fetch("http://localhost:8080/login",
+        fetch("http://127.0.0.1:8080/login",
             { method: "POST", credentials: 'include' }).then(res => {
                 if (res.ok) {
                     res.json().then(data => {
@@ -67,7 +67,7 @@ export default function Nav() {
     const router = useRouter()
     function logoutButton() {
         if (user != null) {
-            fetch("http://localhost:8080/logout",
+            fetch("http://127.0.0.1:8080/logout",
                 { method: "POST", credentials: 'include' }).then(res => {
                     console.log(res.status);
                     res.text().then(data => {

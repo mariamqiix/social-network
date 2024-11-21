@@ -69,7 +69,7 @@ export default function Home() {
   function sendPost(content: string, privacy: string, image: string | null) {
     console.log(privacy);
     if (user) {
-      fetch("http://localhost:8080/post/createPost/user", {
+      fetch("http://127.0.0.1:8080/post/createPost/user", {
         credentials: 'include', method: "POST", body: JSON.stringify({
           description: content,
           image: image == null ? null : image.substring(image.indexOf(",") + 1),
@@ -90,7 +90,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    fetch("http://localhost:8080", { credentials: 'include' }).then(res => {
+    fetch("http://127.0.0.1:8080", { credentials: 'include' }).then(res => {
       res.json().then(data => {
         console.log(data.Posts);
         data.Posts.forEach((post: any) => {
@@ -101,7 +101,7 @@ export default function Home() {
       });
     });
 
-    fetch("http://localhost:8080/user/list/").then(res => {
+    fetch("http://127.0.0.1:8080/user/list/").then(res => {
       res.json().then(data => {
         let newUsers: any[] = [];
         data.forEach((user: any) => {
@@ -114,7 +114,7 @@ export default function Home() {
   }, [dispatch]);
 
   function likePostClicked(id: Number) {
-    fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
+    fetch("http://127.0.0.1:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: id, reaction: "Like" }) }).then((res) => {
       console.log(res.status);
       if (res.status == 204) {
         dispatch(likePost(id, -1));
