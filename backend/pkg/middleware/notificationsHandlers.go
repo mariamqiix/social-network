@@ -154,36 +154,36 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 	case "followResponse":
 
-		var userRequestToFollow *structs.UserInfoRequest
+		var userRequestedToFollow *structs.UserInfoRequest
 		status := "Accept"
 		notificationType := "followRequestAccept"
 		code := 2
 
-		err := json.NewDecoder(r.Body).Decode(&userRequestToFollow)
+		err := json.NewDecoder(r.Body).Decode(&userRequestedToFollow)
 		if err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		if userRequestToFollow.Response == "Reject" {
+		if userRequestedToFollow.Response == "Reject" {
 			models.DeleteFollower(structs.Follower{
 				FollowingID: user.ID,
-				FollowerID:  userRequestToFollow.UserID,
+				FollowerID:  userRequestedToFollow.UserID,
 			})
 			notificationType = "followRequestReject"
 			code = 1
 
 		} else {
 			models.UpdateFollowerStatues(structs.Follower{
-				FollowingID: user.ID,
-				FollowerID:  userRequestToFollow.UserID,
+				FollowingID: userRequestedToFollow.UserID,
+				FollowerID:  user.ID,
 				Status:      &status,
 			})
 		}
 
 		notification := structs.Notification{
-			UserID:           user.ID,
-			SenderID:         &userRequestToFollow.UserID,
+			UserID:           userRequestedToFollow.UserID,
+			SenderID:         &user.ID,
 			NotificationType: notificationType,
 			IsRead:           false,
 		}
@@ -194,7 +194,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		}
 
 		models.CreateMessagesNotification(notification)
-		SendNotification(user.ID, *notificate)
+		SendNotification(userRequestedToFollow.UserID, *notificate)
 
 	case "requestToFollow":
 		var userRequestToFollow *structs.UserInfoRequest
