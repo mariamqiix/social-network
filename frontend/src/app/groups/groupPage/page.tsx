@@ -89,6 +89,7 @@ const GroupPage = () => {
     });
 
     const [isMember, setIsMember] = useState(true);
+    const [isInvited, setIsInvited] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -171,11 +172,13 @@ const GroupPage = () => {
         return date.toISOString(); // Converts to "2024-10-09T22:19:00.000Z"
     };
     const handleCreateEvent = async () => {
-        if (eventTitle && eventDescription && eventDateTime) {
-            const eventOptions = options.map(option => ({
-                option: option.name,
-                icon_name: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
-            }));
+        const eventOptions = options.map(option => ({
+            option: option.name,
+            icon_name: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
+        }));
+        console.log(eventOptions.length >= 2)
+        if (eventTitle && eventDescription && eventDateTime && eventOptions.length >=2 ) {
+
 
             const eventData = {
                 title: eventTitle,
@@ -441,17 +444,18 @@ const GroupPage = () => {
                                         <div className="event-icons">
                                             {group.options && group.options.map((option, index) => (
                                                 <span
-                                                    key={index}
-                                                    className={`iconEvent`} // Optionally add unique class based on ID
-                                                    style={getIconStyle(option.did_user_respond)} // Apply styles based on response
-                                                    onClick={() => {
-                                                        const hasResponded = group.options.some(option => option.did_user_respond);
-                                                        if (!hasResponded) {
-                                                            handleReact(option.id, group.id);
-                                                        }
-                                                    }}                                     >
-                                                    {getIconComponent(option.icon)} {/* Render icon */}
-                                                </span>
+                                                key={`event${index}`}
+                                                className={`iconEvent`} // Optionally add unique class based on ID
+                                                style={getIconStyle(option.did_user_respond)} // Apply styles based on response
+                                                onClick={() => {
+                                                    const hasResponded = group.options.some(option => option.did_user_respond);
+                                                    if (!hasResponded) {
+                                                        handleReact(option.id, group.id);
+                                                        option.did_user_respond = true; // or update state if you're using a state management system
+                                                    }
+                                                }}                                     >
+                                                {getIconComponent(option.icon)} {/* Render icon */}
+                                            </span>
                                             ))}
                                         </div>
 
@@ -561,6 +565,7 @@ const GroupPage = () => {
                                 <div className="member-info">
                                     <p className='memberName'>{member.nickname}</p>
                                     <p>{member.username}</p>
+
                                     <button className="invite" onClick={() => sendInvite(member.id)}>Invite</button>
                                 </div>
                             </div>

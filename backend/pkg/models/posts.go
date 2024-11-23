@@ -523,9 +523,14 @@ func GetPostsForUser(userId int) ([]structs.Post, error) {
 
 func ProfilePagePosts(userId, FollowerID int) ([]structs.Post, error) {
 	query := `
-		SELECT * FROM Post WHERE user_id = ? AND privacy = 'Public'
+		SELECT * FROM Post WHERE user_id = ? AND privacy = 'Public' AND group_id is NULL AND parent_id is NULL
         UNION
-        SELECT * FROM Post WHERE user_id = ? AND id IN (SELECT post_id FROM Recipient WHERE recipient_id = ?) 
+        SELECT * FROM Post WHERE user_id = ? AND privacy = 'Almost' 
+		AND id IN (
+			SELECT post_id 
+			FROM Recipient 
+			WHERE recipient_id = ?
+		)
         UNION
         SELECT * FROM Post WHERE user_id = ? AND privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?  AND Follower_status = 'Accepted')
     `

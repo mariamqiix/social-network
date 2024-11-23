@@ -333,6 +333,7 @@ export default function Page() {
                                             const hasResponded = group.options.some(option => option.did_user_respond);
                                             if (!hasResponded) {
                                                 handleReact(option.id, group.id);
+                                                option.did_user_respond = true; // or update state if you're using a state management system
                                             }
                                         }}                                     >
                                         {getIconComponent(option.icon)} {/* Render icon */}

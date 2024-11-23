@@ -1,13 +1,14 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func GroupHandler(w http.ResponseWriter, r *http.Request) {
@@ -569,7 +570,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 
 		models.CreateEventsNotification(notification)
 
-		SendNotification(member.ID, structs.NotificatoinResponse{
+		SendNotification(member.UserID, structs.NotificatoinResponse{
 			Id:           notification.ID,
 			Type:         notification.NotificationType,
 			GroupID:      group.ID,

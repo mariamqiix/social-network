@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/json"
-
 	// "fmt"
 	"net/http"
 	"strings"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func NotificationsHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +107,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		SendNotification(user.ID, *notificate)
+		SendNotification(group.CreatorID, *notificate)
 
 	case "adminGroupRequestResponse":
 
@@ -150,12 +150,12 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		SendNotification(user.ID, *notificate)
+		SendNotification(GroupRequestResponse.UserID, *notificate)
 
 	case "followResponse":
 
 		var userRequestedToFollow *structs.UserInfoRequest
-		status := "Accept"
+		status := "Accepted"
 		notificationType := "followRequestAccept"
 		code := 2
 
@@ -175,8 +175,8 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 		} else {
 			models.UpdateFollowerStatues(structs.Follower{
-				FollowingID: userRequestedToFollow.UserID,
-				FollowerID:  user.ID,
+				FollowingID: user.ID,
+				FollowerID:  userRequestedToFollow.UserID,
 				Status:      &status,
 			})
 		}
