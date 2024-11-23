@@ -86,6 +86,9 @@ func HomePageHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 	if sessionUser != nil {
 		posts, err = models.GetPostsForUser(sessionUser.ID)
+		for _, i := range posts {
+			fmt.Print(i.ID)
+		}
 		if err != nil {
 			errorServer(w, http.StatusInternalServerError)
 			return

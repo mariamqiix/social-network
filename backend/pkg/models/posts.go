@@ -1,9 +1,10 @@
 package models
 
 import (
+	"fmt"
+
 	"backend/pkg/db"
 	"backend/pkg/structs"
-	"fmt"
 )
 
 func CreateUserPost(p structs.Post) (int, error) {
@@ -473,13 +474,13 @@ func GetGroupPostsForUser(userId int) ([]structs.Post, error) {
 
 func GetPostsForUser(userId int) ([]structs.Post, error) {
 	query := `
-        SELECT * FROM Post WHERE privacy = 'Public'
+        SELECT * FROM Post WHERE privacy = 'Public' AND group_id IS NULL
 		UNION
-		SELECT * FROM Post WHERE user_id = ?
+		SELECT * FROM Post WHERE user_id = ? AND group_id IS NULL
         UNION
         SELECT * FROM Post WHERE id IN (SELECT post_id FROM Recipient WHERE recipient_id = ?)
         UNION
-        SELECT * FROM Post WHERE privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?)
+        SELECT * FROM Post WHERE privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ? AND Follower_status = 'Accepted')
     `
 	rows, err := db.Database.Query(query, userId, userId, userId)
 	if err != nil {
@@ -526,7 +527,7 @@ func ProfilePagePosts(userId, FollowerID int) ([]structs.Post, error) {
         UNION
         SELECT * FROM Post WHERE user_id = ? AND id IN (SELECT post_id FROM Recipient WHERE recipient_id = ?) 
         UNION
-        SELECT * FROM Post WHERE user_id = ? AND privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?)
+        SELECT * FROM Post WHERE user_id = ? AND privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?  AND Follower_status = 'Accepted')
     `
 	rows, err := db.Database.Query(query, userId, userId, FollowerID, userId, FollowerID)
 	if err != nil {
@@ -620,7 +621,7 @@ func SearchGroupPosts(subString string) ([]structs.Group, error) {
 }
 
 func GetPostsForGuest() ([]structs.Post, error) {
-	Rows, err := Read("Post", []string{"*"}, []string{"privacy"}, []interface{}{"Public"})
+	Rows, err := Read("Post", []string{"*"}, []string{"group_id is NULL AND privacy"}, []interface{}{"Public"})
 	if err != nil {
 		return nil, err
 	}

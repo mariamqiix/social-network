@@ -114,6 +114,9 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		Bio:            &userRequest.Bio,
 		Nickname:       &userRequest.Nickname,
 	}
+
+
+	fmt.Print(user)
 	err = models.CreateUser(user)
 	if err != nil {
 		fmt.Println(err)
