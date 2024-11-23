@@ -112,8 +112,8 @@ export default function Nav() {
                     </div> : <p>Not logged in</p>}
                 {links.map((link, i) => link != "/login" || user == null ? (
                     <Link
-                        href={link}
-                        key={link}
+                    href={(link.includes("/profile") || link.includes("/notifications") || link.includes("/chat")) && !user ? "/login" : link}
+                    key={link}
                         className={
                             (pathName == link || (pathName == "" && link == "/") ? "btn-dark" : "") +
                             " btn nav-item rounded-4 m-1 d-flex align-items-center"
@@ -136,6 +136,7 @@ export default function Nav() {
                             }
                         >
                             {link == "/" ? "Posts" : link[1].toLocaleUpperCase() + link.slice(2).split("/")[0]}
+
                         </span>
                         {link == "/notifications" && notifications.length > 0 ? notifications.length : ""}
                     </Link>

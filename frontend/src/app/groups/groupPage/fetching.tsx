@@ -162,7 +162,7 @@ export async function LeaveGroup() {
         if (!response.ok) {
             throw new Error(`Error: status code ${response.status}`);
         }
-        window.location.href = `./groups/groupPage?id=${id}`
+        // window.location.href = `http://localhost:3000/groups/groupPage?id=${id}`
 
         console.log('Successfully left the group');
 

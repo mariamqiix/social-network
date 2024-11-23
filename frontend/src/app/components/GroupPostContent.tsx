@@ -2,9 +2,11 @@ import React from "react";
 import { PostResponse } from "../types/Types";
 import { height } from "@fortawesome/free-solid-svg-icons/faExclamation";
 import { relative } from "path";
+import Link from 'next/link';
 
 // Define your Client Component here
 const Post = ({ post }: { post: PostResponse }) => (
+    <Link href={post.author == null ? "" : "/posts/" + post.id} className='text-decoration-none text-black'>
     <div
         key={`postId${post.id}`}
         style={{
@@ -50,28 +52,32 @@ const Post = ({ post }: { post: PostResponse }) => (
                 >
                     {post.group.title}
                 </h3>}
-                <div
-                    style={{
-                        marginTop: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        fontSize: "0.9rem",
-                        color: "#888",
-                    }}
-                >
-                    {post.author &&  <img
-                        src={`data:image/jpeg;base64,${post.author.image_url}`}
-                        alt="User"
+                <Link href={post.author == null ? "" : "/profile/" + post.author.id} className='text-decoration-none text-black'>
+                    <div
                         style={{
-                            borderRadius: "50%",
-                            marginRight: "8px",
-                            width: "30px",
-                            height: "30px",
+                            marginTop: "10px",
+                            display: "flex",
+                            alignItems: "center",
+                            fontSize: "0.9rem",
+                            color: "#888",
                         }}
-                    />}
-                    <span style={{ color: "#0073e6", marginRight: "5px" }}>{post.author.username}</span>
-                    <span style={{ fontSize: "0.8rem", color: "#aaa" }}>{post.created_at}</span>
-                </div>
+                    >
+                        {post.author && (
+                            <img
+                                src={`data:image/jpeg;base64,${post.author.image_url}`}
+                                alt="User"
+                                style={{
+                                    borderRadius: "50%",
+                                    marginRight: "8px",
+                                    width: "30px",
+                                    height: "30px",
+                                }}
+                            />
+                        )}
+                        <span style={{ color: "#0073e6", marginRight: "5px" }}>{post.author.username}</span>
+                        <span style={{ fontSize: "0.8rem", color: "#aaa" }}>{post.created_at}</span>
+                    </div>
+                </Link>
             </div>
         </div>
 
@@ -94,7 +100,10 @@ const Post = ({ post }: { post: PostResponse }) => (
                 />
             )}
         </div>
+
     </div>
+    </Link>
+
 );
 
 export default Post;

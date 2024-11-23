@@ -22,32 +22,32 @@ const GroupPage = () => {
                 setActiveTab('Posts');
                 LeaveGroup();
 
-                useEffect(() => {
-                    const getData = async () => {
-                        const data = await fetchGroupData();
-                        console.log(data);
-                        if (data.Group.is_user_member) {
-                            setIsMember(true)
-                        }
-                        console.log(data.Group.is_user_member)
-                        setProfileData(data);
-                    };
+                // useEffect(() => {
+                //     const getData = async () => {
+                //         const data = await fetchGroupData();
+                //         console.log(data);
+                //         if (data.Group.is_user_member) {
+                //             setIsMember(true)
+                //         }
+                //         console.log(data.Group.is_user_member)
+                //         setProfileData(data);
+                //     };
 
-                    getData();
-                }, []);
+                //     getData();
+                // }, []);
 
 
-                const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
+                // const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
 
-                useEffect(() => {
-                    const getData = async () => {
-                        const data = await fetchEventData();
-                        console.log(data);
-                        setGroupEvent(data);
-                    };
+                // useEffect(() => {
+                //     const getData = async () => {
+                //         const data = await fetchEventData();
+                //         console.log(data);
+                //         setGroupEvent(data);
+                //     };
 
-                    getData();
-                }, []);
+                //     getData();
+                // }, []);
 
                 // send a request to leave the group
                 break;
@@ -369,7 +369,7 @@ const GroupPage = () => {
                             <p className="profile-desc">
                                 {profileData.Group.description}                        </p>
                             <div className="profile-follow-info">
-                                {profileData.Members &&
+                                {profileData.Members &&  isMember &&
 
                                     <span>{profileData.Members ? profileData.Members.length : 0} Member</span>}
                             </div>
@@ -428,7 +428,8 @@ const GroupPage = () => {
 
 
             {/* Main Content Area */}
-            <div className="content-area">
+           {isMember && (
+             <div className="content-area">
                 {activeTab === 'Events' && profileData.Group && profileData.Group.is_user_member && groupEvent && (
                     <div className="events-section">
                         <div className="profileGroup-container">
@@ -531,7 +532,7 @@ const GroupPage = () => {
 
 
             </div>
-
+)}
             {/* Expandable div */}
             {isOpen && profileData.Group.is_user_member && (
                 <div className="popup">
