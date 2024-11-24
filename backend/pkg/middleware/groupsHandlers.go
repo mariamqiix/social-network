@@ -613,7 +613,15 @@ func CreateEventResponseHandler(w http.ResponseWriter, r *http.Request) {
 		EventID:  eventResponse.EventID,
 		Response: eventResponse.OptionID,
 	}
+	exist, err := models.CheckExistance("EventResponse", []string{"event_id", "user_id"}, []interface{}{respone.EventID, respone.UserID})
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+	}
 
+	if exist {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
 	err = models.CreateEventResponse(respone)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)

@@ -147,8 +147,16 @@ export default function Page() {
         return didUserRespond ? { backgroundColor: randomColor() } : {}; // Random color if user responded
     };
 
+    const [clickedStates, setClickedStates] = useState<{
+        [key: number]: { clickedIndex: number | null; colors: string[] };
+    }>({});
 
-    const handleReact = async (option_id: number, event_id: number) => {
+    const handleReact = async (
+        option_id: number,
+        event_id: number,
+        index: number,
+        options: Array<any>
+    ) => {
         try {
             const response = await fetch('http://localhost:8080/group/event/userResponse', {
                 method: 'POST',
@@ -156,19 +164,33 @@ export default function Page() {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({ event_id, option_id }), // Send the ID of the option being reacted to
+                body: JSON.stringify({ event_id, option_id }),
             });
 
             if (!response.ok) {
                 throw new Error(`Error: status code ${response.status}`);
+            } else {
+
+                // Update the clicked state for the specific event
+                setClickedStates((prev) => {
+                    const colors = options.map((_, i) =>
+                        i === index ? randomColor() : prev[event_id]?.colors?.[i] || 'initial'
+                    );
+
+                    return {
+                        ...prev,
+                        [event_id]: { clickedIndex: index, colors },
+                    };
+                });
+
+                console.log('User reacted to option:', option_id);
             }
 
-            // Optionally, update the UI state here to reflect the user's reaction
-            console.log('User reacted to option:', option_id);
         } catch (error) {
             console.error('Error sending reaction:', error);
         }
     };
+
 
     return (
         <div
@@ -324,21 +346,35 @@ export default function Page() {
 
                         <div className="group-details">
                             <div className="event-icons">
-                                {group.options && group.options.map((option, index) => (
-                                    <span
-                                        key={`event${index}`}
-                                        className={`iconEvent`} // Optionally add unique class based on ID
-                                        style={getIconStyle(option.did_user_respond)} // Apply styles based on response
-                                        onClick={() => {
-                                            const hasResponded = group.options.some(option => option.did_user_respond);
-                                            if (!hasResponded) {
-                                                handleReact(option.id, group.id);
-                                                option.did_user_respond = true; // or update state if you're using a state management system
-                                            }
-                                        }}                                     >
-                                        {getIconComponent(option.icon)} {/* Render icon */}
-                                    </span>
-                                ))}
+
+                                {group.options &&
+                                    group.options.map((option, index) => (
+                                        <span
+                                            key={`event${index}`}
+                                            className={`iconEvent event${index} event${group.title}`} // Adjusted className
+                                            onClick={() => {
+                                                const hasResponded = group.options.some(option => option.did_user_respond);
+
+                                                if (!option.did_user_respond && !(clickedStates[group.id]?.clickedIndex === index) && !hasResponded) {
+                                                    handleReact(option.id, group.id, index, group.options);
+                                                }
+                                            }}
+                                            style={{
+                                                backgroundColor: option.did_user_respond
+                                                    ? randomColor() // Set the color for pre-responded options
+                                                    : clickedStates[group.id]?.clickedIndex === index
+                                                        ? clickedStates[group.id]?.colors[index] || 'initial'
+                                                        : 'initial',
+                                                pointerEvents: option.did_user_respond
+                                                    ? 'none'
+                                                    : clickedStates[group.id]?.clickedIndex === index
+                                                        ? 'none'
+                                                        : 'auto',
+                                            }}
+                                        >
+                                            {getIconComponent(option.icon)} {/* Render icon */}
+                                        </span>
+                                    ))}
                             </div>
 
                             <p className="group-date"><i className="icon-calendar"></i> {group.event_time}</p>
