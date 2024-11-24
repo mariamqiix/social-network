@@ -181,7 +181,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	imageID := 0
+	imageID := 1
 	if createGroupRequest.Image != nil {
 
 		isImage, _ := IsDataImage(createGroupRequest.Image)
