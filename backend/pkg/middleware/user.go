@@ -115,8 +115,6 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		Nickname:       &userRequest.Nickname,
 	}
 
-
-	fmt.Print(user)
 	err = models.CreateUser(user)
 	if err != nil {
 		fmt.Println(err)
@@ -128,7 +126,12 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	errorServer(w, http.StatusOK)
+	err2 := CreateSessionAndSetCookie("", w, &user)
+	if err2 != nil {
+		http.Error(w, "something went wrong, please try again later", http.StatusInternalServerError)
+		return
+	}
+	writeToJson(user, w)
 }
 
 func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {

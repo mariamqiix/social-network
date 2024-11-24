@@ -1,43 +1,43 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Card from "../components/card";
 import { colors } from "../components/colors";
-import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../redux/actions";
-import { selectNotifications, selectUser } from "../redux/selectors";
+import { useSelector } from "react-redux";
+import { selectUser } from "../redux/selectors";
 import Metadata from "../components/Metadata";
 
 const color = colors[0];
 export default function loginPage() {
     const user = useSelector(selectUser);
 
-    const dispatch = useDispatch();
-    const router = useRouter()
+    function login(formData: FormData) {
+        console.log(formData);
+        fetch("http://127.0.0.1:8080/login",
+            { method: "POST", credentials: 'include', body: formData }).then(res => {
+                if (res.ok) {
+                    location.replace("/");
+                } else {
+                    res.text().then(text => {
+                        // alert("credentials not entered correctly");
+                        alert(text);
+                        // console.error(text);
+                    });
+                }
+            });
+    }
     let [isLogin, setIsLogin] = useState(true);
     return isLogin ? <Card title="Login" color={color}>
         <Metadata seoTitle="Friendz | Login" seoDescription="The next gen social network" />
         <form className="d-flex flex-column" onSubmit={(e) => {
             e.preventDefault();
             let formData = new FormData(e.target as HTMLFormElement);
-            fetch("http://127.0.0.1:8080/login",
-                { method: "POST", credentials: 'include', body: formData }).then(res => {
-                    if (res.ok && formData.get("username")) {
-                        res.json().then(data => {
-                            // dispatch(login({ id: data.ID, username: data.Username, first_name: data.FirstName, last_name: data.LastName, email: data.Email, image_url: "", dob: data.DateOfBirth, bio: data.Bio, nickname: data.Nickname }));
-                            // router.replace("/");
-                            location.replace("/");
-                        });
-                    } else {
-                        alert("credentials not entered correctly");
-                    }
-                });
+            login(formData);
         }}>
             {/* <h3 className="text-center">Please enter your login details</h3> */}
             <div className="mb-3">
                 <label className="form-label">User name</label>
-                <input required type="text" className="form-control" name="username" aria-describedby="emailHelp" />
+                <input required type="text" className="form-control" name="username" />
             </div>
             <div className="mb-3">
                 <label className="form-label">Password</label>
@@ -52,58 +52,64 @@ export default function loginPage() {
         </form>
     </Card > : <Card title="Register" color={color}>
         <Metadata seoTitle="Friendz | Register" seoDescription="The next gen social network" />
-        <form className="d-flex flex-column"   onSubmit={async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
+        <form className="d-flex flex-column" onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target as HTMLFormElement);
 
-    let imageContent: string | undefined = undefined;
+            let imageContent: string | undefined = undefined;
 
-    const fileInput = (e.target as HTMLFormElement).querySelector('input[type="file"]') as HTMLInputElement;
-    const file = fileInput.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      imageContent = await new Promise<string>((resolve, reject) => {
-        reader.onload = (event) => resolve(event.target?.result as string);
-        reader.onerror = (error) => reject(error);
-        reader.readAsDataURL(file);
-      });
-      // Strip the "data:image/*;base64," prefix.
-      imageContent = imageContent.substring(imageContent.indexOf(",") + 1);
-    }
+            const fileInput = (e.target as HTMLFormElement).querySelector('input[type="file"]') as HTMLInputElement;
+            const file = fileInput.files?.[0];
+            if (file) {
+                const reader = new FileReader();
+                imageContent = await new Promise<string>((resolve, reject) => {
+                    reader.onload = (event) => resolve(event.target?.result as string);
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsDataURL(file);
+                });
+                // Strip the "data:image/*;base64," prefix.
+                imageContent = imageContent.substring(imageContent.indexOf(",") + 1);
+            }
 
-    const payload = {
-      username: formData.get("username"),
-      password: formData.get("password"),
-      email: formData.get("email"),
-      first_name: formData.get("first_name"),
-      last_name: formData.get("last_name"),
-      nickname: formData.get("nickname"),
-      date_of_birth: formData.get("date_of_birth"),
-      image: imageContent, // Base64-encoded image
-      bio: formData.get("bio") ?? "",
-      type: formData.get("type"), // Public or Private
-    };
+            const payload = {
+                username: formData.get("username"),
+                password: formData.get("password"),
+                email: formData.get("email"),
+                first_name: formData.get("first_name"),
+                last_name: formData.get("last_name"),
+                nickname: formData.get("nickname"),
+                date_of_birth: formData.get("date_of_birth"),
+                image: imageContent, // Base64-encoded image
+                bio: formData.get("bio") ?? "",
+                type: formData.get("type"), // Public or Private
+            };
 
-    try {
-      const response = await fetch("http://localhost:8080/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+            try {
+                const response = await fetch("http://127.0.0.1:8080/signup", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
 
-      if (response.ok) {
-        alert("Registration successful! You can now log in.");
-        setIsLogin(true);
-      } else {
-        const errorText = await response.text();
-        alert(`Registration failed: ${errorText}`);
-      }
-    } catch (err) {
-      console.error("Error during registration:", err);
-      alert("An error occurred. Please try again.");
-    }
+                if (response.ok) {
+                    alert("Registration successful!");
+                    // setIsLogin(true);
+                    ["nickname", "last_name", "first_name", "date_of_birth", "bio", "type", "email"].forEach((field) => {
+                        formData.delete(field);
+                    })
+                    login(formData);
+                    // location.replace("/");
+                } else {
+                    const errorText = await response.text();
+                    alert(`Registration failed: ${errorText}`);
+                }
+            } catch (err) {
+                console.error("Error during registration:", err);
+                alert("An error occurred. Please try again.");
+            }
 
         }}>
             {/* <h3 className="text-center">Please enter your account details</h3> */}
@@ -160,7 +166,7 @@ export default function loginPage() {
                     className="form-control"
                     name="image"
                     aria-describedby="avatarHelp"
-                    accept="image/*"  /> {/* Only allows image files */}
+                    accept="image/*" /> {/* Only allows image files */}
 
                 <small id="avatarHelp" className="form-text text-muted">
                     Please upload an image file (e.g., .jpg, .png).

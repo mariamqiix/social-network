@@ -18,12 +18,12 @@ const PostActions = ({ likes, liked }) => {
         <button className="btn btn-outline-primary border-0 btn-sm me-2" onClick={liked}>
           <FontAwesomeIcon icon={faThumbsUp} /> {likes} {likes == 1 ? "Like" : "Likes"}
         </button>
-        <button className="btn btn-outline-purple border-0 btn-sm me-2">
+        {/* <button className="btn btn-outline-purple border-0 btn-sm me-2">
           <FontAwesomeIcon icon={faCommentAlt} /> Comment
         </button>
         <button className="btn btn-outline-secondary border-0 btn-sm">
           <FontAwesomeIcon icon={faShare} /> Share
-        </button>
+        </button> */}
       </div>
     </div>
   );

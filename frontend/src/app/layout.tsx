@@ -8,6 +8,8 @@ import Toasts from "./components/toast";
 import { Provider } from "react-redux";
 import store from "./redux/store";
 import Metadata from "./components/Metadata";
+import { faBell } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +25,14 @@ export default function RootLayout({
         <Provider store={store}>
           <Nav />
           <div className="flex-fill h-100 p-2">
-            <SearchBar />
+            <div className="d-flex flex-row align-items-center">
+              <SearchBar />
+              <button className="btn" onClick={() => {
+                alert("Not yet implemented");
+              }}>
+                <FontAwesomeIcon icon={faBell} />
+              </button>
+            </div>
             {children}
           </div>
           <Toasts />
