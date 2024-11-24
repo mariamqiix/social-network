@@ -1,13 +1,14 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func GroupHandler(w http.ResponseWriter, r *http.Request) {
@@ -180,7 +181,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	imageID := 0
+	imageID := 1
 	if createGroupRequest.Image != nil {
 
 		isImage, _ := IsDataImage(createGroupRequest.Image)
@@ -569,7 +570,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 
 		models.CreateEventsNotification(notification)
 
-		SendNotification(member.ID, structs.NotificatoinResponse{
+		SendNotification(member.UserID, structs.NotificatoinResponse{
 			Id:           notification.ID,
 			Type:         notification.NotificationType,
 			GroupID:      group.ID,
@@ -612,7 +613,15 @@ func CreateEventResponseHandler(w http.ResponseWriter, r *http.Request) {
 		EventID:  eventResponse.EventID,
 		Response: eventResponse.OptionID,
 	}
+	exist, err := models.CheckExistance("EventResponse", []string{"event_id", "user_id"}, []interface{}{respone.EventID, respone.UserID})
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+	}
 
+	if exist {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
 	err = models.CreateEventResponse(respone)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)

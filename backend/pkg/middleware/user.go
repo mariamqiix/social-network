@@ -83,7 +83,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-	imageID := -1
+	imageID := 1
 	if userRequest.Image != nil {
 		imageBytes, err := base64.StdEncoding.DecodeString(*userRequest.Image)
 		if err != nil {
@@ -114,6 +114,9 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 		Bio:            &userRequest.Bio,
 		Nickname:       &userRequest.Nickname,
 	}
+
+
+	fmt.Print(user)
 	err = models.CreateUser(user)
 	if err != nil {
 		fmt.Println(err)
@@ -166,6 +169,7 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	userProfile, err := models.GetUserByID(profileUserId)
 	if err != nil {
+		fmt.Print("wef")
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
@@ -177,12 +181,16 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	UserPosts, err := returnProfilePosts("", profileUserId, requestUserId, sessionUser)
 	if err != nil {
+		fmt.Print("wdddddef")
+
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
 
 	UserLikedPost, err := returnProfilePosts("like", profileUserId, requestUserId, sessionUser)
 	if err != nil {
+		fmt.Print("hello")
+
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
@@ -201,6 +209,8 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 
 	followingsStruct, err := mapBasicUsers(followings, 1)
 	if err != nil {
+		fmt.Print("hdddddello")
+
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
@@ -258,6 +268,7 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	switch path {
 	case "":
 		writeToJson(profile, w)
+
 		return
 
 	case "like":
@@ -298,6 +309,7 @@ func returnProfilePosts(mode string, profileUserId int, sessionUserID int, sessi
 
 	} else {
 		posts, err = models.ProfilePagePosts(profileUserId, sessionUserID)
+		fmt.Print(posts)
 		if err != nil {
 			return []structs.PostResponse{}, err
 		}

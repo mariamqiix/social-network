@@ -1,10 +1,11 @@
 package models
 
 import (
-	"backend/pkg/db"
-	"backend/pkg/structs"
 	"fmt"
 	"strconv"
+
+	"backend/pkg/db"
+	"backend/pkg/structs"
 )
 
 func CreateUser(u structs.User) error {
@@ -290,7 +291,7 @@ func GetUsersToInvite(userID int, groupId int) ([]structs.User, error) {
         ) 
         AND id != ? 
         AND id NOT IN (
-            SELECT user_id FROM GroupRequest WHERE group_id = ? AND request_status = 'pending'
+            SELECT user_id FROM GroupRequest WHERE group_id = ? AND request_status = 'Pending'
         ) 
     `
 	// Correctly pass all parameters for the query
@@ -484,4 +485,20 @@ func GetUserIdByUsername(username string) (int, error) {
 		return 0, fmt.Errorf("error scanning row: %v", err)
 	}
 	return id, nil
+}
+
+
+func UpdateUserPassword(userId int, password string) error {
+    // Update the password in the database
+    query := `
+        UPDATE User
+        SET hashed_password = ?
+        WHERE id = ?
+    `
+    _, err := db.Database.Exec(query, password, userId)
+    if err != nil {
+        return fmt.Errorf("failed to update password: %v", err)
+    }
+
+    return nil
 }

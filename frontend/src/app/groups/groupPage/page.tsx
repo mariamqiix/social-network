@@ -22,32 +22,32 @@ const GroupPage = () => {
                 setActiveTab('Posts');
                 LeaveGroup();
 
-                useEffect(() => {
-                    const getData = async () => {
-                        const data = await fetchGroupData();
-                        console.log(data);
-                        if (data.Group.is_user_member) {
-                            setIsMember(true)
-                        }
-                        console.log(data.Group.is_user_member)
-                        setProfileData(data);
-                    };
+                // useEffect(() => {
+                //     const getData = async () => {
+                //         const data = await fetchGroupData();
+                //         console.log(data);
+                //         if (data.Group.is_user_member) {
+                //             setIsMember(true)
+                //         }
+                //         console.log(data.Group.is_user_member)
+                //         setProfileData(data);
+                //     };
 
-                    getData();
-                }, []);
+                //     getData();
+                // }, []);
 
 
-                const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
+                // const [groupEvent, setGroupEvent] = useState<GroupEventResponse[]>([]);
 
-                useEffect(() => {
-                    const getData = async () => {
-                        const data = await fetchEventData();
-                        console.log(data);
-                        setGroupEvent(data);
-                    };
+                // useEffect(() => {
+                //     const getData = async () => {
+                //         const data = await fetchEventData();
+                //         console.log(data);
+                //         setGroupEvent(data);
+                //     };
 
-                    getData();
-                }, []);
+                //     getData();
+                // }, []);
 
                 // send a request to leave the group
                 break;
@@ -89,6 +89,7 @@ const GroupPage = () => {
     });
 
     const [isMember, setIsMember] = useState(true);
+    const [isInvited, setIsInvited] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -171,11 +172,13 @@ const GroupPage = () => {
         return date.toISOString(); // Converts to "2024-10-09T22:19:00.000Z"
     };
     const handleCreateEvent = async () => {
-        if (eventTitle && eventDescription && eventDateTime) {
-            const eventOptions = options.map(option => ({
-                option: option.name,
-                icon_name: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
-            }));
+        const eventOptions = options.map(option => ({
+            option: option.name,
+            icon_name: option.icon.type.displayName || option.icon.type.name // Convert icon to string representation
+        }));
+        console.log(eventOptions.length >= 2)
+        if (eventTitle && eventDescription && eventDateTime && eventOptions.length >= 2) {
+
 
             const eventData = {
                 title: eventTitle,
@@ -329,9 +332,16 @@ const GroupPage = () => {
     const getIconStyle = (didUserRespond: boolean) => {
         return didUserRespond ? { backgroundColor: randomColor() } : {}; // Random color if user responded
     };
+    const [clickedStates, setClickedStates] = useState<{
+        [key: number]: { clickedIndex: number | null; colors: string[] };
+    }>({});
 
-
-    const handleReact = async (option_id: number, event_id: number) => {
+    const handleReact = async (
+        option_id: number,
+        event_id: number,
+        index: number,
+        options: Array<any>
+    ) => {
         try {
             const response = await fetch('http://127.0.0.1:8080/group/event/userResponse', {
                 method: 'POST',
@@ -339,19 +349,35 @@ const GroupPage = () => {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({ event_id, option_id }), // Send the ID of the option being reacted to
+                body: JSON.stringify({ event_id, option_id }),
             });
 
             if (!response.ok) {
                 throw new Error(`Error: status code ${response.status}`);
+            } else {
+
+            // Update the clicked state for the specific event
+            setClickedStates((prev) => {
+                const colors = options.map((_, i) =>
+                    i === index ? randomColor() : prev[event_id]?.colors?.[i] || 'initial'
+                );
+
+                return {
+                    ...prev,
+                    [event_id]: { clickedIndex: index, colors },
+                };
+            });
+
+            console.log('User reacted to option:', option_id);
             }
 
-            // Optionally, update the UI state here to reflect the user's reaction
-            console.log('User reacted to option:', option_id);
         } catch (error) {
             console.error('Error sending reaction:', error);
         }
     };
+
+
+
 
     return (
         <div className="GroupPageContainer">
@@ -369,7 +395,7 @@ const GroupPage = () => {
                             <p className="profile-desc">
                                 {profileData.Group.description}                        </p>
                             <div className="profile-follow-info">
-                                {profileData.Members &&
+                                {profileData.Members && isMember &&
 
                                     <span>{profileData.Members ? profileData.Members.length : 0} Member</span>}
                             </div>
@@ -428,110 +454,130 @@ const GroupPage = () => {
 
 
             {/* Main Content Area */}
-            <div className="content-area">
-                {activeTab === 'Events' && profileData.Group && profileData.Group.is_user_member && groupEvent && (
-                    <div className="events-section">
-                        <div className="profileGroup-container">
-                            {groupEvent.map((group) => (
-                                <div className="profileGroup">
-                                    <img src={`data:image/jpeg;base64,${profileData.Group.image_url}`} alt={profileData.Group.image_url} className="group-image" />
+            {isMember && (
+                <div className="content-area">
+                    {activeTab === 'Events' && profileData.Group && profileData.Group.is_user_member && groupEvent && (
+                        <div className="events-section">
+                            <div className="profileGroup-container">
+                                {groupEvent.map((group) => (
+                                    <div className="profileGroup">
+                                        <img src={`data:image/jpeg;base64,${profileData.Group.image_url}`} alt={profileData.Group.image_url} className="group-image" />
 
-                                    <div className="group-details">
-                                        <div className="event-icons">
-                                            {group.options && group.options.map((option, index) => (
-                                                <span
-                                                    key={index}
-                                                    className={`iconEvent`} // Optionally add unique class based on ID
-                                                    style={getIconStyle(option.did_user_respond)} // Apply styles based on response
-                                                    onClick={() => {
-                                                        const hasResponded = group.options.some(option => option.did_user_respond);
-                                                        if (!hasResponded) {
-                                                            handleReact(option.id, group.id);
-                                                        }
-                                                    }}                                     >
-                                                    {getIconComponent(option.icon)} {/* Render icon */}
-                                                </span>
-                                            ))}
-                                        </div>
+                                        <div className="group-details">
+                                            <div className="event-icons">
+                                                
+                                                {group.options &&
+                                                    group.options.map((option, index) => (
+                                                        <span
+                                                            key={`event${index}`}
+                                                            className={`iconEvent event${index} event${group.title}`} // Adjusted className
+                                                            onClick={() => {
+                                                                const hasResponded = group.options.some(option => option.did_user_respond);
 
-                                        <p className="group-date"><i className="icon-calendar"></i> {group.created_at}</p>
-                                        <h3 className="eventTitle">{group.title}</h3>
-                                        <p className="group-location">{group.description
-                                        }</p>
-
-                                        {/* Display images of friends, showing only the first three and a + if there are more */}
-                                        <p className="group-friends">
-                                            {group.options && group.options[0] && group.options[0].users_response && (
-                                                <>
-                                                    <i className="icon-friends"></i>
-                                                    {group.options[0].users_response.slice(0, 3).map((friend, index) => (
-                                                        <img
-                                                            key={index}
-                                                            src={`data:image/jpeg;base64,${friend.image_url}`}
-                                                            alt={`Friend ${index + 1}`}
-                                                            className="friend-image"
-                                                        />
+                                                                if (!option.did_user_respond && !(clickedStates[group.id]?.clickedIndex === index) && !hasResponded) {
+                                                                    handleReact(option.id, group.id, index, group.options);
+                                                                }
+                                                            }}
+                                                            style={{
+                                                                backgroundColor: option.did_user_respond
+                                                                    ? randomColor() // Set the color for pre-responded options
+                                                                    : clickedStates[group.id]?.clickedIndex === index
+                                                                        ? clickedStates[group.id]?.colors[index] || 'initial'
+                                                                        : 'initial',
+                                                                pointerEvents: option.did_user_respond
+                                                                    ? 'none'
+                                                                    : clickedStates[group.id]?.clickedIndex === index
+                                                                        ? 'none'
+                                                                        : 'auto',
+                                                            }}
+                                                        >
+                                                            {getIconComponent(option.icon)} {/* Render icon */}
+                                                        </span>
                                                     ))}
-                                                    {group.options[0].users_response.length > 3 ? (
-                                                        <span className="friendsText">+ {group.options[0].users_response.length - 3} friends are going</span>
-                                                    ) : (
-                                                        <span className="friendsText">{group.options[0].users_response.length} friends are going</span>
-                                                    )}
-                                                </>
-                                            )}
-                                        </p>
+                                            </div>
+
+
+
+
+
+                                            <p className="group-date"><i className="icon-calendar"></i> {group.created_at}</p>
+                                            <h3 className="eventTitle">{group.title}</h3>
+                                            <p className="group-location">{group.description
+                                            }</p>
+
+                                            {/* Display images of friends, showing only the first three and a + if there are more */}
+                                            <p className="group-friends">
+                                                {group.options && group.options[0] && group.options[0].users_response && (
+                                                    <>
+                                                        <i className="icon-friends"></i>
+                                                        {group.options[0].users_response.slice(0, 3).map((friend, index) => (
+                                                            <img
+                                                                key={index}
+                                                                src={`data:image/jpeg;base64,${friend.image_url}`}
+                                                                alt={`Friend ${index + 1}`}
+                                                                className="friend-image"
+                                                            />
+                                                        ))}
+                                                        {group.options[0].users_response.length > 3 ? (
+                                                            <span className="friendsText">+ {group.options[0].users_response.length - 3} friends are going</span>
+                                                        ) : (
+                                                            <span className="friendsText">{group.options[0].users_response.length} friends are going</span>
+                                                        )}
+                                                    </>
+                                                )}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
-                {activeTab === 'Posts' && (
-                    <div className="posts-section" >
-                        <div
-                            id="group-post"
-                            style={{
-                                marginTop: "1.5%",
-                                width: "100%",
-                                display: "grid", // Use CSS Grid
-                                gridTemplateColumns: "repeat(2, minmax(380px, 1fr))", // Auto-adjust columns
-                                gap: "30px", // Space between posts
-                                justifyContent: "center",
-                                alignItems: "center",
-                            }}
-                        >
-                            {profileData.Posts && profileData.Posts.map((post, index) => (
-                                <Post post={post} />
-                            ))}
+                    )}
+                    {activeTab === 'Posts' && (
+                        <div className="posts-section" >
+                            <div
+                                id="group-post"
+                                style={{
+                                    marginTop: "1.5%",
+                                    width: "100%",
+                                    display: "grid", // Use CSS Grid
+                                    gridTemplateColumns: "repeat(2, minmax(380px, 1fr))", // Auto-adjust columns
+                                    gap: "30px", // Space between posts
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                {profileData.Posts && profileData.Posts.map((post, index) => (
+                                    <Post post={post} />
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                )}
-                {activeTab === 'Members' && profileData.Members && (
-                    <div className="members-section">
-                        <ul className="member-list">
-                            {profileData.Members.map((member) => (
-                                <li key={member.id} className="member-item">
-                                    <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
-                                    <div className="member-details">
-                                        <h3 className="member-name">{member.username}</h3>
-                                        <p className="member-username">{member.nickname}</p> {/* Username added here */}
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
+                    )}
+                    {activeTab === 'Members' && profileData.Members && (
+                        <div className="members-section">
+                            <ul className="member-list">
+                                {profileData.Members.map((member) => (
+                                    <li key={member.id} className="member-item">
+                                        <img src={`data:image/jpeg;base64,${member.image_url}`} alt={member.username} className="member-image" />
+                                        <div className="member-details">
+                                            <h3 className="member-name">{member.username}</h3>
+                                            <p className="member-username">{member.nickname}</p> {/* Username added here */}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
-                {activeTab === 'Leave' && (
-                    <div className="leave-section">
-                        <h2>Leave</h2>
-                        <p>Leave content goes here...</p>
-                    </div>
-                )}
+                    {activeTab === 'Leave' && (
+                        <div className="leave-section">
+                            <h2>Leave</h2>
+                            <p>Leave content goes here...</p>
+                        </div>
+                    )}
 
 
-            </div>
-
+                </div>
+            )}
             {/* Expandable div */}
             {isOpen && profileData.Group.is_user_member && (
                 <div className="popup">
@@ -560,6 +606,7 @@ const GroupPage = () => {
                                 <div className="member-info">
                                     <p className='memberName'>{member.nickname}</p>
                                     <p>{member.username}</p>
+
                                     <button className="invite" onClick={() => sendInvite(member.id)}>Invite</button>
                                 </div>
                             </div>

@@ -1,10 +1,10 @@
 package main
 
 import (
+	_ "github.com/mattn/go-sqlite3"
+
 	"backend/pkg/db"
 	"backend/pkg/middleware"
-
-	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {

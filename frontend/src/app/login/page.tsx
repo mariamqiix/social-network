@@ -52,49 +52,58 @@ export default function loginPage() {
         </form>
     </Card > : <Card title="Register" color={color}>
         <Metadata seoTitle="Friendz | Register" seoDescription="The next gen social network" />
-        <form className="d-flex flex-column" onSubmit={(e) => {
-            e.preventDefault();
-            let formData = new FormData(e.target as HTMLFormElement);
-            // console.log(formData);
-            // console.log(e.target.children[8]);
-            let imageContent: string | undefined;
-            if (e.target.children[8].children[1].files.length > 0) {
-                let reader = new FileReader();
-                reader.onload = function (e) {
-                    imageContent = e.target?.result as string;
-                    if (imageContent) {
-                        fetch("http://127.0.0.1:8080/signup",
-                            {
-                                method: "POST", body: JSON.stringify({
-                                    first_name: formData.get("first_name"),
-                                    last_name: formData.get("last_name"),
-                                    username: formData.get("username"),
-                                    password: formData.get("password"),
-                                    email: formData.get("email"),
-                                    date_of_birth: formData.get("date_of_birth"),
-                                    image: imageContent.substring(imageContent.indexOf(",") + 1),
-                                    bio: formData.get("bio") ?? "",
-                                    nickname: formData.get("nickname") ?? "",
-                                    type: formData.get("type"),
-                                })
-                            }).then(res => {
-                                if (res.ok) {
-                                    res.json().then(data => {
-                                        console.log(data);
-                                        setIsLogin(true);
-                                        // dispatch(login({ id: data.ID, username: data.Username, firstName: data.FirstName, lastName: data.LastName, email: data.Email, image: data.ImageID, dob: data.DateOfBirth, bio: data.Bio }));
-                                        // router.replace("/");
-                                    });
-                                } else {
-                                    res.text().then(data => {
-                                        alert(data);
-                                    });
-                                }
-                            });
-                    }
-                }
-                reader.readAsDataURL(e.target.children[8].children[1].files[0]);
-            }
+        <form className="d-flex flex-column"   onSubmit={async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+
+    let imageContent: string | undefined = undefined;
+
+    const fileInput = (e.target as HTMLFormElement).querySelector('input[type="file"]') as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      imageContent = await new Promise<string>((resolve, reject) => {
+        reader.onload = (event) => resolve(event.target?.result as string);
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+      // Strip the "data:image/*;base64," prefix.
+      imageContent = imageContent.substring(imageContent.indexOf(",") + 1);
+    }
+
+    const payload = {
+      username: formData.get("username"),
+      password: formData.get("password"),
+      email: formData.get("email"),
+      first_name: formData.get("first_name"),
+      last_name: formData.get("last_name"),
+      nickname: formData.get("nickname"),
+      date_of_birth: formData.get("date_of_birth"),
+      image: imageContent, // Base64-encoded image
+      bio: formData.get("bio") ?? "",
+      type: formData.get("type"), // Public or Private
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        alert("Registration successful! You can now log in.");
+        setIsLogin(true);
+      } else {
+        const errorText = await response.text();
+        alert(`Registration failed: ${errorText}`);
+      }
+    } catch (err) {
+      console.error("Error during registration:", err);
+      alert("An error occurred. Please try again.");
+    }
 
         }}>
             {/* <h3 className="text-center">Please enter your account details</h3> */}
@@ -128,9 +137,9 @@ export default function loginPage() {
             </div>
             <div className="mb-3">
                 <label className="form-label">Privacy Type *</label>
-                <select className="form-select" defaultValue={"Public"} name="type">
-                    <option>Public</option>
-                    <option>Private</option>
+                <select className="form-select" defaultValue="Public" name="type">
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
                 </select>
             </div>
             <div className="mb-3">
@@ -145,13 +154,13 @@ export default function loginPage() {
             </div>
 
             <div className="mb-3">
-                <label className="form-label">Avatar *</label>
+                <label className="form-label">Avatar</label>
                 <input
                     type="file"
                     className="form-control"
                     name="image"
                     aria-describedby="avatarHelp"
-                    accept="image/*" required /> {/* Only allows image files */}
+                    accept="image/*"  /> {/* Only allows image files */}
 
                 <small id="avatarHelp" className="form-text text-muted">
                     Please upload an image file (e.g., .jpg, .png).

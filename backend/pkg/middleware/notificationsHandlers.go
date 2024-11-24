@@ -1,13 +1,13 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/json"
-
 	// "fmt"
 	"net/http"
 	"strings"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func NotificationsHandler(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +107,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		SendNotification(user.ID, *notificate)
+		SendNotification(group.CreatorID, *notificate)
 
 	case "adminGroupRequestResponse":
 
@@ -150,25 +150,25 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		SendNotification(user.ID, *notificate)
+		SendNotification(GroupRequestResponse.UserID, *notificate)
 
 	case "followResponse":
 
-		var userRequestToFollow *structs.UserInfoRequest
-		status := "Accept"
+		var userRequestedToFollow *structs.UserInfoRequest
+		status := "Accepted"
 		notificationType := "followRequestAccept"
 		code := 2
 
-		err := json.NewDecoder(r.Body).Decode(&userRequestToFollow)
+		err := json.NewDecoder(r.Body).Decode(&userRequestedToFollow)
 		if err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		if userRequestToFollow.Response == "Reject" {
+		if userRequestedToFollow.Response == "Reject" {
 			models.DeleteFollower(structs.Follower{
 				FollowingID: user.ID,
-				FollowerID:  userRequestToFollow.UserID,
+				FollowerID:  userRequestedToFollow.UserID,
 			})
 			notificationType = "followRequestReject"
 			code = 1
@@ -176,14 +176,14 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		} else {
 			models.UpdateFollowerStatues(structs.Follower{
 				FollowingID: user.ID,
-				FollowerID:  userRequestToFollow.UserID,
+				FollowerID:  userRequestedToFollow.UserID,
 				Status:      &status,
 			})
 		}
 
 		notification := structs.Notification{
-			UserID:           user.ID,
-			SenderID:         &userRequestToFollow.UserID,
+			UserID:           userRequestedToFollow.UserID,
+			SenderID:         &user.ID,
 			NotificationType: notificationType,
 			IsRead:           false,
 		}
@@ -194,7 +194,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 		}
 
 		models.CreateMessagesNotification(notification)
-		SendNotification(user.ID, *notificate)
+		SendNotification(userRequestedToFollow.UserID, *notificate)
 
 	case "requestToFollow":
 		var userRequestToFollow *structs.UserInfoRequest
