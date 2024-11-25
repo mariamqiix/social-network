@@ -1,7 +1,7 @@
 import { createStore } from "redux";
 import { Notifi, Post, State, ChatMessage, Chat } from "../types/Types";
 import { addMessage, addNotification } from "./actions";
-import { addNotificationFunction } from "../notifications/get_notification";
+import { addNotificationFunction } from "../components/get_notification";
 
 const initialState: State = {
     posts: [],
@@ -101,6 +101,11 @@ const reducer = (state = initialState, action: any) => {
                     notifications: [action.payload, ...state.notifications]
                 };
             }
+        case 'notifications/remove':
+            return {
+                ...state,
+                notifications: state.notifications.filter(notification => notification.id != action.payload),
+            };
         case 'notifications/hideToast':
             return {
                 ...state,

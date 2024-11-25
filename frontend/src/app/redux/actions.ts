@@ -30,6 +30,11 @@ export const addNotification = (notification: Notifi) => ({
     payload: notification,
 });
 
+export const removeNotification = (id: number) => ({
+    type: 'notifications/remove',
+    payload: id,
+});
+
 export const hideToastNotification = (id: number) => ({
     type: 'notifications/hideToast',
     payload: id,

@@ -10,6 +10,7 @@ import store from "./redux/store";
 import Metadata from "./components/Metadata";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import NotificationsBox from "./components/Notifications";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,15 +28,11 @@ export default function RootLayout({
           <div className="flex-fill h-100 p-2">
             <div className="d-flex flex-row align-items-center">
               <SearchBar />
-              <button className="btn" onClick={() => {
-                alert("Not yet implemented");
-              }}>
-                <FontAwesomeIcon icon={faBell} />
-              </button>
+              <NotificationsBox />
             </div>
             {children}
           </div>
-          <Toasts />
+          {/* <Toasts /> */}
         </Provider>
       </body>
     </html>

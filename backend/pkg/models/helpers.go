@@ -148,7 +148,6 @@ func CheckExistance(tablename string, columnnames []string, values []interface{}
 
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE %s", tablename, whereClause)
 
-
 	// Lock the mutex
 	mutex.Lock()
 	defer mutex.Unlock()

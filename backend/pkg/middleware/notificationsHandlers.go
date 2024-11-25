@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"encoding/json"
+	"fmt"
+
 	// "fmt"
 	"net/http"
 	"strings"
@@ -41,7 +43,7 @@ func NotificationsHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func UserResponde(w http.ResponseWriter, r *http.Request) {
+func UserResponds(w http.ResponseWriter, r *http.Request) {
 	user := GetUser(r)
 
 	if user == nil {
@@ -51,7 +53,7 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 	// Get the path parameter from the URL
 	path := strings.TrimPrefix(r.URL.Path, "/user/responds/")
-
+	id := r.URL.Query().Get("id")
 	// Handle the different cases based on the path
 	switch path {
 	case "groupInviteResponse":
@@ -72,7 +74,6 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusInternalServerError)
 			return
 		}
-
 		models.RemoveInvite(group.ID, user.ID)
 		invites, err := models.GetUserGroupInvites(user.ID, groupInviteResponse.GroupID)
 		if err != nil {
@@ -98,8 +99,6 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 			GroupID:          &group.ID,
 			IsRead:           false,
 		}
-
-		// fmt.Print(notification)
 
 		models.CreateGroupsNotification(notification)
 		notificate, err := createGroupNotificationRequestResponse(notification, code)
@@ -195,7 +194,6 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 		models.CreateMessagesNotification(notification)
 		SendNotification(userRequestedToFollow.UserID, *notificate)
-
 	case "requestToFollow":
 		var userRequestToFollow *structs.UserInfoRequest
 		status := "Pending"
@@ -281,5 +279,12 @@ func UserResponde(w http.ResponseWriter, r *http.Request) {
 
 	default:
 		http.NotFound(w, r)
+	}
+
+	if id != "" {
+		err := models.Delete("UserNotification", []string{"id"}, []interface{}{id})
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }

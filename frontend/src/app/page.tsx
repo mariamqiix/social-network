@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import Select from 'react-select'
+import Link from "next/link";
 
 export default function Home() {
   const posts = useSelector(selectPosts);
@@ -198,7 +199,9 @@ export default function Home() {
             images={post.images}
             id={post.id.toString()}
           />
-          <PostActions likes={post.likes} liked={() => likePostClicked(post.id)} />
+          <Link href={"posts/" + post.id}>
+            <PostActions likes={post.likes} liked={() => likePostClicked(post.id)} />
+          </Link>
         </div>
       ))}
     </main>

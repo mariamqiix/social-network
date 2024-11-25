@@ -46,7 +46,7 @@ func GoLive() {
 	mux.HandleFunc("/user/changePrivacy/", PrivacyChangeHandler)
 	mux.HandleFunc("/user/list/", ListUsersHandler)
 	mux.HandleFunc("/user/notifications/", NotificationsHandler)
-	mux.HandleFunc("/user/responds/", UserResponde)
+	mux.HandleFunc("/user/responds/", UserResponds)
 
 	mux.HandleFunc("/user/userMessages/{id}", UserChatHandler) // to return the messages between two users
 	mux.HandleFunc("/user/Chats", UserChatHandler)             // to return the chats of the user
