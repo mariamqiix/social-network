@@ -22,7 +22,8 @@ export default function Page() {
       },
       content: string,
       time: string,
-      likes: number
+      likes: number,
+      image: string,
     };
   const [comments, setComments] = useState<null | Comment[]>(null);
   const [post, setPost] = useState<null | Post>(null)
@@ -33,34 +34,39 @@ export default function Page() {
         let newPost: Post = { id: data.Posts.id, author: { id: data.Posts.author.id, name: data.Posts.author.username, avatar: "data:image/jpeg;base64," + data.Posts.author.image_url }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : ["data:image/jpeg;base64," + data.Posts.image_url], likes: data.Posts.likes.count };
         setPost(newPost);
         if (data.Comments) {
-          setComments(data.Comments.map((comment: any) => ({ author: { name: comment.author.username, avatar: "data:image/jpeg;base64," + comment.author.image_url }, content: comment.content, time: comment.created_at, likes: comment.likes.count })));
+          setComments(data.Comments.map((comment: any) => ({ author: { name: comment.author.username, avatar: "data:image/jpeg;base64," + comment.author.image_url }, content: comment.content, time: comment.created_at, likes: comment.likes.count, image: "data:image/jpeg;base64," + comment.image_url })));
         }
       });
     });
   }, [fetch]);
   function likePost() {
     fetch("http://127.0.0.1:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: Number.parseInt(id), reaction: "Like" }) }).then((res) => {
-      console.log(res.status);
+      // console.log(res.status);
       if (res.status == 204) {
         // console.log("remove");
         setPost({ ...post, likes: post?.likes - 1 });
       } else if (res.status == 201) {
         // console.log("add");
         setPost({ ...post, likes: post?.likes + 1 });
+      } else {
+        res.text().then(text => {
+          console.error(text);
+        });
       }
 
     });
   }
-  function addComment(text: string) {
-    fetch("http://127.0.0.1:8080/post/addComment/user", { method: "POST", credentials: 'include', body: JSON.stringify({ parent_id: Number.parseInt(id), description: text }) }).then((res) => {
-      console.log(res.status);
-      if (res.status == 201) {
+  function addComment(text: string, image: string | null) {
+    fetch("http://127.0.0.1:8080/post/addComment/user", { method: "POST", credentials: 'include', body: JSON.stringify({ parent_id: Number.parseInt(id), description: text, image: image ? image.substring(image.indexOf(",") + 1) : null }) }).then((res) => {
+      // console.log(res.status);
+      if (res.status == 201 || res.ok) {
         console.log("Comment added");
-        setComments([...(comments == null ? [] : comments), { author: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, content: text, time: (new Date()).toISOString(), likes: 0 }]);
+        setComments([...(comments == null ? [] : comments), { author: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, content: text, time: (new Date()).toISOString(), likes: 0, image: image ?? "" }]);
+      } else {
+        res.text().then((data) => {
+          console.error(data);
+        });
       }
-      res.text().then((data) => {
-        console.log(data);
-      });
     });
   }
   if (post == null) {

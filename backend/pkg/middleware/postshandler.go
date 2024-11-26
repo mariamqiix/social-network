@@ -247,11 +247,31 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusBadRequest)
 			return
 		}
+		fmt.Println(comment)
+
+		imageID := -1
+		if comment.Image != nil {
+			imageBytes, err := base64.StdEncoding.DecodeString(*comment.Image)
+			if err != nil {
+				fmt.Println("Error decoding base64 image:", err)
+				errorServer(w, http.StatusBadRequest)
+				return
+			}
+			isImage, _ := IsDataImage(imageBytes)
+			if isImage {
+				imageID, err = models.UploadImage(imageBytes)
+				if err != nil {
+					errorServer(w, http.StatusInternalServerError)
+					return
+				}
+			}
+		}
 
 		post := structs.Post{
 			UserID:   &sessionUser.ID,
 			Content:  comment.Description,
 			ParentID: &comment.ParentID,
+			ImageID:  &imageID,
 		}
 
 		err = models.CreateNormalComment(post)

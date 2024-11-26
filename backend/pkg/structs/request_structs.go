@@ -40,8 +40,9 @@ type CommentGroupRequest struct {
 }
 
 type CommentRequest struct {
-	ParentID    int    `json:"parent_id"`
-	Description string `json:"description"`
+	ParentID    int     `json:"parent_id"`
+	Description string  `json:"description"`
+	Image       *string `json:"image"`
 }
 
 type CreateGroupRequest struct {

@@ -33,8 +33,8 @@ func CreateGroupPost(p structs.Post) error {
 
 func CreateNormalComment(p structs.Post) error {
 	// Create a new record in the Post table
-	columns := []string{"user_id", "parent_id", "content", "privacy"}
-	values := []interface{}{p.UserID, p.ParentID, p.Content, "Public"}
+	columns := []string{"user_id", "parent_id", "content", "privacy", "image_id"}
+	values := []interface{}{p.UserID, p.ParentID, p.Content, "Public", p.ImageID}
 	return Create("Post", columns, values)
 }
 

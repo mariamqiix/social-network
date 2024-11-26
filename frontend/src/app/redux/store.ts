@@ -130,30 +130,43 @@ const reducer = (state = initialState, action: any) => {
 }
 
 const store = createStore(reducer);
-
-export const socket = new WebSocket('ws://127.0.0.1:8080/socket');
-console.log("socket created: ", socket);
-socket.onmessage = (event) => {
-    // setMessages((prevMessages) => [...prevMessages, event.data]);
-    console.log("socket received: ", event.data);
-    try {
-        let data = JSON.parse(event.data);
-        console.log(data);
-        console.log(data.message_type);
-        if (data.message_type == "Notification") {
-            store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true, function: addNotificationFunction(data) }));
-        } else if (data.message_type == "User") {
-            store.dispatch(addMessage({ id: data.user_chat.id, content: data.user_chat.content, created_at: data.user_chat.created_at, image_url: "data:image/jpeg;base64," + data.user_chat.image_url, sender: { name: data.user_chat.Sender.username, avatar: "data:image/jpeg;base64," + data.user_chat.Sender.image_url }, type: "user", group_name: null },));
-        } else if (data.message_type == "Group") {
-            store.dispatch(addMessage({ id: data.group_chat.id, content: data.group_chat.content, created_at: data.group_chat.created_at, image_url: "data:image/jpeg;base64," + data.group_chat.image_url, sender: { name: data.group_chat.Sender.username, avatar: "data:image/jpeg;base64," + data.group_chat.Sender.image_url }, type: "group", group_name: data.group_chat.group_id }));
-        }
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-socket.addEventListener("error", (event) => {
-    console.error(event);
-});
-
 export default store;
+
+
+let interval: NodeJS.Timeout | null = null;
+function connectWebsocket() {
+    const newSocket = new WebSocket('ws://127.0.0.1:8080/socket');
+    if (interval) {
+        clearInterval(interval);
+        interval = null;
+        console.log("socket reconnected");
+    } else {
+        console.log("socket created");
+    }
+    newSocket.onmessage = (event) => {
+        // console.log("socket received: ", event.data);
+        try {
+            let data = JSON.parse(event.data);
+            // console.log(data);
+            // console.log(data.message_type);
+            if (data.message_type == "Notification") {
+                store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true, function: addNotificationFunction(data) }));
+            } else if (data.message_type == "User") {
+                store.dispatch(addMessage({ id: data.user_chat.id, content: data.user_chat.content, created_at: data.user_chat.created_at, image_url: "data:image/jpeg;base64," + data.user_chat.image_url, sender: { name: data.user_chat.Sender.username, avatar: "data:image/jpeg;base64," + data.user_chat.Sender.image_url }, type: "user", group_name: null },));
+            } else if (data.message_type == "Group") {
+                store.dispatch(addMessage({ id: data.group_chat.id, content: data.group_chat.content, created_at: data.group_chat.created_at, image_url: "data:image/jpeg;base64," + data.group_chat.image_url, sender: { name: data.group_chat.Sender.username, avatar: "data:image/jpeg;base64," + data.group_chat.Sender.image_url }, type: "group", group_name: data.group_chat.group_id }));
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    newSocket.addEventListener("close", (event) => {
+        console.error("socket closed");
+        interval = setInterval(() => {
+            socket = connectWebsocket();
+        }, 1000);
+    });
+    return newSocket;
+}
+export let socket = connectWebsocket();

@@ -204,6 +204,9 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Message, ReceiverUsername, 
 		// 	imageData = string(image.Data)
 		// }
 
+		if image == nil {
+			image = &emptyString
+		}
 		newMessageStruct := structs.WebsocketResponse{
 			MessageType: "User",
 			UserChat: structs.ChatResponse{

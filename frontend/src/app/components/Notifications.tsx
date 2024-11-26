@@ -32,7 +32,7 @@ export default function NotificationsBox() {
         </div>
         <div className={(isOpen ? "" : "d-none ") + "position-absolute z-2 w-32 top-20 end-0 me-2 overflow-y-scroll"}>
             <ul className="list-group">
-                {notifications.map((notification) => (<a href="#" className="list-group-item list-group-item-action" aria-current="true">
+                {notifications.map((notification, index) => (<div key={index} className="list-group-item list-group-item-action" aria-current="true">
                     <div className="d-flex w-100 justify-content-between">
                         <h5 className="mb-1">{notification.title}</h5>
                         {/* <small>{not.type}</small> */}
@@ -56,7 +56,7 @@ export default function NotificationsBox() {
                             }
                         }}>Reject</button>
                     </div>)}
-                </a>))}
+                </div>))}
             </ul>
         </div>
     </div>;
