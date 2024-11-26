@@ -126,9 +126,9 @@ export default function page(params: any) {
                     {profileData != null && (
                         <div className="profile-details">
                             <h1 className="profile-name">{profileData?.user.first_name} {profileData?.user.last_name} ({profileData?.user.username})</h1>
-                            <p className="profile-desc">{profileData?.user.bio}</p>
                             {isActive && (
                                 <div>
+                                    <p className="profile-desc">{profileData?.user.bio}</p>
                                     <p className="profile-desc">{calculateAge(profileData?.user.DateOfBirth)} Years</p>
                                     <p className="profile-desc">{profileData?.user.email}</p>
                                 </div>

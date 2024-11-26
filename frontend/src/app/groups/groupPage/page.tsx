@@ -157,6 +157,7 @@ const GroupPage = () => {
 
                 console.log('Post created:');
                 closePopup();
+                window.location.reload();
             } catch (error) {
                 console.error('Error creating post:', error);
             }
@@ -210,6 +211,7 @@ const GroupPage = () => {
                 setEventDateTime("");
                 setOptions([{ name: "", icon: <FaIcons.FaQuestionCircle /> }]); // Reset options
                 closePopup();
+                window.location.reload();
             } catch (error) {
                 console.error("Error creating event:", error);
             }
@@ -356,19 +358,19 @@ const GroupPage = () => {
                 throw new Error(`Error: status code ${response.status}`);
             } else {
 
-            // Update the clicked state for the specific event
-            setClickedStates((prev) => {
-                const colors = options.map((_, i) =>
-                    i === index ? randomColor() : prev[event_id]?.colors?.[i] || 'initial'
-                );
+                // Update the clicked state for the specific event
+                setClickedStates((prev) => {
+                    const colors = options.map((_, i) =>
+                        i === index ? randomColor() : prev[event_id]?.colors?.[i] || 'initial'
+                    );
 
-                return {
-                    ...prev,
-                    [event_id]: { clickedIndex: index, colors },
-                };
-            });
+                    return {
+                        ...prev,
+                        [event_id]: { clickedIndex: index, colors },
+                    };
+                });
 
-            console.log('User reacted to option:', option_id);
+                console.log('User reacted to option:', option_id);
             }
 
         } catch (error) {
@@ -460,12 +462,12 @@ const GroupPage = () => {
                         <div className="events-section">
                             <div className="profileGroup-container">
                                 {groupEvent.map((group) => (
-                                    <div className="profileGroup">
+                                    <div key={"group" + group.id} className="profileGroup">
                                         <img src={`data:image/jpeg;base64,${profileData.Group.image_url}`} alt={profileData.Group.image_url} className="group-image" />
 
                                         <div className="group-details">
                                             <div className="event-icons">
-                                                
+
                                                 {group.options &&
                                                     group.options.map((option, index) => (
                                                         <span
@@ -547,7 +549,7 @@ const GroupPage = () => {
                                 }}
                             >
                                 {profileData.Posts && profileData.Posts.map((post, index) => (
-                                    <Post post={post} />
+                                    <Post key={"post"+index} post={post} />
                                 ))}
                             </div>
                         </div>

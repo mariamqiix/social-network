@@ -30,7 +30,7 @@ export default function Nav() {
             />
         },
         {
-            href: "/chat",
+            href: user ? "/chat" : "#",
             title: "Chat",
             icon: <path
                 fillRule="evenodd"
@@ -48,7 +48,7 @@ export default function Nav() {
             />
         },
         {
-            href: user ? "/profile/" + user.id : "/profile/1",
+            href: user ? "/profile/" + user.id : "#",
             title: "Profile",
             icon: <path
                 strokeLinecap="round"
@@ -125,10 +125,10 @@ export default function Nav() {
                             <span className="text-body-tertiary">{user.username}</span>
                         </span>
                     </div> : <p>Not logged in</p>}
-                {items.map((item) => (
+                {items.map((item, index) => (
                     <Link
                         href={item.href}
-                        key={item.href}
+                        key={item.href + "-" + index}
                         className={
                             (pathName == item.href ? "btn-dark text-bg-dark" : "") +
                             " btn nav-item rounded-4 m-1 d-flex align-items-center"
@@ -136,6 +136,8 @@ export default function Nav() {
                         onClick={() => {
                             if (user && item.href == "/login") {
                                 logoutButton();
+                            } else if (!user && item.href == "#") {
+                                alert("not logged in");
                             }
                         }}
                     >

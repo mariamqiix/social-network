@@ -112,7 +112,7 @@ export default function page() {
         fetch("http://127.0.0.1:8080/group/list/joined", { credentials: 'include' }).then((res) => {
             if (res.ok) {
                 res.json().then((data) => {
-                    // console.log(data);
+                    console.log(data);
                     data.Groups.forEach((group: any) => {
                         // console.log(group);
                         dispatch(addChat({ id: group.id, name: group.title, avatar: "data:image/jpeg;base64," + group.image_url, type: "group" }));

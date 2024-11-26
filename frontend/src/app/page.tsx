@@ -162,7 +162,7 @@ export default function Home() {
             }}>
               <option value="Public">Public</option>
               <option value="Private">Private</option>
-              <option value="Almost">Custom</option>
+              <option value="Almost">Almost Private</option>
             </select>
           </div>
           <button className="btn btn-dark" type="submit">Post</button>

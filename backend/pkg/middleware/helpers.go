@@ -222,7 +222,9 @@ func MapMembers(members []structs.GroupMember) []structs.BasicUserResponse {
 	var memberResponses []structs.BasicUserResponse
 	for _, User := range members {
 		member := ReturnBasicUser(User.UserID)
-		memberResponses = append(memberResponses, *member)
+		if member != nil {
+			memberResponses = append(memberResponses, *member)
+		}
 	}
 	return memberResponses
 }
@@ -300,6 +302,9 @@ func ReturnBasicUser(userId int) *structs.BasicUserResponse {
 	user, err := models.GetUserByID(userId)
 	if err != nil {
 		log.Printf("error getting user by user id: %s\n", err.Error())
+		return nil
+	} else if user == nil {
+		log.Println("user not found")
 		return nil
 	}
 	nickname := user.FirstName + " " + user.LastName

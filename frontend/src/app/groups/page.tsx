@@ -84,6 +84,7 @@ export default function Page() {
                 if (buttonRef.current) {
                     buttonRef.current.focus();
                 }
+                window.location.reload();
             } catch (error) {
                 console.error('Error creating group:', error);
                 alert('Failed to create group. Please try again.');
@@ -426,7 +427,7 @@ export default function Page() {
                 }}
             >
                 {groupData.Posts && groupData.Posts.map((post, index) => (
-                    <Post post={post} />
+                    <Post key={"post"+index} post={post} />
                 ))}
             </div>
 

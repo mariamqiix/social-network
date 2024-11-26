@@ -48,7 +48,8 @@ const reducer = (state = initialState, action: any) => {
                 posts: [...state.posts]
             };
         case 'chats/add':
-            if (state.chats.some((chat: Chat) => chat.id == action.payload.id)) {
+            console.log(action.payload);
+            if (state.chats.some((chat: Chat) => chat.id == action.payload.id && chat.type == action.payload.type)) {
                 for (let i = 0; i < state.chats.length; i++) {
                     if (state.chats[i].id == action.payload.id && state.chats[i].type == action.payload.type) {
                         state.chats[i] = action.payload;
@@ -139,7 +140,7 @@ function connectWebsocket() {
     if (interval) {
         clearInterval(interval);
         interval = null;
-        console.log("socket reconnected");
+        // console.log("socket reconnected");
     } else {
         console.log("socket created");
     }
@@ -150,7 +151,7 @@ function connectWebsocket() {
             // console.log(data);
             // console.log(data.message_type);
             if (data.message_type == "Notification") {
-                store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true, function: addNotificationFunction(data) }));
+                store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true, function: addNotificationFunction(data.notification) }));
             } else if (data.message_type == "User") {
                 store.dispatch(addMessage({ id: data.user_chat.id, content: data.user_chat.content, created_at: data.user_chat.created_at, image_url: "data:image/jpeg;base64," + data.user_chat.image_url, sender: { name: data.user_chat.Sender.username, avatar: "data:image/jpeg;base64," + data.user_chat.Sender.image_url }, type: "user", group_name: null },));
             } else if (data.message_type == "Group") {
@@ -162,7 +163,7 @@ function connectWebsocket() {
     };
 
     newSocket.addEventListener("close", (event) => {
-        console.error("socket closed");
+        // console.error("socket closed");
         interval = setInterval(() => {
             socket = connectWebsocket();
         }, 1000);
