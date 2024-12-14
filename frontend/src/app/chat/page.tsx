@@ -63,8 +63,8 @@ export default function page() {
             fetch("http://127.0.0.1:8080/group/messages?id=" + chat.id, { credentials: 'include' }).then((res) => {
                 if (res.ok) {
                     res.json().then((data) => {
-                        // console.log(data);
-                        data.map((da: any) => ({ id: da.id, sender: { name: da.Sender.username, avatar: "data:image/jpeg;base64," + da.Sender.image_url }, created_at: da.created_at, content: da.content, image_url: "data:image/jpeg;base64," + da.image_url, type: "group", group_name: chat.id })).forEach((message: ChatMessage) => {
+                        console.log(data);
+                        data.map((da: any) => ({ id: da.id, sender: { name: da.Sender.username, avatar: "data:image/jpeg;base64," + da.Sender.image_url }, created_at: da.created_at, content: da.content, image_url: "data:image/jpeg;base64," + da.image_url, type: "group", group_name: chats.find((c) => c.id == chat.id && c.type == "group")?.name })).forEach((message: ChatMessage) => {
                             dispatch(addMessage(message));
                         });;
                     });
@@ -146,7 +146,7 @@ export default function page() {
                             let receiverUsername = selectedChat.name;
                             socket.send(JSON.stringify({ message: message, type: selectedChat.type == "group" ? "GroupMessage" : "User message", sender_username: user?.username, receiver_id: receiverUsername, group_id: selectedChat?.id, image: imageData != "" ? imageData.substring(imageData.indexOf(",") + 1) : null }));
                             if (selectedChat.type == "user") {
-                                dispatch(addMessage({ id: 0, content: message, created_at: (new Date()).toISOString(), image_url: imageData, sender: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, type: selectedChat.type, group_name: (selectedChat.type == "group" ? selectedChat.id : null) }));
+                                dispatch(addMessage({ id: 0, content: message, created_at: (new Date()).toISOString(), image_url: imageData, sender: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, type: selectedChat.type, group_name: null }));
                             }
                             setImageData("");
                             e.target.reset();

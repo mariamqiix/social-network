@@ -73,19 +73,24 @@ const reducer = (state = initialState, action: any) => {
             };
         case 'message/add':
             let messageId = state.messages.findIndex((mes) => ((mes.id + mes.created_at + mes.content) == (action.payload.id + action.payload.created_at + action.payload.content)));
-            if (messageId > -1) {
-                state.messages[messageId] = action.payload;
-                return {
-                    ...state,
-                    messages: [...state.messages]
-                };
-            } else if (state.user?.username == action.payload.sender.name || ((state.selectedChat?.name == action.payload.sender.name && state.selectedChat?.type == "user") || state.selectedChat?.id == action.payload.group_name)) {
-                return {
-                    ...state,
-                    messages: [action.payload, ...state.messages]
-                };
+            if (state.selectedChat) {
+                if (messageId > -1) {
+                    state.messages[messageId] = action.payload;
+                    return {
+                        ...state,
+                        messages: [...state.messages]
+                    };
+                } else if (action.payload.sender.name == state.user!.username || ((state.selectedChat.type == "user" && action.payload.type == "user" && state.selectedChat.name == action.payload.sender.name) || (state.selectedChat.type == "group" && action.payload.type == "group" && state.selectedChat.name == action.payload.group_name))) {
+                    return {
+                        ...state,
+                        messages: [action.payload, ...state.messages]
+                    };
+                }
             }
         case 'notifications/add':
+            if (action.payload.id == 0) {
+                action.payload.id = Math.floor(Math.random() * 1000) + state.notifications.length;
+            }
             if (state.notifications.some((not: Notifi) => not.id == action.payload.id)) {
                 for (let i = 0; i < state.notifications.length; i++) {
                     if (state.notifications[i].id == action.payload.id) {
@@ -148,8 +153,6 @@ function connectWebsocket() {
         // console.log("socket received: ", event.data);
         try {
             let data = JSON.parse(event.data);
-            // console.log(data);
-            // console.log(data.message_type);
             if (data.message_type == "Notification") {
                 store.dispatch(addNotification({ id: data.notification.id, type: "message", title: data.notification.type, message: data.notification.message, link: "", showToast: true, function: addNotificationFunction(data.notification) }));
             } else if (data.message_type == "User") {

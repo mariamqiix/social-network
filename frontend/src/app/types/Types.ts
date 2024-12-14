@@ -47,7 +47,7 @@ export type ChatMessage = {
     content: string;
     image_url: string;
     type: "group" | "user";
-    group_name: number | null;
+    group_name: string | null;
 };
 
 export type User = {

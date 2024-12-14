@@ -250,7 +250,6 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusInternalServerError)
 		return
 	}
-
 	notification := structs.Notification{
 		UserID:           group.CreatorID,
 		NotificationType: "GroupRequestToJoin",
@@ -260,11 +259,11 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	models.CreateGroupsNotification(notification)
-
 	SendNotification(notification.UserID, structs.NotificatoinResponse{
 		Id:           notification.ID,
 		Type:         notification.NotificationType,
 		GroupID:      *notification.GroupID,
+		SenderID:     sessionUser.ID,
 		IsRead:       notification.IsRead,
 		CreationDate: notification.CreationDate,
 		Message:      user.Username + " has has rquested to join your " + group.Title + " group.",

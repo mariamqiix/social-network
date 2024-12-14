@@ -152,13 +152,14 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Message, ReceiverUsername, 
 		if !ok {
 			return fmt.Errorf("no connection found for the user with id: %d\n", ReceiverId.ID)
 		}
+		group, _ := models.GetGroupByID(GroupID)
 		newMessageStruct := structs.WebsocketResponse{
 			MessageType: "Group",
 			GroupChat: structs.GroupChatResponse{
 				Sender:       *ReturnBasicUser(message.SenderID),
 				Sended:       false,
 				Content:      message.Message,
-				GroupID:      GroupID,
+				GroupID:      group.Title,
 				Image:        *image,
 				CreationDate: message.CreationDate,
 			},

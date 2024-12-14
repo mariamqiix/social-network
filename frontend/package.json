@@ -13,6 +13,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "bootstrap": "^5.3.3",
+    "motion": "^11.14.4",
     "next": "14.2.14",
     "react": "^18",
     "react-dom": "^18",

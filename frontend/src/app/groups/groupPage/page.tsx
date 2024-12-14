@@ -10,11 +10,13 @@ import { GroupPageView, GroupEventResponse } from "../../types/Types";
 import { faCalendarDays, faPlus, faUser, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { RequestToJoin, sendInvite, fetchEventData, fetchMembers, fetchGroupData, LeaveGroup } from "./fetching";
 import { randomColor } from "@/app/components/colors";
+import { useSearchParams } from "next/navigation";
 
-const query = new URLSearchParams(window.location.search);
-const id = query.get('id') || ''; // Get the 'id' from the query string and ensure it's a string
+// const query = new URLSearchParams(window.location.search);
+// const id = query.get('id') || ''; // Get the 'id' from the query string and ensure it's a string
 
 const GroupPage = () => {
+    const id = useSearchParams().get("id") ?? "";
     const handleTabClick = (tabName: string) => {
         switch (tabName) {
             case 'Leave':
@@ -549,7 +551,7 @@ const GroupPage = () => {
                                 }}
                             >
                                 {profileData.Posts && profileData.Posts.map((post, index) => (
-                                    <Post key={"post"+index} post={post} />
+                                    <Post key={"post" + index} post={post} />
                                 ))}
                             </div>
                         </div>
