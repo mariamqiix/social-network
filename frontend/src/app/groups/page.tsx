@@ -59,7 +59,7 @@ export default function Page() {
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:8080/group/createGroup', {
+                const response = await fetch('http://localhost:8080/group/createGroup', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -127,7 +127,7 @@ export default function Page() {
 
     useEffect(() => {
         const getData = async () => {
-            const data = await fetchGroupData('http://127.0.0.1:8080/group/list/all');
+            const data = await fetchGroupData('http://localhost:8080/group/list/all');
             console.log(data);
 
             setGroupData(data);
@@ -159,7 +159,7 @@ export default function Page() {
         options: Array<any>
     ) => {
         try {
-            const response = await fetch('http://127.0.0.1:8080/group/event/userResponse', {
+            const response = await fetch('http://localhost:8080/group/event/userResponse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -211,12 +211,12 @@ export default function Page() {
             <div className="tabs">
 
                 <div className="tab-group-left">
-                    <button className="tab-button" autoFocus onClick={() => reloadGroups('http://127.0.0.1:8080/group/list/all')} ref={buttonRef}>All</button>
+                    <button className="tab-button" autoFocus onClick={() => reloadGroups('http://localhost:8080/group/list/all')} ref={buttonRef}>All</button>
                     {groupData.User && (
                         <>
-                            <button className="tab-button" onClick={() => reloadGroups('http://127.0.0.1:8080/group/list/joind')}>Joined</button>
-                            <button className="tab-button" onClick={() => reloadGroups('http://127.0.0.1:8080/group/list/created')}>Created</button>
-                            <button className="tab-button" onClick={() => reloadGroups('http://127.0.0.1:8080/group/list/requested')}>Requested To Join</button>
+                            <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/joind')}>Joined</button>
+                            <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/created')}>Created</button>
+                            <button className="tab-button" onClick={() => reloadGroups('http://localhost:8080/group/list/requested')}>Requested To Join</button>
                         </>
                     )}
 
@@ -520,7 +520,7 @@ export async function fetchGroupData(url: string): Promise<GroupsHomePageView> {
 }
 
 export async function fetchEventData(): Promise<GroupEventResponse[]> {
-    const url = 'http://127.0.0.1:8080/group/event/list/user';
+    const url = 'http://localhost:8080/group/event/list/user';
 
     try {
         const response = await fetch(url, {

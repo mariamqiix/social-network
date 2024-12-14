@@ -28,7 +28,7 @@ export default function Page() {
   const [comments, setComments] = useState<null | Comment[]>(null);
   const [post, setPost] = useState<null | Post>(null)
   useEffect(() => {
-    fetch("http://127.0.0.1:8080/postPage?id=" + id, { credentials: 'include' }).then((res) => {
+    fetch("http://localhost:8080/postPage?id=" + id, { credentials: 'include' }).then((res) => {
       res.json().then((data) => {
         console.log(data);
         let newPost: Post = { id: data.Posts.id, author: { id: data.Posts.author.id, name: data.Posts.author.username, avatar: "data:image/jpeg;base64," + data.Posts.author.image_url }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : ["data:image/jpeg;base64," + data.Posts.image_url], likes: data.Posts.likes.count };
@@ -40,7 +40,7 @@ export default function Page() {
     });
   }, [fetch]);
   function likePost() {
-    fetch("http://127.0.0.1:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: Number.parseInt(id), reaction: "Like" }) }).then((res) => {
+    fetch("http://localhost:8080/post/addReaction", { method: "POST", credentials: 'include', body: JSON.stringify({ post_id: Number.parseInt(id), reaction: "Like" }) }).then((res) => {
       // console.log(res.status);
       if (res.status == 204) {
         // console.log("remove");
@@ -57,7 +57,7 @@ export default function Page() {
     });
   }
   function addComment(text: string, image: string | null) {
-    fetch("http://127.0.0.1:8080/post/addComment/user", { method: "POST", credentials: 'include', body: JSON.stringify({ parent_id: Number.parseInt(id), description: text, image: image ? image.substring(image.indexOf(",") + 1) : null }) }).then((res) => {
+    fetch("http://localhost:8080/post/addComment/user", { method: "POST", credentials: 'include', body: JSON.stringify({ parent_id: Number.parseInt(id), description: text, image: image ? image.substring(image.indexOf(",") + 1) : null }) }).then((res) => {
       // console.log(res.status);
       if (res.status == 201 || res.ok) {
         console.log("Comment added");

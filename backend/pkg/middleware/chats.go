@@ -14,7 +14,7 @@ func UserChatHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -51,7 +51,7 @@ func UserAbleToChatHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = user.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}

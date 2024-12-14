@@ -13,7 +13,7 @@ export default function loginPage() {
 
     function login(formData: FormData) {
         console.log(formData);
-        fetch("http://127.0.0.1:8080/login",
+        fetch("http://localhost:8080/login",
             { method: "POST", credentials: 'include', body: formData }).then(res => {
                 if (res.ok) {
                     location.replace("/");
@@ -85,7 +85,7 @@ export default function loginPage() {
             };
 
             try {
-                const response = await fetch("http://127.0.0.1:8080/signup", {
+                const response = await fetch("http://localhost:8080/signup", {
                     method: "POST",
                     credentials: "include",
                     headers: {

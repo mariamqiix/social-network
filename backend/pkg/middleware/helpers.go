@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -12,6 +10,9 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 var emailRegex = regexp.MustCompile(`^[\w]+@[\w]+\.[a-zA-Z]{2,}$`)

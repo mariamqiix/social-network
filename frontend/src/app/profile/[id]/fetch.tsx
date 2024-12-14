@@ -1,7 +1,7 @@
 import { ProfilePageView } from '../../types/Types';
 
 export async function fetchProfileData(id: number): Promise<ProfilePageView> {
-    const url = `http://127.0.0.1:8080/user/profile/`; // Append the id to the URL
+    const url = `http://localhost:8080/user/profile/`; // Append the id to the URL
 
     try {
         const response = await fetch(url, {

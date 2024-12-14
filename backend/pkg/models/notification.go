@@ -72,3 +72,12 @@ func DeleteUserNotifications(userId int) error {
 func DeleteNotification(notificationId int) error {
 	return Delete("UserNotification", []string{"id"}, []interface{}{notificationId})
 }
+
+func DeleteNotificationByFollowRequest(notificationId,user_id int, notificationType string) error {
+	return Delete("UserNotification", []string{"sender_id","user_id","notification_type"}, []interface{}{notificationId,user_id,notificationType})
+}
+
+
+func DeleteNotificationByGroupRequest(notificationId,group_id int, notificationType string) error {
+	return Delete("UserNotification", []string{"sender_id","group_id","notification_type"}, []interface{}{notificationId,group_id,notificationType})
+}

@@ -1,13 +1,14 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gofrs/uuid"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func CreateSessionAndSetCookie(token string, w http.ResponseWriter, user *structs.User) error {

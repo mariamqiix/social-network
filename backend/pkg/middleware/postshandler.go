@@ -1,14 +1,15 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func PostHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +44,7 @@ func PostPageHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -81,7 +82,7 @@ func GroupPostsHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -113,7 +114,7 @@ func AddReactionHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -165,7 +166,7 @@ func RemoveReactionHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -195,7 +196,7 @@ func AddCommentHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -294,7 +295,7 @@ func CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}

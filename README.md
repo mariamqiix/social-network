@@ -43,13 +43,13 @@ This is typically divided into three major parts:
 
 - **Server**: this is the computer that receives requests. It acts as the entry point for all incoming requests. While there are specialized machines designed for this purpose, you can use your own computer as a server.
 
-- **App**: is the application running on the server that listens for requests, retrieves information from the database and sends responses. This is where the core logic of your social network resides. It contains the logic for handling various requests based on HTTP or other protocols. Some of these functions are known as middleware, which execute between receiving a request and sending a response.
+- **App**: is the application running on the server that listens for requests, retrieves information from the database and sends responses. This is where the core logic of your social network resides. It contains the logic for handling various requests based on HTTP or other protocols. Some of these functions are known as app, which execute between receiving a request and sending a response.
 
 - **Database**: As you may already know, the database is used to organize and store data. Many requests sent to the server involve database queries. Clients may request information stored in the database or submit data to be added to it.
 
 #### App
 
-The backend may consist, like said above, of an **app** containing all the backend logic. This logic will therefore have several middleware, for example:
+The backend may consist, like said above, of an **app** containing all the backend logic. This logic will therefore have several app, for example:
 
 - Authentication, since HTTP is a stateless protocol, we can use several ways to overcome and authenticate a client/user. You must use [sessions](https://allaboutcookies.org/cookies/session-cookies-used-for.html) and cookies.
 - Images handling, supporting various types of extensions. In this project you have to handle at least JPEG, PNG and GIF types. You will have to store the images, it can be done by storing the file/path in the database and saving the image in a specific file system.
