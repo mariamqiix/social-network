@@ -101,7 +101,7 @@ export type BasicUserResponse = {
 
 // Define GroupPageView type
 export type GroupPageView = {
-    user: User | null; // null if not logged in
+    User: User | null; // null if not logged in
     Posts: PostResponse[];
     Group: GroupResponse;
     Members: BasicUserResponse[];

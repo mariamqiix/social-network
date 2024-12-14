@@ -8,10 +8,10 @@ import (
 	"backend/pkg/structs"
 )
 
-var userLimiter *UserRateLimiter
+var UserLimiter *UserRateLimiter
 
 func GoLive() {
-	userLimiter = NewUserRateLimiter()
+	UserLimiter = NewUserRateLimiter()
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", HomePageHandler)
@@ -19,7 +19,7 @@ func GoLive() {
 	mux.HandleFunc("/login", LoginHandler)       //  DONE >>>>>	login function || checked
 	mux.HandleFunc("/logout", LogoutHandler)
 	mux.HandleFunc("/signup", SignupHandler)
-	mux.HandleFunc("/socket", websocketHandler)
+	mux.HandleFunc("/socket", WebsocketHandler)
 
 	// ///// the /post api's
 	mux.HandleFunc("/post/", PostHandler)
@@ -54,10 +54,10 @@ func GoLive() {
 	mux.HandleFunc("/user/usersAbleToChat", UserAbleToChatHandler) //// to return the users that can be talked with
 	// mux.HandleFunc("/user/getUpdateUserInformation", UpdateUserInformationHandler)        // to return the user information that will be showen in the front
 	// mux.HandleFunc("/user/postUpdateUserInformation", UpdateUserInformationHandler)       // to update the user information
-	corsWrappedMux := Cors(mux)
+	corsWrAppedMux := Cors(mux)
 
-	fmt.Println("Server is running on http://127.0.0.1:8080")
-	http.ListenAndServe(":8080", corsWrappedMux)
+	fmt.Println("Server is running on http://localhost:8080")
+	http.ListenAndServe(":8080", corsWrAppedMux)
 }
 
 func HomePageHandler(w http.ResponseWriter, r *http.Request) {

@@ -3,7 +3,7 @@ import { GroupPageView, GroupEventResponse } from '../../types/Types';
 export async function fetchGroupData(): Promise<GroupPageView> {
     const query = new URLSearchParams(window.location.search);
     const id = query.get('id'); // Get the 'id' from the query string
-    const url = `http://127.0.0.1:8080/group/page?id=${id}`; // Append the id to the URL
+    const url = `http://localhost:8080/group/page?id=${id}`; // Append the id to the URL
 
     try {
         const response = await fetch(url, {
@@ -21,7 +21,7 @@ export async function fetchGroupData(): Promise<GroupPageView> {
         console.error('Error fetching data:', error);
         // If there is an error fetching data, return a default GroupPageView object
         return {
-            user: null,
+            User: null,
             Posts: [],
             Group: {
                 id: 0,
@@ -54,7 +54,7 @@ import { User } from '../../types/Types';
 export async function fetchMembers(): Promise<User[]> {
     const query = new URLSearchParams(window.location.search);
     const id = query.get('id'); // Get the 'id' from the query string
-    const url = `http://127.0.0.1:8080/group/UsersToInvite?id=${id}`; // Append the id to the URL
+    const url = `http://localhost:8080/group/UsersToInvite?id=${id}`; // Append the id to the URL
 
     try {
         const response = await fetch(url, {
@@ -80,7 +80,7 @@ export async function fetchMembers(): Promise<User[]> {
 export async function fetchEventData(): Promise<GroupEventResponse[]> {
     const query = new URLSearchParams(window.location.search);
     const id = query.get('id'); // Get the 'id' from the query string
-    const url = `http://127.0.0.1:8080/group/event/list/group?id=${id}`;
+    const url = `http://localhost:8080/group/event/list/group?id=${id}`;
 
     try {
         const response = await fetch(url, {
@@ -120,7 +120,7 @@ export function sendInvite(memberId: number) {
         user_id: memberId,
     };
 
-    const url = `http://127.0.0.1:8080/group/inviteUser`;
+    const url = `http://localhost:8080/group/inviteUser`;
 
     fetch(url, {
         method: 'POST',
@@ -151,7 +151,7 @@ export async function LeaveGroup() {
         return;
     }
 
-    const url = `http://127.0.0.1:8080/group/leaveGroup?id=${id}`;
+    const url = `http://localhost:8080/group/leaveGroup?id=${id}`;
 
     try {
         const response = await fetch(url, {
@@ -182,7 +182,7 @@ export async function RequestToJoin() {
         return;
     }
 
-    const url = `http://127.0.0.1:8080/group/requestToJoin?id=${id}`;
+    const url = `http://localhost:8080/group/requestToJoin?id=${id}`;
 
     try {
         const response = await fetch(url, {

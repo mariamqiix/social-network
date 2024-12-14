@@ -136,7 +136,7 @@ export default store;
 
 let interval: NodeJS.Timeout | null = null;
 function connectWebsocket() {
-    const newSocket = new WebSocket('ws://127.0.0.1:8080/socket');
+    const newSocket = new WebSocket('ws://localhost:8080/socket');
     if (interval) {
         clearInterval(interval);
         interval = null;

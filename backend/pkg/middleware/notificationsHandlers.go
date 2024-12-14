@@ -3,7 +3,6 @@ package middleware
 import (
 	"encoding/json"
 	"fmt"
-
 	// "fmt"
 	"net/http"
 	"strings"
@@ -80,6 +79,8 @@ func UserResponds(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusInternalServerError)
 			return
 		}
+
+		models.DeleteNotificationByGroupRequest(user.ID,groupInviteResponse.GroupID,"GroupInvite")
 		if groupInviteResponse.Response == "Accept" {
 			err := models.AddMember(groupInviteResponse.GroupID, user.ID)
 			if err != nil {
@@ -134,6 +135,7 @@ func UserResponds(w http.ResponseWriter, r *http.Request) {
 		}
 
 		models.RemoveRequest(GroupRequestResponse.GroupID, GroupRequestResponse.UserID)
+		models.DeleteNotificationByGroupRequest(user.ID,GroupRequestResponse.GroupID,"GroupRequestToJoin")
 
 		notification := structs.Notification{
 			UserID:           GroupRequestResponse.UserID,
@@ -271,6 +273,10 @@ func UserResponds(w http.ResponseWriter, r *http.Request) {
 			errorServer(w, http.StatusInternalServerError)
 			return
 		}
+
+		models.DeleteNotificationByFollowRequest(user.ID,userToFollow.ID,"followRequest")
+
+
 
 		models.DeleteFollower(structs.Follower{
 			FollowingID: userToFollow.ID,

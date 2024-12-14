@@ -63,7 +63,7 @@ const GroupPage = () => {
 
 
     const [profileData, setProfileData] = useState<GroupPageView>({
-        user: null,
+        User: null,
         Posts: [],
         Group: {
             id: 0,
@@ -142,7 +142,7 @@ const GroupPage = () => {
             };
             try {
                 console.log(postData)
-                const response = await fetch('http://127.0.0.1:8080/post/createPost/group', {
+                const response = await fetch('http://localhost:8080/post/createPost/group', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ const GroupPage = () => {
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:8080/group/event/create', {
+                const response = await fetch('http://localhost:8080/group/event/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -324,9 +324,9 @@ const GroupPage = () => {
         getData();
     }, []);
 
-    const filteredMembers = membersToInvite.filter(member =>
+    const filteredMembers = membersToInvite?.filter(member =>
         typeof member.username === 'string' && member.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    ) || [];;
 
     const [activeTab, setActiveTab] = useState('Posts');
 
@@ -345,7 +345,7 @@ const GroupPage = () => {
         options: Array<any>
     ) => {
         try {
-            const response = await fetch('http://127.0.0.1:8080/group/event/userResponse', {
+            const response = await fetch('http://localhost:8080/group/event/userResponse', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -447,9 +447,13 @@ const GroupPage = () => {
                     >
                         Members
                     </li>
-                    <li onClick={() => handleTabClick(isMember ? 'Leave' : 'Join')}>
-                        {isMember ? 'Leave' : 'Join'}
-                    </li>
+                    {profileData.User && (profileData.Group?.creator?.id !== profileData.User?.id) && (
+                        <li onClick={() => handleTabClick(isMember ? 'Leave' : 'Join')}>
+                            {isMember ? 'Leave' : 'Join'}
+                        </li>
+                    )}
+
+
                 </ul>
             </div>
 
@@ -549,7 +553,7 @@ const GroupPage = () => {
                                 }}
                             >
                                 {profileData.Posts && profileData.Posts.map((post, index) => (
-                                    <Post key={"post"+index} post={post} />
+                                    <Post key={"post" + index} post={post} />
                                 ))}
                             </div>
                         </div>

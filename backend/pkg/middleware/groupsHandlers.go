@@ -68,7 +68,7 @@ func UsersToInviteHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -101,7 +101,7 @@ func GroupsHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -171,7 +171,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -293,6 +293,17 @@ func LeaveGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	Group, err := models.GetGroupByID(groupID)
+	if err != nil {
+		errorServer(w, http.StatusInternalServerError)
+		return
+	}
+
+	if Group.CreatorID == sessionUser.ID {
+		errorServer(w, http.StatusBadRequest)
+		return
+	}
+
 	err = models.RemoveMember(groupID, sessionUser.ID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
@@ -308,7 +319,7 @@ func GroupPageHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil {
 		limiterUsername = sessionUser.Username
 	}
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -426,7 +437,7 @@ func ListEventHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 	}
 
@@ -505,7 +516,7 @@ func CreateEventHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -591,7 +602,7 @@ func CreateEventResponseHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}

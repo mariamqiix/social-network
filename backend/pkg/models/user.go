@@ -332,6 +332,9 @@ func CheckIfUserFollows(userID, followUserID int) (bool, error) {
 	return false, nil
 }
 
+
+
+
 func GetFollows(userID int, followType string) ([]structs.Follower, error) {
 	// Execute a read query to fetch the followers for the given user ID
 	rows, err := Read("Follower", []string{"*"}, []string{followType}, []interface{}{userID})

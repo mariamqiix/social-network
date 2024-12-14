@@ -1,14 +1,17 @@
 package middleware
 
 import (
-	"backend/pkg/models"
-	"backend/pkg/structs"
+	"fmt"
 	"net/http"
 	"time"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	sessionUser := GetUser(r)
+	fmt.Print("hello")
 	if sessionUser != nil {
 		writeToJson(sessionUser, w)
 		return

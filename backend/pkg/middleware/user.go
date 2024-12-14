@@ -20,7 +20,7 @@ func PrivacyChangeHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -59,7 +59,7 @@ func PrivacyChangeHandler(w http.ResponseWriter, r *http.Request) {
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	limiterUsername := "[GUESTS]"
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -147,7 +147,7 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}
@@ -231,12 +231,12 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if requestUserId != -1 {
-		for _, user := range followings {
-			if user.FollowingID == requestUserId {
-				canSeeInfo = *user.Status
-				break
-			}
-		}
+		// for _, user := range followings {
+		// 	if user.FollowingID == requestUserId {
+		// 		canSeeInfo = *user.Status
+		// 		break
+		// 	}
+		// }
 
 		for _, user := range followers {
 			if user.FollowerID == requestUserId && canSeeInfo != "Accept" {
@@ -357,7 +357,7 @@ func ListUsersHandler(w http.ResponseWriter, r *http.Request) {
 		limiterUsername = sessionUser.Username
 	}
 
-	if !userLimiter.Allow(limiterUsername) {
+	if !UserLimiter.Allow(limiterUsername) {
 		errorServer(w, http.StatusTooManyRequests)
 		return
 	}

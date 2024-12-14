@@ -12,8 +12,8 @@ CREATE TABLE GroupTable (
 -- GroupMember Table
 CREATE TABLE GroupMember (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    group_id INTEGER REFERENCES GroupTable(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE
+    group_id INTEGER REFERENCES GroupTable(id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL
 );
 
 -- GroupRequest Table
@@ -23,5 +23,6 @@ CREATE TABLE GroupRequest (
     user_id INTEGER REFERENCES User(id) ON UPDATE CASCADE ON DELETE CASCADE,
     request_status VARCHAR(50) DEFAULT 'Pending' CHECK (request_status IN ('Pending', 'Accepted', 'Rejected')),
     request_type VARCHAR(50) CHECK (request_type IN ('Invite', 'Request')),
-    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, group_id) -- Ensures a user can only react once per post
 );

@@ -69,7 +69,7 @@ export default function Nav() {
         }
     ];
     useEffect(() => {
-        fetch("http://127.0.0.1:8080/login",
+        fetch("http://localhost:8080/login",
             { method: "POST", credentials: 'include' }).then(res => {
                 if (res.ok) {
                     res.json().then(data => {
@@ -83,7 +83,7 @@ export default function Nav() {
 
     function logoutButton() {
         if (user != null) {
-            fetch("http://127.0.0.1:8080/logout",
+            fetch("http://localhost:8080/logout",
                 { method: "POST", credentials: 'include' }).then(res => {
                     console.log(res.status);
                     res.text().then(data => {

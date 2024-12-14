@@ -2,9 +2,6 @@ package middleware
 
 import (
 	// "RealTimeForum/models"
-
-	"backend/pkg/models"
-	"backend/pkg/structs"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -12,10 +9,13 @@ import (
 	"net/http"
 	"strconv"
 	"time"
-
 	// "strconv"
 	// "strings"
+
 	"github.com/gorilla/websocket"
+
+	"backend/pkg/models"
+	"backend/pkg/structs"
 )
 
 type Connection struct {
@@ -33,7 +33,7 @@ var upgrader = websocket.Upgrader{
 var connections []Connection
 var emptyString = ""
 
-func websocketHandler(w http.ResponseWriter, r *http.Request) {
+func WebsocketHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -66,7 +66,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 		// fmt.Println(MessageRequest)
 		SenderId, err := models.GetUserByUsername(MessageRequest.SenderUsername)
 		// fmt.Println(SenderId)
-		if err != nil {
+		if err != nil || SenderId == nil {
 			log.Println("Error getting user by username:", err)
 			continue
 		}
@@ -88,6 +88,7 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 				}
 				id, err := models.UploadImage(imageBytes)
 				if err != nil {
+					fmt.Print("hello")
 					fmt.Println(err)
 				}
 				imageId = id
@@ -110,14 +111,17 @@ func websocketHandler(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			for _, member := range groupMembers {
-				reciver := ReturnBasicUser(member.UserID)
-				if MessageRequest.Image == nil {
-					MessageRequest.Image = &emptyString
-				}
-				err := SendMessageToGroupOrUser(SenderId.ID, MessageRequest.GroupID, MessageRequest.Message, reciver.Username, "GroupMessage", (MessageRequest.Image), imageId)
-				if err != nil {
-					fmt.Print(err)
-					continue
+				fmt.Println(member.UserID)
+				if member.UserID != 0 {
+					reciver := ReturnBasicUser(member.UserID)
+					if MessageRequest.Image == nil {
+						MessageRequest.Image = &emptyString
+					}
+					err := SendMessageToGroupOrUser(SenderId.ID, MessageRequest.GroupID, MessageRequest.Message, reciver.Username, "GroupMessage", (MessageRequest.Image), imageId)
+					if err != nil {
+						fmt.Print(err)
+						continue
+					}
 				}
 			}
 
@@ -150,6 +154,7 @@ func SendMessageToGroupOrUser(SenderId, GroupID int, Message, ReceiverUsername, 
 		}
 		receiverConnections, ok := GetConnectionByID(ReceiverId.ID)
 		if !ok {
+			fmt.Println("gkjdnlfms;ld")
 			return fmt.Errorf("no connection found for the user with id: %d\n", ReceiverId.ID)
 		}
 		newMessageStruct := structs.WebsocketResponse{
