@@ -102,7 +102,7 @@ export default function page() {
             if (res.ok) {
                 res.json().then((data) => {
                     // console.log(data);
-                    data.forEach((element: any) => {
+                    data && data.forEach((element: any) => {
                         // console.log(element);
                         dispatch(addChat({ id: element.id, name: element.username, avatar: "data:image/jpeg;base64," + element.image_url, type: "user" }));
                     });
@@ -113,7 +113,7 @@ export default function page() {
             if (res.ok) {
                 res.json().then((data) => {
                     console.log(data);
-                    data.Groups.forEach((group: any) => {
+                    data.Groups && data.Groups.forEach((group: any) => {
                         // console.log(group);
                         dispatch(addChat({ id: group.id, name: group.title, avatar: "data:image/jpeg;base64," + group.image_url, type: "group" }));
                     });
@@ -138,31 +138,73 @@ export default function page() {
                 </div>
                 <div className="border-start ms-2 d-flex flex-column w-100 justify-content-stretch">
                     {renderChatWindow()}
-                    <form className="input-group w-full ps-2 position-sticky bottom-0" onSubmit={(e) => {
-                        e.preventDefault();
-                        let formData = new FormData(e.target as HTMLFormElement);
-                        if (selectedChat != null && formData.get("message")) {
-                            let message: string = formData.get("message")?.toString() ?? "";
-                            let receiverUsername = selectedChat.name;
-                            socket.send(JSON.stringify({ message: message, type: selectedChat.type == "group" ? "GroupMessage" : "User message", sender_username: user?.username, receiver_id: receiverUsername, group_id: selectedChat?.id, image: imageData != "" ? imageData.substring(imageData.indexOf(",") + 1) : null }));
-                            if (selectedChat.type == "user") {
-                                dispatch(addMessage({ id: 0, content: message, created_at: (new Date()).toISOString(), image_url: imageData, sender: { name: user?.username ?? "", avatar: user?.image_url ?? "" }, type: selectedChat.type, group_name: null }));
+                    <form
+                        className="input-group w-full ps-2 position-sticky bottom-0"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            let formData = new FormData(e.target as HTMLFormElement);
+                            // Check if there is either a message or an image to send
+                            if ((selectedChat != null && formData.get("message")) || imageData) {
+                                let message: string = formData.get("message")?.toString() ?? "";
+                                let receiverUsername = selectedChat.name;
+                                // Prepare the message data to send
+                                socket.send(
+                                    JSON.stringify({
+                                        message: message,
+                                        type: selectedChat.type == "group" ? "GroupMessage" : "User message",
+                                        sender_username: user?.username,
+                                        receiver_id: receiverUsername,
+                                        group_id: selectedChat?.id,
+                                        image: imageData != "" ? imageData.substring(imageData.indexOf(",") + 1) : null,
+                                    })
+                                );
+                                // If it's a user message, dispatch to the store
+                                if (selectedChat.type == "user") {
+                                    dispatch(
+                                        addMessage({
+                                            id: 0,
+                                            content: message,
+                                            created_at: new Date().toISOString(),
+                                            image_url: imageData,
+                                            sender: { name: user?.username ?? "", avatar: user?.image_url ?? "" },
+                                            type: selectedChat.type,
+                                            group_name: null,
+                                        })
+                                    );
+                                }
+                                setImageData(""); // Reset image data after sending
+                                e.target.reset(); // Reset the form fields
                             }
-                            setImageData("");
-                            e.target.reset();
-                        }
-                    }}>
+                        }}
+                    >
                         <input type="text" name="message" className="form-control" />
-                        <input type="file" className="d-none" id="inputFile" aria-describedby="inputGroupFileAddon03" aria-label="Upload" onChange={() => {
-                            loadImage();
-                        }} />
+                        <input
+                            type="file"
+                            className="d-none"
+                            id="inputFile"
+                            aria-describedby="inputGroupFileAddon03"
+                            aria-label="Upload"
+                            onChange={() => {
+                                loadImage(); // Function that loads image data
+                            }}
+                        />
                         <button className="btn btn-outline-secondary" type="button">
-                            <img src={imageData} height={30} width={40} alt="Image" onClick={() => {
-                                selectImage();
-                            }} />
+                            {/* Display the image thumbnail if an image is selected */}
+                            <img
+                                src={imageData}
+                                height={30}
+                                width={40}
+                                alt="Image"
+                                onClick={() => {
+                                    selectImage(); // Function to select an image
+                                }}
+                            />
                         </button>
-                        <button type="submit" className="btn btn-outline-secondary text-bg-primary">Send</button>
+                        <button type="submit" className="btn btn-outline-secondary text-bg-primary">
+                            Send
+                        </button>
                     </form>
+
                 </div>
             </div>)
             : <p>No chats available</p>}

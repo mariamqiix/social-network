@@ -5,11 +5,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faImage } from '@fortawesome/free-solid-svg-icons/faImage';
 import { useState } from 'react';
 
-
 const CommentList = ({ comments, addComment }: { comments: any[], addComment: Function }) => {
   let [imageData, setImageData] = useState<string | null>(null);
+
   function loadImage() {
-    let imageInput = document.getElementById("commentImage");
+    let imageInput = document.getElementById("commentImage") as HTMLInputElement;
     if (imageInput && imageInput.files) {
       let reader = new FileReader();
       reader.onload = function (e) {
@@ -18,6 +18,7 @@ const CommentList = ({ comments, addComment }: { comments: any[], addComment: Fu
       reader.readAsDataURL(imageInput.files[0]);
     }
   }
+
   return (
     <div className="mt-4">
       <h5 className="mb-4">Comments</h5>
@@ -26,6 +27,7 @@ const CommentList = ({ comments, addComment }: { comments: any[], addComment: Fu
         let data = new FormData(e.target as HTMLFormElement);
         addComment(data.get("content"), imageData);
         (e.target as HTMLFormElement).reset();
+        setImageData(null); // Clear the image data after submitting
       }}>
         <textarea
           className="form-control w-100"
@@ -42,7 +44,9 @@ const CommentList = ({ comments, addComment }: { comments: any[], addComment: Fu
             }}>
               <FontAwesomeIcon icon={faImage} className="me-2" />
               Image
-              <img src={imageData ?? ""} height={20} className="mx-2"></img>
+              {imageData && (
+                <img src={imageData} height={20} className="mx-2" alt="Selected preview" />
+              )}
             </button>
             {imageData != null && (
               <button className='btn btn-link ' onClick={() => {
@@ -79,5 +83,3 @@ const CommentList = ({ comments, addComment }: { comments: any[], addComment: Fu
 };
 
 export default CommentList;
-
-

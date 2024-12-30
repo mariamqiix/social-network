@@ -168,7 +168,10 @@ const GroupPage = () => {
         }
     };
 
-
+    function isDateInThePast(date: Date): boolean {
+        const currentDate = new Date();
+        return date < currentDate;
+    }
 
     const formatDateTime = (dateTimeStr: string): string => {
         const date = new Date(dateTimeStr);
@@ -182,6 +185,11 @@ const GroupPage = () => {
         console.log(eventOptions.length >= 2)
         if (eventTitle && eventDescription && eventDateTime && eventOptions.length >= 2) {
 
+
+            if (isDateInThePast(new Date(eventDateTime))) {
+                alert("Please select a future date and time.");
+                return;
+            }
 
             const eventData = {
                 title: eventTitle,
@@ -218,7 +226,11 @@ const GroupPage = () => {
                 console.error("Error creating event:", error);
             }
         } else {
-            alert("Please fill in all fields.");
+            if (eventOptions.length < 2){
+                alert("Please add at least 2 options.");
+            } else {
+                alert("Please fill in all fields.");
+            }
         }
     };
 
@@ -295,6 +307,7 @@ const GroupPage = () => {
             } else {
                 setIsMember(false)
             }
+            console.log(data.Posts)
             setProfileData(data);
         };
 
