@@ -193,9 +193,7 @@ export async function RequestToJoin() {
 
         if (!response.ok) {
             throw new Error(`Error: status code ${response.status}`);
-        }
-
-        console.log('Successfully request the group');
+        }        
     } catch (error) {
         console.error('Error requesting the group:', error);
     }

@@ -125,7 +125,7 @@ export default function page() {
         <Metadata seoTitle="Friendz | Chat" seoDescription="The next gen social network chat feature" />
         {chats.length > 0 ?
             (<div className="d-flex flex-row" style={{ height: "94vh" }}>
-                <div>
+                <div className="w-25 pt-30">
                     <h3>Groups</h3><br />
                     <div className="list-group">
                         {renderChatList(chats.filter(chat => chat.type == "group"))}
