@@ -16,7 +16,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		writeToJson(sessionUser, w)
 		return
 	}
-	if r.ContentLength > 1024 {
+	if r.ContentLength > 1024*1024*7 {
 		http.Error(w, "Request too large", http.StatusRequestEntityTooLarge)
 		return
 	}
