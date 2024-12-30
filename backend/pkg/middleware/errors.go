@@ -22,6 +22,8 @@ func errorServer(w http.ResponseWriter, code int) {
 		view.Message = "Resource Not Found"
 	case http.StatusInternalServerError:
 		view.Message = "Internal Server Error"
+	case http.StatusUnauthorized:
+		view.Message = "Unauthorized"	
 	default:
 		// as a fallback get a default text for the status code
 		log.Printf("errorServer: %d is not implemented\n", code)
