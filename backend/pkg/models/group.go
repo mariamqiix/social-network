@@ -143,7 +143,7 @@ func GetGroupRequests(groupID int) ([]structs.GroupRequest, error) {
 }
 func GetGroupMembers(groupID int) ([]structs.GroupMember, error) {
 	// Execute a read query to fetch the group members
-	rows, err := Read("GroupMember", []string{"*"}, []string{"group_id"}, []interface{}{groupID})
+	rows, err := Read("GroupMember", []string{"*"}, []string{"user_id != 0 AND group_id"}, []interface{}{groupID})
 	if err != nil {
 		return nil, err
 	}
