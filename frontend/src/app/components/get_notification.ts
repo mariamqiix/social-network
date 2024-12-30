@@ -50,7 +50,7 @@ export async function getNotification(): Promise<Notifi[]> {
             });
         } else {
             res.text().then(text => {
-                console.error(text);
+                if (text!="Unauthorized"){console.error(text);}
             })
         }
     });

@@ -136,7 +136,7 @@ const GroupPage = () => {
     };
 
     const handlePostCreation = async () => {
-        if (description || postImage) {
+        if (description) {
             const postData = {
                 group_id: parseInt(id, 10), // Convert id to an integer
                 description: description,

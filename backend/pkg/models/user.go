@@ -189,12 +189,17 @@ func UpdateUser(u structs.User) error {
 
 func CreateUserSession(s structs.Session) error {
 	// Create a new record in the Session table
+	DeleteUserSessionByUserId(*s.UserID)
 	columns := []string{"token", "user_id"}
 	values := []interface{}{s.Token, s.UserID}
 	return Create("UserSession", columns, values)
 }
 
 func DeleteUserSession(userId int) error {
+	// Execute a delete query to delete the session
+	return Delete("UserSession", []string{"user_id"}, []interface{}{userId})
+}
+func DeleteUserSessionByUserId(userId int) error {
 	// Execute a delete query to delete the session
 	return Delete("UserSession", []string{"id"}, []interface{}{userId})
 }

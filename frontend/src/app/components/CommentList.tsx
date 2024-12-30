@@ -27,7 +27,13 @@ const CommentList = ({ comments, addComment }: { comments: any[], addComment: Fu
         addComment(data.get("content"), imageData);
         (e.target as HTMLFormElement).reset();
       }}>
-        <textarea className="w-10rea0 form-control" name="content"></textarea>
+        <textarea
+          className="form-control w-100"
+          name="content"
+          required
+          minLength={5}  // Minimum number of characters
+          maxLength={500} // Maximum number of characters
+        />
         <input id="commentImage" type='file' className="d-none" accept="image/*" onChange={loadImage} />
         <div className='mt-2 d-flex justify-content-between'>
           <div>

@@ -395,38 +395,41 @@ func InviteUserHandler(w http.ResponseWriter, r *http.Request) {
 		errorServer(w, http.StatusBadRequest)
 		return
 	}
-	err = models.AddInviteToGroup(Invite.GroupID, Invite.UserID)
-	if err != nil {
-		errorServer(w, http.StatusInternalServerError)
-		return
+	exist,err := models.CheckExistance("GroupRequest", []string{"group_id", "user_id", "request_status", "request_type"},[]interface{}{Invite.GroupID, Invite.UserID, "Pending", "Request"})
+	if !exist {
+		err = models.AddInviteToGroup(Invite.GroupID, Invite.UserID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusCreated)
+
+		notification := structs.Notification{
+			UserID:           Invite.UserID,
+			NotificationType: "GroupInvite",
+			SenderID:         &sessionUser.ID,
+			GroupID:          &Invite.GroupID,
+			IsRead:           false,
+		}
+
+		models.CreateGroupsNotification(notification)
+
+		group, err := models.GetGroupByID(Invite.GroupID)
+		if err != nil {
+			errorServer(w, http.StatusInternalServerError)
+			return
+		}
+
+		SendNotification(Invite.UserID, structs.NotificatoinResponse{
+			Id:           notification.ID,
+			Type:         notification.NotificationType,
+			GroupID:      Invite.GroupID,
+			IsRead:       notification.IsRead,
+			CreationDate: notification.CreationDate,
+			Message:      "You've been invited to join " + group.Title + " group.",
+		})
 	}
-
-	w.WriteHeader(http.StatusCreated)
-
-	notification := structs.Notification{
-		UserID:           Invite.UserID,
-		NotificationType: "GroupInvite",
-		SenderID:         &sessionUser.ID,
-		GroupID:          &Invite.GroupID,
-		IsRead:           false,
-	}
-
-	models.CreateGroupsNotification(notification)
-
-	group, err := models.GetGroupByID(Invite.GroupID)
-	if err != nil {
-		errorServer(w, http.StatusInternalServerError)
-		return
-	}
-
-	SendNotification(Invite.UserID, structs.NotificatoinResponse{
-		Id:           notification.ID,
-		Type:         notification.NotificationType,
-		GroupID:      Invite.GroupID,
-		IsRead:       notification.IsRead,
-		CreationDate: notification.CreationDate,
-		Message:      "You've been invited to join " + group.Title + " group.",
-	})
 }
 
 func ListEventHandler(w http.ResponseWriter, r *http.Request) {
