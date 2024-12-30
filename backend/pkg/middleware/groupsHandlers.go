@@ -233,7 +233,10 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = models.AddUserRequestJoinGroup(groupID, sessionUser.ID)
+	exist,_ := models.CheckExistance("GroupRequest", []string{"group_id", "user_id", "request_status", "request_type"},[]interface{}{groupID, sessionUser.ID, "Pending", "Request"})
+
+
+	if !exist {err = models.AddUserRequestJoinGroup(groupID, sessionUser.ID)
 	if err != nil {
 		errorServer(w, http.StatusInternalServerError)
 		return
@@ -268,7 +271,7 @@ func JoinGroupHandler(w http.ResponseWriter, r *http.Request) {
 		CreationDate: notification.CreationDate,
 		Message:      user.Username + " has has rquested to join your " + group.Title + " group.",
 	})
-
+}
 	w.WriteHeader(http.StatusCreated)
 }
 

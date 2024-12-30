@@ -96,7 +96,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 				log.Printf("error getting group by group id: %s\n", err.Error())
 				continue
 			}
-			user, err = models.GetUserByID(group.CreatorID)
+			user2, err := models.GetUserByID(group.CreatorID)
 			if err != nil {
 				log.Printf("error getting user by user id: %s\n", err.Error())
 				continue
@@ -116,7 +116,7 @@ func mapPosts(sessionUser *structs.User, posts []structs.Post) []structs.PostRes
 				log.Printf("error getting group members by group id: %s\n", err.Error())
 				continue
 			}
-			GroupCreator := ReturnUserResponse(user)
+			GroupCreator := ReturnUserResponse(user2)
 			Group = structs.GroupResponse{
 				Id:           group.ID,
 				Creator:      *GroupCreator,
