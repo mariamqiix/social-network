@@ -183,6 +183,7 @@ export default function page() {
                             className="d-none"
                             id="inputFile"
                             aria-describedby="inputGroupFileAddon03"
+                            accept="image/*"
                             aria-label="Upload"
                             onChange={() => {
                                 loadImage(); // Function that loads image data

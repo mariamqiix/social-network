@@ -30,11 +30,11 @@ export default function Page() {
   useEffect(() => {
     fetch("http://localhost:8080/postPage?id=" + id, { credentials: 'include' }).then((res) => {
       res.json().then((data) => {
-        console.log(data);
+        // console.log(data);
         let newPost: Post = { id: data.Posts.id, author: { id: data.Posts.author.id, name: data.Posts.author.username, avatar: "data:image/jpeg;base64," + data.Posts.author.image_url }, time: data.Posts.created_at, content: data.Posts.content, images: data.Posts.image_url == "" ? [] : ["data:image/jpeg;base64," + data.Posts.image_url], likes: data.Posts.likes.count };
         setPost(newPost);
         if (data.Comments) {
-          setComments(data.Comments.map((comment: any) => ({ author: { name: comment.author.username, avatar: comment.author.image_url }, content: comment.content, time: comment.created_at, likes: comment.likes.count, image: comment.image_url != "" ? "data:image/jpeg;base64," + comment.image_url : "" })));
+          setComments(data.Comments.map((comment: any) => ({ author: { name: comment.author.username, avatar: comment.author.image_url != undefined ? "data:image/jpeg;base64," + comment.author.image_url : "" }, content: comment.content, time: comment.created_at, likes: comment.likes.count, image: comment.image_url != "" ? "data:image/jpeg;base64," + comment.image_url : "" })));
         }
       });
     });
