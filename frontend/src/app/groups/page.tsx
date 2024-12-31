@@ -350,31 +350,51 @@ export default function Page() {
 
                                 {group.options &&
                                     group.options.map((option, index) => (
-                                        <span
+                                        <abbr
                                             key={`event${index}`}
                                             className={`iconEvent event${index} event${group.title}`} // Adjusted className
+                                            title={`${option.option}`} // Tooltip content
                                             onClick={() => {
-                                                const hasResponded = group.options.some(option => option.did_user_respond);
+                                                const hasResponded = group.options.some(
+                                                    (option) => option.did_user_respond
+                                                );
 
-                                                if (!option.did_user_respond && !(clickedStates[group.id]?.clickedIndex === index) && !hasResponded) {
-                                                    handleReact(option.id, group.id, index, group.options);
+                                                if (
+                                                    !option.did_user_respond &&
+                                                    !(
+                                                        clickedStates[group.id]?.clickedIndex ===
+                                                        index
+                                                    ) &&
+                                                    !hasResponded
+                                                ) {
+                                                    handleReact(
+                                                        option.id,
+                                                        group.id,
+                                                        index,
+                                                        group.options
+                                                    );
                                                 }
                                             }}
                                             style={{
                                                 backgroundColor: option.did_user_respond
                                                     ? randomColor() // Set the color for pre-responded options
-                                                    : clickedStates[group.id]?.clickedIndex === index
-                                                        ? clickedStates[group.id]?.colors[index] || 'initial'
-                                                        : 'initial',
+                                                    : clickedStates[group.id]?.clickedIndex ===
+                                                        index
+                                                        ? clickedStates[group.id]?.colors[index] ||
+                                                        "initial"
+                                                        : "initial",
                                                 pointerEvents: option.did_user_respond
-                                                    ? 'none'
-                                                    : clickedStates[group.id]?.clickedIndex === index
-                                                        ? 'none'
-                                                        : 'auto',
+                                                    ? "none"
+                                                    : clickedStates[group.id]?.clickedIndex ===
+                                                        index
+                                                        ? "none"
+                                                        : "auto",
                                             }}
                                         >
-                                            {getIconComponent(option.icon)} {/* Render icon */}
-                                        </span>
+                                            {getIconComponent(option.icon)}{" "}
+                                            {/* Render icon */}
+                                        </abbr>
+
                                     ))}
                             </div>
 
@@ -427,7 +447,7 @@ export default function Page() {
                 }}
             >
                 {groupData.Posts && groupData.Posts.map((post, index) => (
-                    <Post key={"post"+index} post={post} />
+                    <Post key={"post" + index} post={post} />
                 ))}
             </div>
 

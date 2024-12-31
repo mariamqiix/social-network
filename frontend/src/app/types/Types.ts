@@ -128,6 +128,7 @@ export type GroupEventResponse = {
 };
 
 export type EventOptionsResponse = {
+    name: any;
     id: number;
     option: string;
     icon: string;
