@@ -110,7 +110,7 @@ const reducer = (state = initialState, action: any) => {
         case 'notifications/remove':
             return {
                 ...state,
-                notifications: state.notifications.filter(notification => notification.id != action.payload),
+                notifications: [...state.notifications.filter(notification => notification.id != action.payload)],
             };
         case 'notifications/hideToast':
             return {

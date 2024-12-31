@@ -14,6 +14,8 @@ import { faImage } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 import Select from 'react-select'
 import Link from "next/link";
+import SearchBar from "./components/search_bar";
+import NotificationsBox from "./components/Notifications";
 
 export default function Home() {
   const posts = useSelector(selectPosts);
@@ -126,6 +128,9 @@ export default function Home() {
   }
 
   return <div>
+    <div className="d-flex flex-row align-items-center">
+      <SearchBar />
+    </div>
     <Card color={colors[9]} className="m-1">
       {user != null ? <form onSubmit={(e: any) => {
         e.preventDefault();

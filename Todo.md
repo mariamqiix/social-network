@@ -1,5 +1,3 @@
-- adjust search suggestions to not cover all page
-- logged in users can still see login form
 - numbering of notification is not updating after accepting/rejecting
 
 EXTRA?

@@ -34,7 +34,6 @@ export default function SearchBar() {
       });
     });
   }, [fetch]);
-  const pages = ["chat", "groups", "posts"];
   return (
     <div className="w-100 p-2">
       <input
@@ -54,24 +53,12 @@ export default function SearchBar() {
           "position-fixed z-1 p-3 w-100 text-bg-light"
         }
       >
-        {pages
-          .filter((item) => item.includes(searchTerms))
-          .map((item, index) => (
-            <p key={index}>
-              <Link
-                className="btn btn-link"
-                href={"/" + (item == "posts" ? "" : item)}
-              >
-                {item}
-              </Link>
-            </p>
-          ))}
         {posts
           .filter((item) => item.content.includes(searchTerms))
           .map((item, index) => (
             <p key={index}>
               <Link className="btn btn-link" href={"/posts/" + item.id}>
-                {item.content}
+                post: {item.content}
               </Link>
             </p>
           ))}
@@ -80,7 +67,7 @@ export default function SearchBar() {
           .map((u) => (
             <p key={u.id + "-user"}>
               <Link className="btn btn-link" href={"/profile/" + u.id}>
-                {u.username}
+                user: {u.username}
               </Link>
             </p>
           ))}

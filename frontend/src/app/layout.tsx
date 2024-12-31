@@ -26,8 +26,8 @@ export default function RootLayout({
         <Provider store={store}>
           <Nav />
           <div className="flex-fill h-100 p-2">
-            <div className="d-flex flex-row align-items-center">
-              <SearchBar />
+            <div className="d-flex flex-row-reverse">
+              {/* <SearchBar /> */}
               <NotificationsBox />
             </div>
             {children}

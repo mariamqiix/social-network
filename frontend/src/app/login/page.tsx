@@ -11,6 +11,10 @@ const color = colors[0];
 export default function loginPage() {
     const user = useSelector(selectUser);
 
+    if (user != null) {
+        location.replace("/");
+    }
+
     function login(formData: FormData) {
         console.log(formData);
         fetch("http://localhost:8080/login",

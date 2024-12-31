@@ -13,13 +13,13 @@ import { selectUser } from "../../redux/selectors";
 
 export default function page(params: any) {
     let id = Number.parseInt(params.params.id) ?? 1;
-    // console.log(id);
+    console.log(id);
     const user = useSelector(selectUser);
     const [profileData, setProfileData] = useState<any>();
     const dispatch = useDispatch();
     const [activeTab, setActiveTab] = useState('Posts');
 
-    var [posts, setposts] = useState<Post[]>([]);
+    var [posts, setPosts] = useState<Post[]>([]);
     var [follows, setFollows] = useState([]);
     var [isActive, setIsActive] = useState(false);
 
@@ -41,11 +41,11 @@ export default function page(params: any) {
     const handleTabClick = (tabName: string) => {
         switch (tabName) {
             case 'Posts':
-                setposts(profileData?.user_posts)
+                setPosts(profileData?.user_posts)
                 break;
 
             case 'LikedPosts':
-                setposts(profileData?.user_Liked_posts)
+                setPosts(profileData?.user_Liked_posts)
                 break;
 
             case 'Followers':
@@ -57,7 +57,7 @@ export default function page(params: any) {
                 break;
 
             default:
-                setposts([])
+                setPosts([])
                 setFollows([])
                 break;
         }
@@ -114,18 +114,18 @@ export default function page(params: any) {
 
     return (
         <div className="Container">
-            <Metadata seoTitle={"Friendz | " + profileData?.user.username} seoDescription="The next gen social network" />
+            <Metadata seoTitle={"Friendz | " + (profileData?.user?.username ?? "")} seoDescription="The next gen social network" />
             {/* Profile Header */}
             <div className="ProfilePageHeader">
                 <div className="profile-info">
                     <img
-                        src={`data:image/jpeg;base64,${profileData?.user.image_url}`} alt={profileData?.user.username}
+                        src={(profileData != undefined && profileData.user != undefined && profileData.user.image_url != undefined) ? `data:image/jpeg;base64,${profileData?.user?.image_url}` : ""} alt={profileData?.user?.username ?? ""}
                         className="profile-avatar"
                     />
 
                     {profileData != null && (
                         <div className="profile-details">
-                            <h1 className="profile-name">{profileData?.user.first_name} {profileData?.user.last_name} ({profileData?.user.username})</h1>
+                            <h1 className="profile-name">{profileData?.user?.first_name ?? ""} {profileData?.user?.last_name ?? ""} ({profileData?.user?.username ?? ""})</h1>
                             {isActive && (
                                 <div>
                                     <p className="profile-desc">{profileData?.user.bio}</p>

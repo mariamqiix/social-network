@@ -19,11 +19,7 @@ export default function NotificationsBox() {
             });
         });
     }, [getNotifications]);
-    const [notificationCount, setNotificationCount] = useState(notifications.length);
-    useEffect(() => {
-        setNotificationCount(notifications.length);
-      }, [notifications]);
-    
+
     return <div>
         <motion.button key={notifications.length} animate={{ scale: [1, 1.5, 1], transition: { duration: 0.5 } }} className="btn btn-outline-secondary transition-colors d-inline-flex align-items-center gap-2" type="button" onClick={() => {
             setIsOpen(!isOpen);
