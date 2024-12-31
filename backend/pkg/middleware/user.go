@@ -81,12 +81,14 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Print(userProfileRequest)
+
 	profileUserId := userProfileRequest.UserID
 	if userProfileRequest.UserID == -1 && sessionUser != nil {
 		profileUserId = sessionUser.ID
 	}
 
-	if profileUserId == sessionUser.ID {
+	if sessionUser != nil  && (profileUserId == sessionUser.ID)  {
 		isUserProfile = true
 	}
 

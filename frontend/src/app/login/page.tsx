@@ -160,8 +160,13 @@ export default function loginPage() {
                     className="form-control"
                     name="date_of_birth"
                     aria-describedby="dobHelp"
-                    max={new Date().toISOString().split("T")[0]} required />{/** Restrict to dates before today */}
+                    max={new Date().toISOString().split("T")[0]} 
+                    min={new Date(new Date().setFullYear(new Date().getFullYear() - 6)).toISOString().split("T")[0]} 
+                    required 
+                />
+                {/** Restrict to dates within the range 6 years ago to today */}
             </div>
+
 
             <div className="mb-3">
                 <label className="form-label">Avatar</label>
