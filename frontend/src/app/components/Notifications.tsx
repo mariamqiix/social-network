@@ -38,7 +38,6 @@ export default function NotificationsBox() {
                         <motion.div key={notification.id} exit={{ minHeight: 0, y: -20, opacity: 0, }} className="list-group-item list-group-item-action" aria-current="true">
                             <div className="d-flex w-100 justify-content-between">
                                 <h5 className="mb-1">{notification.title}</h5>
-                                {/* <small>{not.type}</small> */}
                             </div>
                             <p className="mb-1">{notification.message}</p>
                             {notification.function && (<div>

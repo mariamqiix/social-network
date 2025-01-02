@@ -1,0 +1,13 @@
+.search-container {
+  position: relative !important;
+}
+
+.search-results {
+  top: 100%; /* Position directly below the input */
+  left: 0;
+  max-height: 300px; /* Optional: limit the height */
+  overflow-y: auto; /* Add scroll if needed */
+  background: #f8f9fa; /* Light background */
+  border: 1px solid #dee2e6; /* Add border for clarity */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: shadow */
+}

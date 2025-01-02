@@ -300,6 +300,7 @@
     padding: 20px 0;
     /* Increased padding between items */
     border-bottom: 1px solid #e0e0e0;
+    text-decoration: none;
 }
 
 .member-image {
@@ -324,6 +325,7 @@
     /* Bolder font for name */
     margin: 0;
     color: #333;
+    text-decoration: none;
 }
 
 .member-username {
@@ -332,6 +334,7 @@
     color: #666;
     /* Slightly darker color */
     margin: 6px 0 0 0;
+    text-decoration: none;
 }
 
 .popup {

@@ -63,7 +63,6 @@ export default function page() {
             fetch("http://localhost:8080/group/messages?id=" + chat.id, { credentials: 'include' }).then((res) => {
                 if (res.ok) {
                     res.json().then((data) => {
-                        console.log(data);
                         data.map((da: any) => ({ id: da.id, sender: { name: da.Sender.username, avatar: "data:image/jpeg;base64," + da.Sender.image_url }, created_at: da.created_at, content: da.content, image_url: "data:image/jpeg;base64," + da.image_url, type: "group", group_name: chats.find((c) => c.id == chat.id && c.type == "group")?.name })).forEach((message: ChatMessage) => {
                             dispatch(addMessage(message));
                         });;

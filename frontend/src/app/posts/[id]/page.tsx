@@ -9,6 +9,7 @@ import { Post } from "@/app/types/Types";
 import { randomColor } from '@/app/components/colors';
 import { useSelector } from 'react-redux';
 import { selectUser } from '@/app/redux/selectors';
+
 let color = randomColor();
 
 export default function Page() {

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { selectPosts, selectUser } from "../redux/selectors";
 import Link from "next/link";
+import "../../../public/search.css";
+
 type userLink = {
   id: String;
   username: String;
@@ -35,7 +37,7 @@ export default function SearchBar() {
     });
   }, [fetch]);
   return (
-    <div className="w-100 p-2">
+    <div className="search-container w-100 p-2 position-relative w-100 p-2">
       <input
         type="text"
         className="form-control"
@@ -50,14 +52,14 @@ export default function SearchBar() {
       <div
         className={
           (isOpen ? "" : "d-none ") +
-          "position-fixed z-1 p-3 w-100 text-bg-light"
+          "z-1 p-3 w-100 text-bg-light"
         }
       >
         {posts
           .filter((item) => item.content.includes(searchTerms))
           .map((item, index) => (
             <p key={index}>
-              <Link className="btn btn-link" href={"/posts/" + item.id}>
+              <Link className="btn btn-link text-decoration-none" href={"/posts/" + item.id}>
                 post: {item.content}
               </Link>
             </p>
@@ -66,7 +68,7 @@ export default function SearchBar() {
           .filter((item) => item.username.includes(searchTerms))
           .map((u) => (
             <p key={u.id + "-user"}>
-              <Link className="btn btn-link" href={"/profile/" + u.id}>
+              <Link className="btn btn-link text-decoration-none" href={"/profile/" + u.id}>
                 user: {u.username}
               </Link>
             </p>
