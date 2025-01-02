@@ -522,7 +522,11 @@ func GetPostsForUser(userId int) ([]structs.Post, error) {
 }
 
 func ProfilePagePosts(userId, FollowerID int) ([]structs.Post, error) {
-	query := `
+	query := ""
+	if userId == FollowerID {
+		query = "SELECT * FROM Post WHERE user_id = ?"
+	} else {
+		query = `
 		SELECT * FROM Post WHERE user_id = ? AND privacy = 'Public' AND group_id is NULL AND parent_id is NULL
         UNION
         SELECT * FROM Post WHERE user_id = ? AND privacy = 'Almost' 
@@ -534,6 +538,7 @@ func ProfilePagePosts(userId, FollowerID int) ([]structs.Post, error) {
         UNION
         SELECT * FROM Post WHERE user_id = ? AND privacy = 'Private' AND user_id IN (SELECT following_id FROM Follower WHERE follower_id = ?  AND Follower_status = 'Accepted')
     `
+	}
 	rows, err := db.Database.Query(query, userId, userId, FollowerID, userId, FollowerID)
 	if err != nil {
 		return nil, fmt.Errorf("error executing query: %v", err)

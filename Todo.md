@@ -1,7 +1,5 @@
 - likes in profile not working
-- private and almost private posts not showing in profile 
-- options must be shown in events so users choose an option (and can change the option)
-- not registered user can see groups & their details?
+- private and almost private posts not showing in profile
 - add groups to search
 
 EXTRA?

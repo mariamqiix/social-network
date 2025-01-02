@@ -91,7 +91,6 @@ func ProfilePageHandler(w http.ResponseWriter, r *http.Request) {
 	if sessionUser != nil  && (profileUserId == sessionUser.ID)  {
 		isUserProfile = true
 	}
-
 	userProfile, err := models.GetUserByID(profileUserId)
 	if err != nil {
 		fmt.Print("wef")
